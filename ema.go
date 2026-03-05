@@ -1,0 +1,71 @@
+package talive
+
+import "fmt"
+
+type EMA struct {
+	Period       int
+	Alpha        float64
+	valuesNumber int
+	prevEma      float64
+	out          []float64
+}
+
+func NewEMA(period int) (MA, error) {
+	if period < 2 {
+		return nil, fmt.Errorf("period should be greater than 1")
+	}
+	return &EMA{
+		Period:       period,
+		Alpha:        2.0 / float64(period+1),
+		valuesNumber: 0,
+		prevEma:      0.0,
+		out:          make([]float64, 1),
+	}, nil
+}
+
+func (ema *EMA) next(value float64) float64 {
+	ema.valuesNumber++
+	if ema.IsIdle() {
+		// first EMA value = avg of close prices. We need to save them
+		ema.prevEma += value
+		return 0.0
+	}
+	if ema.valuesNumber == ema.Period {
+		ema.prevEma = (ema.prevEma + value) / float64(ema.Period)
+		return ema.prevEma
+	}
+
+	currentEma := value*ema.Alpha + ema.prevEma*(1-ema.Alpha)
+	ema.prevEma = currentEma
+	return currentEma
+}
+
+func (ema *EMA) current(value float64) float64 {
+	ema.valuesNumber++
+	if ema.IsIdle() {
+		ema.valuesNumber--
+		return 0.0
+	}
+	if ema.valuesNumber == ema.Period {
+		result := (ema.prevEma + value) / float64(ema.Period)
+		ema.valuesNumber--
+		return result
+	}
+	result := value*ema.Alpha + ema.prevEma*(1-ema.Alpha)
+	ema.valuesNumber--
+	return result
+}
+
+func (ema *EMA) Next(candle ICandle) []float64 {
+	ema.out[0] = ema.next(candle.Close())
+	return ema.out
+}
+
+func (ema *EMA) Current(candle ICandle) []float64 {
+	ema.out[0] = ema.current(candle.Close())
+	return ema.out
+}
+
+func (ema *EMA) IsIdle() bool {
+	return ema.valuesNumber < ema.Period
+}
