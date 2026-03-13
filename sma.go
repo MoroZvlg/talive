@@ -55,3 +55,15 @@ func (sma *SMA) Current(candle ICandle) []float64 {
 func (sma *SMA) IsIdle() bool {
 	return sma.valueNumber < sma.Period
 }
+
+func (sma *SMA) IdlePeriod() uint {
+	return uint(sma.Period - 1)
+}
+
+func (sma *SMA) IsWarmedUp() bool {
+	return !sma.IsIdle()
+}
+
+func (sma *SMA) WarmUpPeriod() uint {
+	return sma.IdlePeriod()
+}

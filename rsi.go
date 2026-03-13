@@ -104,3 +104,15 @@ func (rsi *RSI) Current(candle ICandle) []float64 {
 func (rsi *RSI) IsIdle() bool {
 	return rsi.valueNumber <= rsi.Period
 }
+
+func (rsi *RSI) IsWarmedUp() bool {
+	return rsi.valueNumber > int(rsi.WarmUpPeriod())
+}
+
+func (rsi *RSI) IdlePeriod() uint {
+	return uint(rsi.Period)
+}
+
+func (rsi *RSI) WarmUpPeriod() uint {
+	return rsi.IdlePeriod() + uint(rsi.Period*6)
+}

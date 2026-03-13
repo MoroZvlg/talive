@@ -74,3 +74,15 @@ func (bb *BBands) Current(candle ICandle) []float64 {
 func (bb *BBands) IsIdle() bool {
 	return bb.ma.IsIdle()
 }
+
+func (bb *BBands) IdlePeriod() uint {
+	return bb.ma.IdlePeriod()
+}
+
+func (bb *BBands) IsWarmedUp() bool {
+	return bb.ma.IsWarmedUp()
+}
+
+func (bb *BBands) WarmUpPeriod() uint {
+	return bb.ma.WarmUpPeriod()
+}
