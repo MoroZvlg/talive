@@ -47,6 +47,18 @@ func (stdDev *StdDev) IsIdle() bool {
 	return stdDev.variance.IsIdle()
 }
 
+func (stdDev *StdDev) IdlePeriod() uint {
+	return stdDev.variance.IdlePeriod()
+}
+
+func (stdDev *StdDev) IsWarmedUp() bool {
+	return !stdDev.IsIdle()
+}
+
+func (stdDev *StdDev) WarmUpPeriod() uint {
+	return stdDev.IdlePeriod()
+}
+
 type Variance struct {
 	valueNumber     int
 	period          int
@@ -103,4 +115,16 @@ func (variance *Variance) Current(candle ICandle) []float64 {
 
 func (variance *Variance) IsIdle() bool {
 	return variance.valueNumber < variance.period
+}
+
+func (variance *Variance) IdlePeriod() uint {
+	return uint(variance.period - 1)
+}
+
+func (variance *Variance) IsWarmedUp() bool {
+	return !variance.IsIdle()
+}
+
+func (variance *Variance) WarmUpPeriod() uint {
+	return variance.IdlePeriod()
 }

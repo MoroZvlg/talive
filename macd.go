@@ -6,6 +6,7 @@ type MACD struct {
 	FastPeriod   int
 	SlowPeriod   int
 	SignalPeriod int
+	valueNumber  int
 	fastEMA      MA
 	slowEMA      MA
 	signalEMA    MA
@@ -36,6 +37,7 @@ func NewMACD(fastPeriod int, slowPeriod int, signalPeriod int) (*MACD, error) {
 }
 
 func (macd *MACD) Next(candle ICandle) []float64 {
+	macd.valueNumber++
 	value := candle.Close()
 	outMACD := macd.fastEMA.next(value) - macd.slowEMA.next(value)
 
@@ -87,4 +89,16 @@ func (macd *MACD) Current(candle ICandle) []float64 {
 
 func (macd *MACD) IsIdle() bool {
 	return macd.signalEMA.IsIdle()
+}
+
+func (macd *MACD) IdlePeriod() uint {
+	return macd.slowEMA.IdlePeriod() + macd.signalEMA.IdlePeriod()
+}
+
+func (macd *MACD) IsWarmedUp() bool {
+	return macd.valueNumber > int(macd.WarmUpPeriod())
+}
+
+func (macd *MACD) WarmUpPeriod() uint {
+	return macd.IdlePeriod() + uint(macd.SlowPeriod*6)
 }

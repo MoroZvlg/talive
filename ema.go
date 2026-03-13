@@ -69,3 +69,15 @@ func (ema *EMA) Current(candle ICandle) []float64 {
 func (ema *EMA) IsIdle() bool {
 	return ema.valuesNumber < ema.Period
 }
+
+func (ema *EMA) IdlePeriod() uint {
+	return uint(ema.Period - 1)
+}
+
+func (ema *EMA) IsWarmedUp() bool {
+	return ema.valuesNumber > int(ema.WarmUpPeriod())
+}
+
+func (ema *EMA) WarmUpPeriod() uint {
+	return ema.IdlePeriod() + uint(ema.Period*2)
+}

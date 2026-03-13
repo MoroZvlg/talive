@@ -82,3 +82,15 @@ func (mfi *MFI) Current(candle ICandle) []float64 {
 func (mfi *MFI) IsIdle() bool {
 	return mfi.valueNumber <= mfi.Period
 }
+
+func (mfi *MFI) IdlePeriod() uint {
+	return uint(mfi.Period)
+}
+
+func (mfi *MFI) IsWarmedUp() bool {
+	return !mfi.IsIdle()
+}
+
+func (mfi *MFI) WarmUpPeriod() uint {
+	return mfi.IdlePeriod()
+}
