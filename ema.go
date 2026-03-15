@@ -2,6 +2,7 @@ package talive
 
 import "fmt"
 
+// EMA is an Exponential Moving Average indicator.
 type EMA struct {
 	Period       int
 	Alpha        float64
@@ -10,6 +11,7 @@ type EMA struct {
 	out          []float64
 }
 
+// NewEMA creates a new EMA indicator with the given period.
 func NewEMA(period int) (MA, error) {
 	if period < 2 {
 		return nil, fmt.Errorf("period should be greater than 1")
@@ -70,14 +72,14 @@ func (ema *EMA) IsIdle() bool {
 	return ema.valuesNumber < ema.Period
 }
 
-func (ema *EMA) IdlePeriod() uint {
-	return uint(ema.Period - 1)
+func (ema *EMA) IdlePeriod() int {
+	return ema.Period - 1
 }
 
 func (ema *EMA) IsWarmedUp() bool {
-	return ema.valuesNumber > int(ema.WarmUpPeriod())
+	return ema.valuesNumber > ema.WarmUpPeriod()
 }
 
-func (ema *EMA) WarmUpPeriod() uint {
-	return ema.IdlePeriod() + uint(ema.Period*2)
+func (ema *EMA) WarmUpPeriod() int {
+	return ema.IdlePeriod() + ema.Period*2
 }

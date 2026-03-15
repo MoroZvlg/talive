@@ -4,6 +4,7 @@ import (
 	"fmt"
 )
 
+// RSI is a Relative Strength Index indicator.
 type RSI struct {
 	Period      int
 	valueNumber int
@@ -13,6 +14,7 @@ type RSI struct {
 	out         []float64
 }
 
+// NewRSI creates a new RSI indicator with the given period.
 func NewRSI(period int) (*RSI, error) {
 	if period < 2 {
 		return nil, fmt.Errorf("period should be greater than 1")
@@ -51,8 +53,7 @@ func (rsi *RSI) Next(candle ICandle) []float64 {
 	} else {
 		loss = change
 	}
-	avgGain := 0.0
-	avgLoss := 0.0
+	var avgGain, avgLoss float64
 
 	if rsi.IsIdle() {
 		prevGain := rsi.prevAvgGain * float64(rsi.valueNumber-2)
@@ -106,13 +107,13 @@ func (rsi *RSI) IsIdle() bool {
 }
 
 func (rsi *RSI) IsWarmedUp() bool {
-	return rsi.valueNumber > int(rsi.WarmUpPeriod())
+	return rsi.valueNumber > rsi.WarmUpPeriod()
 }
 
-func (rsi *RSI) IdlePeriod() uint {
-	return uint(rsi.Period)
+func (rsi *RSI) IdlePeriod() int {
+	return rsi.Period
 }
 
-func (rsi *RSI) WarmUpPeriod() uint {
-	return rsi.IdlePeriod() + uint(rsi.Period*6)
+func (rsi *RSI) WarmUpPeriod() int {
+	return rsi.IdlePeriod() + rsi.Period*6
 }

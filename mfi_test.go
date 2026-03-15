@@ -1,9 +1,10 @@
 package talive_test
 
 import (
-	"github.com/MoroZvlg/talive"
 	"reflect"
 	"testing"
+
+	"github.com/MoroZvlg/talive"
 )
 
 // NOTE: My source of TA results data calculates value with Idx = Period-1.
@@ -11,8 +12,8 @@ import (
 // Most of the open source libraries that I saw also counts it as an Idle value.
 // except this case all other results are matched.
 func TestMfiDefault(t *testing.T) {
-	candles, _ := extractCandles("test_data/input_data.csv")
-	expectedParsedData, _ := extractData("test_data/mfi/output_default.csv", []int{1}, 8)
+	candles, _ := readCandles()
+	expectedParsedData, _ := readData("test_data/mfi/output_default.csv", []int{1}, 8)
 	indicator, _ := talive.NewMFI(14)
 	result := make([]float64, len(candles))
 	for i, candle := range candles {
@@ -25,8 +26,8 @@ func TestMfiDefault(t *testing.T) {
 }
 
 func TestMfiMin(t *testing.T) {
-	candles, _ := extractCandles("test_data/input_data.csv")
-	expectedParsedData, _ := extractData("test_data/mfi/output_min.csv", []int{1}, 8)
+	candles, _ := readCandles()
+	expectedParsedData, _ := readData("test_data/mfi/output_min.csv", []int{1}, 8)
 	indicator, _ := talive.NewMFI(2)
 	result := make([]float64, len(candles))
 	for i, candle := range candles {
@@ -60,8 +61,8 @@ func TestMfiIdle(t *testing.T) {
 }
 
 func TestMfiCurrentValue(t *testing.T) {
-	candles, _ := extractCandles("test_data/input_data.csv")
-	expectedParsedData, _ := extractData("test_data/mfi/output_default.csv", []int{1}, 8)
+	candles, _ := readCandles()
+	expectedParsedData, _ := readData("test_data/mfi/output_default.csv", []int{1}, 8)
 	indicator, _ := talive.NewMFI(14)
 	for i := 0; i < 15; i++ {
 		indicator.Next(candles[i])
@@ -98,7 +99,7 @@ func Benchmark_Mfi_Init_Allocations(benchmark *testing.B) {
 }
 
 func Benchmark_Mfi_Next_Allocations(benchmark *testing.B) {
-	candles, _ := extractCandles("test_data/input_data.csv")
+	candles, _ := readCandles()
 	dataLen := len(candles)
 	benchmark.Run("MFI 2", func(benchmark *testing.B) {
 		indicator, _ := talive.NewMFI(2)
@@ -130,7 +131,7 @@ func Benchmark_Mfi_Next_Allocations(benchmark *testing.B) {
 }
 
 func Benchmark_Mfi_Current_Allocations(benchmark *testing.B) {
-	candles, _ := extractCandles("test_data/input_data.csv")
+	candles, _ := readCandles()
 	dataLen := len(candles)
 	benchmark.Run("MFI 2", func(benchmark *testing.B) {
 		indicator, _ := talive.NewMFI(2)

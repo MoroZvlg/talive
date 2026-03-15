@@ -18,9 +18,8 @@ func roundFloat(number float64, decimals int) float64 {
 func limitedDataIndex(dataIndex int, dataLen int) int {
 	if dataIndex >= dataLen-1 {
 		return 0
-	} else {
-		return dataIndex + 1
 	}
+	return dataIndex + 1
 }
 
 func difference(leftSlice, rightSlice []float64) map[int][]float64 {
@@ -38,8 +37,8 @@ func difference(leftSlice, rightSlice []float64) map[int][]float64 {
 	return result
 }
 
-func extractCandles(filePath string) ([]*testCandle, error) {
-	file, err := os.Open(filePath)
+func readCandles() ([]*testCandle, error) {
+	file, err := os.Open("test_data/input_data.csv")
 	if err != nil {
 		return nil, err
 	}
@@ -57,14 +56,14 @@ func extractCandles(filePath string) ([]*testCandle, error) {
 		open, _ := strconv.ParseFloat(record[1], 64)
 		high, _ := strconv.ParseFloat(record[2], 64)
 		low, _ := strconv.ParseFloat(record[3], 64)
-		close, _ := strconv.ParseFloat(record[4], 64)
+		closeV, _ := strconv.ParseFloat(record[4], 64)
 		volume, _ := strconv.ParseFloat(record[5], 64)
-		result = append(result, &testCandle{open: open, high: high, low: low, close: close, volume: volume})
+		result = append(result, &testCandle{open: open, high: high, low: low, close: closeV, volume: volume})
 	}
 	return result, nil
 }
 
-func extractData(filePath string, columnsIdx []int, roundDecimals int) ([][]float64, error) {
+func readData(filePath string, columnsIdx []int, roundDecimals int) ([][]float64, error) {
 	file, err := os.Open(filePath)
 	if err != nil {
 		return nil, err

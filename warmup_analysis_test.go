@@ -75,7 +75,7 @@ func errorCount(candles []*testCandle, refTail [][]float64, factory indicatorFac
 
 func runWarmUpAnalysis(t *testing.T, name string, factory indicatorFactory, params []int, multipliers []int) {
 	t.Helper()
-	candles, err := extractCandles("test_data/input_data.csv")
+	candles, err := readCandles()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -169,7 +169,7 @@ func periods2to99() []int {
 func Test_WarmUpAnalyze_RSI(t *testing.T) {
 	factory := func(period int) (func(c *testCandle) []float64, int, int) {
 		ind, _ := talive.NewRSI(period)
-		return func(c *testCandle) []float64 { return ind.Next(c) }, 1, int(ind.IdlePeriod())
+		return func(c *testCandle) []float64 { return ind.Next(c) }, 1, ind.IdlePeriod()
 	}
 	runWarmUpAnalysis(t, "RSI", factory, periods2to99(), []int{4, 5, 6, 7, 8})
 }
@@ -181,7 +181,7 @@ func Test_WarmUpAnalyze_RSI(t *testing.T) {
 func Test_WarmUpAnalyze_EMA(t *testing.T) {
 	factory := func(period int) (func(c *testCandle) []float64, int, int) {
 		ind, _ := talive.NewEMA(period)
-		return func(c *testCandle) []float64 { return ind.Next(c) }, 1, int(ind.IdlePeriod())
+		return func(c *testCandle) []float64 { return ind.Next(c) }, 1, ind.IdlePeriod()
 	}
 	runWarmUpAnalysis(t, "EMA", factory, periods2to99(), []int{1, 2, 3})
 }
@@ -198,7 +198,7 @@ func Test_WarmUpAnalyze_MACD(t *testing.T) {
 		}
 		signalPeriod := 9
 		ind, _ := talive.NewMACD(fastPeriod, slowPeriod, signalPeriod)
-		return func(c *testCandle) []float64 { return ind.Next(c) }, 3, int(ind.IdlePeriod())
+		return func(c *testCandle) []float64 { return ind.Next(c) }, 3, ind.IdlePeriod()
 	}
 	// slowPeriod from 4 to 99
 	params := make([]int, 0, 96)
@@ -215,7 +215,7 @@ func Test_WarmUpAnalyze_MACD(t *testing.T) {
 func Test_WarmUpAnalyze_BBands_EMA(t *testing.T) {
 	factory := func(period int) (func(c *testCandle) []float64, int, int) {
 		ind, _ := talive.NewBBands(period, 2.0, 2.0, talive.EMAtype)
-		return func(c *testCandle) []float64 { return ind.Next(c) }, 3, int(ind.IdlePeriod())
+		return func(c *testCandle) []float64 { return ind.Next(c) }, 3, ind.IdlePeriod()
 	}
 	runWarmUpAnalysis(t, "BBands(EMA)", factory, periods2to99(), []int{2, 3, 4, 5, 6})
 }
