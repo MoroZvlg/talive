@@ -1,5 +1,11 @@
 # talive
 
+[![CI](https://github.com/MoroZvlg/talive/actions/workflows/ci.yml/badge.svg)](https://github.com/MoroZvlg/talive/actions/workflows/ci.yml)
+[![Go Report Card](https://goreportcard.com/badge/github.com/MoroZvlg/talive)](https://goreportcard.com/report/github.com/MoroZvlg/talive)
+[![codecov](https://codecov.io/gh/MoroZvlg/talive/branch/main/graph/badge.svg)](https://codecov.io/gh/MoroZvlg/talive)
+[![Go Reference](https://pkg.go.dev/badge/github.com/MoroZvlg/talive.svg)](https://pkg.go.dev/github.com/MoroZvlg/talive)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
 Streaming technical analysis indicators for Go — zero-allocation, bar-by-bar.
 
 Unlike batch TA libraries (ta-lib, go-talib) that recalculate over a full history slice on every update, `talive` maintains running state so each new candle costs **O(1)** regardless of history length. Built for live market feeds, algo trading bots, and any latency-sensitive system.
