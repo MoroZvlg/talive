@@ -1,9 +1,10 @@
 package talive_test
 
 import (
-	"github.com/MoroZvlg/talive"
 	"reflect"
 	"testing"
+
+	"github.com/MoroZvlg/talive"
 )
 
 func TestStdDev(t *testing.T) {

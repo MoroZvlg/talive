@@ -1,5 +1,6 @@
 package talive
 
+// BBands is a Bollinger Bands indicator.
 type BBands struct {
 	Period         int
 	DevUp, DevDown float64
@@ -10,6 +11,7 @@ type BBands struct {
 	out            []float64
 }
 
+// NewBBands creates a new Bollinger Bands indicator with the given parameters.
 func NewBBands(period int, devUp, devDown float64, maType MaType) (*BBands, error) {
 	ma, err := NewMa(period, maType)
 	if err != nil {
@@ -75,7 +77,7 @@ func (bb *BBands) IsIdle() bool {
 	return bb.ma.IsIdle()
 }
 
-func (bb *BBands) IdlePeriod() uint {
+func (bb *BBands) IdlePeriod() int {
 	return bb.ma.IdlePeriod()
 }
 
@@ -83,6 +85,6 @@ func (bb *BBands) IsWarmedUp() bool {
 	return bb.ma.IsWarmedUp()
 }
 
-func (bb *BBands) WarmUpPeriod() uint {
+func (bb *BBands) WarmUpPeriod() int {
 	return bb.ma.WarmUpPeriod()
 }

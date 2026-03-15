@@ -2,6 +2,7 @@ package talive
 
 import "fmt"
 
+// MACD is a Moving Average Convergence Divergence indicator.
 type MACD struct {
 	FastPeriod   int
 	SlowPeriod   int
@@ -13,6 +14,7 @@ type MACD struct {
 	out          []float64
 }
 
+// NewMACD creates a new MACD indicator with the given periods.
 func NewMACD(fastPeriod int, slowPeriod int, signalPeriod int) (*MACD, error) {
 	if fastPeriod < 2 || slowPeriod < 2 || signalPeriod < 2 {
 		return nil, fmt.Errorf("fastPeriod, slowPeriod, signalPeriod should be greater than 1")
@@ -21,7 +23,7 @@ func NewMACD(fastPeriod int, slowPeriod int, signalPeriod int) (*MACD, error) {
 	slowEMA, errSlow := NewEMA(slowPeriod)
 	signalEMA, errSignal := NewEMA(signalPeriod)
 	if errFast != nil || errSlow != nil || errSignal != nil {
-		return nil, fmt.Errorf("error creating EMA: fast: %v, slow: %v, signal: %v", errFast, errSlow, errSignal)
+		return nil, fmt.Errorf("error creating EMA: fast: %w, slow: %w, signal: %w", errFast, errSlow, errSignal)
 	}
 
 	return &MACD{
@@ -91,14 +93,14 @@ func (macd *MACD) IsIdle() bool {
 	return macd.signalEMA.IsIdle()
 }
 
-func (macd *MACD) IdlePeriod() uint {
+func (macd *MACD) IdlePeriod() int {
 	return macd.slowEMA.IdlePeriod() + macd.signalEMA.IdlePeriod()
 }
 
 func (macd *MACD) IsWarmedUp() bool {
-	return macd.valueNumber > int(macd.WarmUpPeriod())
+	return macd.valueNumber > macd.WarmUpPeriod()
 }
 
-func (macd *MACD) WarmUpPeriod() uint {
-	return macd.IdlePeriod() + uint(macd.SlowPeriod*6)
+func (macd *MACD) WarmUpPeriod() int {
+	return macd.IdlePeriod() + macd.SlowPeriod*6
 }

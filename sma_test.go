@@ -1,14 +1,15 @@
 package talive_test
 
 import (
-	"github.com/MoroZvlg/talive"
 	"reflect"
 	"testing"
+
+	"github.com/MoroZvlg/talive"
 )
 
 func TestSmaDefault(t *testing.T) {
-	candles, _ := extractCandles("test_data/input_data.csv")
-	expectedParsedData, _ := extractData("test_data/sma/output_default.csv", []int{1}, 8)
+	candles, _ := readCandles()
+	expectedParsedData, _ := readData("test_data/sma/output_default.csv", []int{1}, 8)
 	indicator, _ := talive.NewSMA(9)
 	result := make([]float64, len(candles))
 	for i, candle := range candles {
@@ -20,8 +21,8 @@ func TestSmaDefault(t *testing.T) {
 }
 
 func TestSmaMin(t *testing.T) {
-	candles, _ := extractCandles("test_data/input_data.csv")
-	expectedParsedData, _ := extractData("test_data/sma/output_min.csv", []int{1}, 8)
+	candles, _ := readCandles()
+	expectedParsedData, _ := readData("test_data/sma/output_min.csv", []int{1}, 8)
 	indicator, _ := talive.NewSMA(2)
 	result := make([]float64, len(candles))
 	for i, candle := range candles {
@@ -49,8 +50,8 @@ func TestSmaIdle(t *testing.T) {
 }
 
 func TestSmaCurrentValue(t *testing.T) {
-	candles, _ := extractCandles("test_data/input_data.csv")
-	expectedParsedData, _ := extractData("test_data/sma/output_default.csv", []int{1}, 8)
+	candles, _ := readCandles()
+	expectedParsedData, _ := readData("test_data/sma/output_default.csv", []int{1}, 8)
 	indicator, _ := talive.NewSMA(9)
 	for i := 0; i < 9; i++ {
 		indicator.Next(candles[i])
@@ -92,7 +93,7 @@ func Benchmark_Sma_Init_Allocations(benchmark *testing.B) {
 }
 
 func Benchmark_Sma_Next_Allocations(benchmark *testing.B) {
-	candles, _ := extractCandles("test_data/input_data.csv")
+	candles, _ := readCandles()
 	dataLen := len(candles)
 	benchmark.Run("SMA 2", func(benchmark *testing.B) {
 		indicator, _ := talive.NewSMA(2)
@@ -133,7 +134,7 @@ func Benchmark_Sma_Next_Allocations(benchmark *testing.B) {
 }
 
 func Benchmark_Sma_Current_Allocations(benchmark *testing.B) {
-	candles, _ := extractCandles("test_data/input_data.csv")
+	candles, _ := readCandles()
 	dataLen := len(candles)
 	benchmark.Run("SMA 2", func(benchmark *testing.B) {
 		indicator, _ := talive.NewSMA(2)

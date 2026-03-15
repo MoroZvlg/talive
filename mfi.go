@@ -2,6 +2,7 @@ package talive
 
 import "fmt"
 
+// MFI is a Money Flow Index indicator.
 type MFI struct {
 	Period           int
 	valueNumber      int
@@ -11,6 +12,7 @@ type MFI struct {
 	out              []float64
 }
 
+// NewMFI creates a new MFI indicator with the given period.
 func NewMFI(period int) (*MFI, error) {
 	if period < 2 {
 		return nil, fmt.Errorf("period should be greater than 1")
@@ -26,9 +28,9 @@ func NewMFI(period int) (*MFI, error) {
 }
 
 func (mfi *MFI) Next(candle ICandle) []float64 {
-	high, low, close, volume := candle.High(), candle.Low(), candle.Close(), candle.Volume()
+	high, low, closeV, volume := candle.High(), candle.Low(), candle.Close(), candle.Volume()
 	mfi.valueNumber++
-	typicalPrice := (high + low + close) / 3.0
+	typicalPrice := (high + low + closeV) / 3.0
 	if mfi.valueNumber == 1 {
 		mfi.prevTypicalPrice = typicalPrice
 		mfi.out[0] = 0.0
@@ -56,7 +58,7 @@ func (mfi *MFI) Next(candle ICandle) []float64 {
 }
 
 func (mfi *MFI) Current(candle ICandle) []float64 {
-	high, low, close, volume := candle.High(), candle.Low(), candle.Close(), candle.Volume()
+	high, low, closeV, volume := candle.High(), candle.Low(), candle.Close(), candle.Volume()
 	mfi.valueNumber++
 	if mfi.IsIdle() {
 		mfi.valueNumber--
@@ -66,7 +68,7 @@ func (mfi *MFI) Current(candle ICandle) []float64 {
 
 	positiveMf := 0.0
 	negativeMf := 0.0
-	typicalPrice := (high + low + close) / 3.0
+	typicalPrice := (high + low + closeV) / 3.0
 	if typicalPrice-mfi.prevTypicalPrice > 0.0 {
 		positiveMf = typicalPrice * volume
 	} else {
@@ -83,14 +85,14 @@ func (mfi *MFI) IsIdle() bool {
 	return mfi.valueNumber <= mfi.Period
 }
 
-func (mfi *MFI) IdlePeriod() uint {
-	return uint(mfi.Period)
+func (mfi *MFI) IdlePeriod() int {
+	return mfi.Period
 }
 
 func (mfi *MFI) IsWarmedUp() bool {
 	return !mfi.IsIdle()
 }
 
-func (mfi *MFI) WarmUpPeriod() uint {
+func (mfi *MFI) WarmUpPeriod() int {
 	return mfi.IdlePeriod()
 }

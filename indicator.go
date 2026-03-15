@@ -1,5 +1,7 @@
+// Package talive provides streaming technical analysis indicators with zero allocations.
 package talive
 
+// ICandle represents a single candlestick (OHLCV) data point.
 type ICandle interface {
 	Open() float64
 	High() float64
@@ -24,7 +26,7 @@ type IIndicator interface {
 
 	// IdlePeriod returns the number of candles that must be fed before the indicator
 	// starts producing non-zero output.
-	IdlePeriod() uint
+	IdlePeriod() int
 
 	// IsWarmedUp returns true when the indicator has received enough candles
 	// for its output to be considered reliable. This requires more candles than
@@ -36,5 +38,5 @@ type IIndicator interface {
 
 	// WarmUpPeriod returns the total number of candles that must be fed before
 	// the indicator output is reliable. This value always includes IdlePeriod.
-	WarmUpPeriod() uint
+	WarmUpPeriod() int
 }

@@ -4,6 +4,7 @@ import (
 	"fmt"
 )
 
+// SMA is a Simple Moving Average indicator.
 type SMA struct {
 	Period      int
 	valueNumber int
@@ -11,6 +12,7 @@ type SMA struct {
 	out         []float64
 }
 
+// NewSMA creates a new SMA indicator with the given period.
 func NewSMA(period int) (MA, error) {
 	if period < 2 {
 		return nil, fmt.Errorf("period should be greater than 1")
@@ -56,14 +58,14 @@ func (sma *SMA) IsIdle() bool {
 	return sma.valueNumber < sma.Period
 }
 
-func (sma *SMA) IdlePeriod() uint {
-	return uint(sma.Period - 1)
+func (sma *SMA) IdlePeriod() int {
+	return sma.Period - 1
 }
 
 func (sma *SMA) IsWarmedUp() bool {
 	return !sma.IsIdle()
 }
 
-func (sma *SMA) WarmUpPeriod() uint {
+func (sma *SMA) WarmUpPeriod() int {
 	return sma.IdlePeriod()
 }

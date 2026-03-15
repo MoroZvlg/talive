@@ -2,6 +2,7 @@ package talive
 
 import "math"
 
+// StdDev is a Standard Deviation indicator.
 type StdDev struct {
 	period    int
 	deviation float64
@@ -9,6 +10,7 @@ type StdDev struct {
 	out       []float64
 }
 
+// NewStdDev creates a new Standard Deviation indicator.
 func NewStdDev(period int, deviation float64) (*StdDev, error) {
 	// TODO: add validations
 	variance, err := NewVariance(period)
@@ -47,7 +49,7 @@ func (stdDev *StdDev) IsIdle() bool {
 	return stdDev.variance.IsIdle()
 }
 
-func (stdDev *StdDev) IdlePeriod() uint {
+func (stdDev *StdDev) IdlePeriod() int {
 	return stdDev.variance.IdlePeriod()
 }
 
@@ -55,10 +57,11 @@ func (stdDev *StdDev) IsWarmedUp() bool {
 	return !stdDev.IsIdle()
 }
 
-func (stdDev *StdDev) WarmUpPeriod() uint {
+func (stdDev *StdDev) WarmUpPeriod() int {
 	return stdDev.IdlePeriod()
 }
 
+// Variance is a Variance indicator.
 type Variance struct {
 	valueNumber     int
 	period          int
@@ -67,6 +70,7 @@ type Variance struct {
 	out             []float64
 }
 
+// NewVariance creates a new Variance indicator with the given period.
 func NewVariance(period int) (*Variance, error) {
 	// TODO: add validations
 	return &Variance{
@@ -117,14 +121,14 @@ func (variance *Variance) IsIdle() bool {
 	return variance.valueNumber < variance.period
 }
 
-func (variance *Variance) IdlePeriod() uint {
-	return uint(variance.period - 1)
+func (variance *Variance) IdlePeriod() int {
+	return variance.period - 1
 }
 
 func (variance *Variance) IsWarmedUp() bool {
 	return !variance.IsIdle()
 }
 
-func (variance *Variance) WarmUpPeriod() uint {
+func (variance *Variance) WarmUpPeriod() int {
 	return variance.IdlePeriod()
 }
