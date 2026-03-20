@@ -2,11 +2,10 @@ package worker
 
 import (
 	"context"
-	"fmt"
 	"log/slog"
-	"math/rand/v2"
 	"screener/binance"
 	"screener/domain/entity"
+	"screener/signal"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -20,7 +19,7 @@ type ScreenerWorker struct {
 	ctx               context.Context
 	ready             atomic.Bool
 	Symbol            string
-	Indicators        []talive.IIndicator
+	Screener          *Screener
 	httpClient        *binance.HTTPClient
 	wsLoadingBuffer   []entity.Kline
 	lastProcessedTime time.Time
@@ -38,7 +37,7 @@ func NewScreenerWorker(
 		ctx:             ctx,
 		PID:             pid,
 		Symbol:          symbol,
-		Indicators:      GenerateRandomIndicators(),
+		Screener:        NewScreener(),
 		httpClient:      client,
 		wsLoadingBuffer: make([]entity.Kline, 0),
 	}
@@ -73,13 +72,7 @@ func (w *ScreenerWorker) Start(klineCh <-chan entity.Kline, wg *sync.WaitGroup) 
 }
 
 func (w *ScreenerWorker) fetchKlinesHistory() {
-	var maxWarmUp int
-	for _, i := range w.Indicators {
-		if i.WarmUpPeriod() > maxWarmUp {
-			maxWarmUp = i.WarmUpPeriod()
-		}
-	}
-	klines, err := w.httpClient.LastKlines(w.ctx, w.Symbol, maxWarmUp+1)
+	klines, err := w.httpClient.LastKlines(w.ctx, w.Symbol, w.Screener.MaxWarmUp()+1)
 	if err != nil {
 		w.log.Error("Error fetching LastKlines", "error", err)
 		// NOTE: it's ok for example to go without history. Do not return
@@ -91,40 +84,61 @@ func (w *ScreenerWorker) fetchKlinesHistory() {
 }
 
 func (w *ScreenerWorker) processKline(kline entity.Kline) {
-	for _, indicator := range w.Indicators {
-		var result []float64
-		if kline.IsClosed {
-			result = indicator.Next(&kline)
-		} else {
-			result = indicator.Current(&kline)
-		}
-		msg := fmt.Sprintf("%T", indicator)
-		w.log.Debug(msg, "result", result, "closed", kline.IsClosed)
-	}
-	w.lastProcessedTime = kline.TimeStart
 	if kline.IsClosed {
-		w.log.Info(
-			"Timings",
-			"symbols",
-			w.Symbol,
-			"receive->processed",
-			time.Since(kline.TimeReceived),
-			"closed->processed",
-			time.Since(kline.TimeStart.Add(time.Minute)),
-		)
+		result := w.Screener.Next(&kline)
+		w.log.Info("Screener result", "symbols", w.Symbol, "result", result, "receive->processed", time.Since(kline.TimeReceived))
 	} else {
-		w.log.Debug("Timings", "symbols", w.Symbol, "receive->processed", time.Since(kline.TimeReceived))
+		w.log.Debug("Do not calcualte screener on open kline", "symbol", w.Symbol)
 	}
 }
 
-func GenerateRandomIndicators() []talive.IIndicator {
-	rsi, _ := talive.NewRSI(rand.IntN(45) + 5)
-	bband, _ := talive.NewBBands(rand.IntN(28)+2, rand.Float64()*2+1, rand.Float64()*2+1, talive.SMAtype)
-	ema, _ := talive.NewEMA(rand.IntN(190) + 10)
-	sma, _ := talive.NewSMA(rand.IntN(90) + 10)
-	mfi, _ := talive.NewMFI(rand.IntN(45) + 5)
-	slow := rand.IntN(45) + 5
-	macd, _ := talive.NewMACD(slow/2, slow, 9)
+type Screener struct {
+	IndicatorsWeight map[signal.Signaler]float64
+}
 
-	return []talive.IIndicator{rsi, bband, ema, sma, mfi, macd}
+func NewScreener() *Screener {
+	signalers := make(map[signal.Signaler]float64)
+
+	// Oscillators Rating is calculated on the following oscillators:
+	//Stochastic (14, 3, 3),
+	//CCI (20),
+	//ADX (14, 14),
+	//AO,
+	//Momentum (10),
+	//Stochastic RSI (3, 3, 14, 14),
+	//Williams %R (14),
+	//Bulls and Bears Power and UO (7,14,28).
+	rsiI, _ := talive.NewRSI(14)
+	rsiSignaler := signal.NewRSISignal(rsiI)
+	signalers[rsiSignaler] = 2.0
+
+	macd, _ := talive.NewMACD(12, 26, 9)
+	macdSignaler := signal.NewMACDSignal(macd)
+	signalers[macdSignaler] = 2.0
+
+	//the Ichimoku Cloud (9, 26, 52), VWMA (20), and HullMA (9).
+	periods := []int{10, 20, 30, 50, 100, 200}
+	for _, period := range periods {
+		ma, _ := talive.NewEMA(period)
+		signaler := signal.NewMASignal(ma)
+		signalers[signaler] = 0.5
+	}
+
+	return &Screener{IndicatorsWeight: signalers}
+}
+
+func (s *Screener) Next(kline *entity.Kline) float64 {
+	result := 0.0
+	for signaler, weight := range s.IndicatorsWeight {
+		result += float64(signaler.Next(kline)) * weight
+	}
+	return result / float64(len(s.IndicatorsWeight))
+}
+
+func (s *Screener) MaxWarmUp() int {
+	result := 0
+	for signaler := range s.IndicatorsWeight {
+		result = max(result, signaler.MaxWarmUp())
+	}
+	return result
 }
