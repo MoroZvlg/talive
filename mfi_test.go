@@ -12,7 +12,7 @@ import (
 // Most of the open source libraries that I saw also counts it as an Idle value.
 // except this case all other results are matched.
 func TestMfiDefault(t *testing.T) {
-	candles, _ := readCandles()
+	candles, _ := readCandles("test_data/input_data.csv")
 	expectedParsedData, _ := readData("test_data/mfi/output_default.csv", []int{1}, 8)
 	indicator, _ := talive.NewMFI(14)
 	result := make([]float64, len(candles))
@@ -26,7 +26,7 @@ func TestMfiDefault(t *testing.T) {
 }
 
 func TestMfiMin(t *testing.T) {
-	candles, _ := readCandles()
+	candles, _ := readCandles("test_data/input_data.csv")
 	expectedParsedData, _ := readData("test_data/mfi/output_min.csv", []int{1}, 8)
 	indicator, _ := talive.NewMFI(2)
 	result := make([]float64, len(candles))
@@ -61,7 +61,7 @@ func TestMfiIdle(t *testing.T) {
 }
 
 func TestMfiCurrentValue(t *testing.T) {
-	candles, _ := readCandles()
+	candles, _ := readCandles("test_data/input_data.csv")
 	expectedParsedData, _ := readData("test_data/mfi/output_default.csv", []int{1}, 8)
 	indicator, _ := talive.NewMFI(14)
 	for i := 0; i < 15; i++ {
@@ -99,7 +99,7 @@ func Benchmark_Mfi_Init_Allocations(benchmark *testing.B) {
 }
 
 func Benchmark_Mfi_Next_Allocations(benchmark *testing.B) {
-	candles, _ := readCandles()
+	candles, _ := readCandles("test_data/input_data.csv")
 	dataLen := len(candles)
 	benchmark.Run("MFI 2", func(benchmark *testing.B) {
 		indicator, _ := talive.NewMFI(2)
@@ -131,7 +131,7 @@ func Benchmark_Mfi_Next_Allocations(benchmark *testing.B) {
 }
 
 func Benchmark_Mfi_Current_Allocations(benchmark *testing.B) {
-	candles, _ := readCandles()
+	candles, _ := readCandles("test_data/input_data.csv")
 	dataLen := len(candles)
 	benchmark.Run("MFI 2", func(benchmark *testing.B) {
 		indicator, _ := talive.NewMFI(2)

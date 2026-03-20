@@ -43,18 +43,14 @@ func (ema *EMA) next(value float64) float64 {
 }
 
 func (ema *EMA) current(value float64) float64 {
-	ema.valuesNumber++
 	if ema.IsIdle() {
-		ema.valuesNumber--
 		return 0.0
 	}
-	if ema.valuesNumber == ema.Period {
+	if ema.valuesNumber+1 == ema.Period {
 		result := (ema.prevEma + value) / float64(ema.Period)
-		ema.valuesNumber--
 		return result
 	}
 	result := value*ema.Alpha + ema.prevEma*(1-ema.Alpha)
-	ema.valuesNumber--
 	return result
 }
 

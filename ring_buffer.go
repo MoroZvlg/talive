@@ -1,6 +1,9 @@
 package talive
 
-import "fmt"
+import (
+	"fmt"
+	"math"
+)
 
 type ringBuffer struct {
 	buffer   []float64
@@ -45,4 +48,50 @@ func (buf *ringBuffer) incrWriteIdx() {
 	} else {
 		buf.writeIdx++
 	}
+}
+
+func (buf *ringBuffer) Min() float64 {
+	minV := math.Inf(1)
+	for _, el := range buf.buffer {
+		if el < minV {
+			minV = el
+		}
+	}
+	return minV
+}
+
+func (buf *ringBuffer) MinExceptLast() float64 {
+	minV := math.Inf(1)
+	for i, el := range buf.buffer {
+		if i == buf.writeIdx {
+			continue
+		}
+		if el < minV {
+			minV = el
+		}
+	}
+	return minV
+}
+
+func (buf *ringBuffer) Max() float64 {
+	maxV := math.Inf(-1)
+	for _, el := range buf.buffer {
+		if el > maxV {
+			maxV = el
+		}
+	}
+	return maxV
+}
+
+func (buf *ringBuffer) MaxExceptLast() float64 {
+	maxV := math.Inf(-1)
+	for i, el := range buf.buffer {
+		if i == buf.writeIdx {
+			continue
+		}
+		if el > maxV {
+			maxV = el
+		}
+	}
+	return maxV
 }

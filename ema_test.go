@@ -8,7 +8,7 @@ import (
 )
 
 func TestEmaDefault(t *testing.T) {
-	candles, _ := readCandles()
+	candles, _ := readCandles("test_data/input_data.csv")
 	expectedParsedData, _ := readData("test_data/ema/output_default.csv", []int{1}, 7)
 	indicator, _ := talive.NewEMA(9)
 	result := make([]float64, len(candles))
@@ -21,7 +21,7 @@ func TestEmaDefault(t *testing.T) {
 }
 
 func TestEmaMin(t *testing.T) {
-	candles, _ := readCandles()
+	candles, _ := readCandles("test_data/input_data.csv")
 	expectedParsedData, _ := readData("test_data/ema/output_min.csv", []int{1}, 8)
 	indicator, _ := talive.NewEMA(2)
 	result := make([]float64, len(candles))
@@ -50,7 +50,7 @@ func TestEmaIdle(t *testing.T) {
 }
 
 func TestEmaCurrentValue(t *testing.T) {
-	candles, _ := readCandles()
+	candles, _ := readCandles("test_data/input_data.csv")
 	expectedParsedData, _ := readData("test_data/ema/output_default.csv", []int{1}, 8)
 	indicator, _ := talive.NewEMA(9)
 	for i := 0; i < 9; i++ {
@@ -93,7 +93,7 @@ func Benchmark_Ema_Init_Allocations(benchmark *testing.B) {
 }
 
 func Benchmark_Ema_Next_Allocations(benchmark *testing.B) {
-	candles, _ := readCandles()
+	candles, _ := readCandles("test_data/input_data.csv")
 	dataLen := len(candles)
 	benchmark.Run("EMA 2", func(benchmark *testing.B) {
 		indicator, _ := talive.NewEMA(2)
@@ -134,7 +134,7 @@ func Benchmark_Ema_Next_Allocations(benchmark *testing.B) {
 }
 
 func Benchmark_Ema_Current_Allocations(benchmark *testing.B) {
-	candles, _ := readCandles()
+	candles, _ := readCandles("test_data/input_data.csv")
 	dataLen := len(candles)
 	benchmark.Run("EMA 2", func(benchmark *testing.B) {
 		indicator, _ := talive.NewEMA(2)

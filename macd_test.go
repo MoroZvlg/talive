@@ -8,7 +8,7 @@ import (
 )
 
 func TestMacdDefault(t *testing.T) {
-	candles, _ := readCandles()
+	candles, _ := readCandles("test_data/input_data.csv")
 	expectedParsedData, _ := readData("test_data/macd/output_default.csv", []int{1, 2, 3}, 7)
 	indicator, _ := talive.NewMACD(12, 26, 9)
 	result := [][]float64{
@@ -35,7 +35,7 @@ func TestMacdDefault(t *testing.T) {
 }
 
 func TestMacdMin(t *testing.T) {
-	candles, _ := readCandles()
+	candles, _ := readCandles("test_data/input_data.csv")
 	expectedParsedData, _ := readData("test_data/macd/output_min.csv", []int{1, 2, 3}, 7)
 	indicator, _ := talive.NewMACD(2, 3, 2)
 	result := [][]float64{
@@ -78,7 +78,7 @@ func TestMacdIdle(t *testing.T) {
 }
 
 func TestMacdCurrentValue(t *testing.T) {
-	candles, _ := readCandles()
+	candles, _ := readCandles("test_data/input_data.csv")
 	expectedParsedData, _ := readData("test_data/macd/output_default.csv", []int{1, 2, 3}, 7)
 	indicator, _ := talive.NewMACD(12, 26, 9)
 	for i := 0; i < 34; i++ {
@@ -137,7 +137,7 @@ func Benchmark_MACD_Init_Allocations(benchmark *testing.B) {
 }
 
 func Benchmark_MACD_Next_Allocations(benchmark *testing.B) {
-	candles, _ := readCandles()
+	candles, _ := readCandles("test_data/input_data.csv")
 	dataLen := len(candles)
 	benchmark.Run("MACD (12, 26, 9)", func(benchmark *testing.B) {
 		indicator, _ := talive.NewMACD(12, 26, 9)
@@ -169,7 +169,7 @@ func Benchmark_MACD_Next_Allocations(benchmark *testing.B) {
 }
 
 func Benchmark_MACD_Current_Allocations(benchmark *testing.B) {
-	candles, _ := readCandles()
+	candles, _ := readCandles("test_data/input_data.csv")
 	dataLen := len(candles)
 	benchmark.Run("MACD (12, 26, 9)", func(benchmark *testing.B) {
 		indicator, _ := talive.NewMACD(12, 26, 9)

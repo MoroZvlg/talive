@@ -8,7 +8,7 @@ import (
 )
 
 func TestRsiDefault(t *testing.T) {
-	candles, _ := readCandles()
+	candles, _ := readCandles("test_data/input_data.csv")
 	expectedParsedData, _ := readData("test_data/rsi/output_default.csv", []int{1}, 8)
 	indicator, _ := talive.NewRSI(14)
 	result := make([]float64, len(candles))
@@ -21,7 +21,7 @@ func TestRsiDefault(t *testing.T) {
 }
 
 func TestRsiMin(t *testing.T) {
-	candles, _ := readCandles()
+	candles, _ := readCandles("test_data/input_data.csv")
 	expectedParsedData, _ := readData("test_data/rsi/output_min.csv", []int{1}, 8)
 	indicator, _ := talive.NewRSI(2)
 	result := make([]float64, len(candles))
@@ -50,7 +50,7 @@ func TestRsiIdle(t *testing.T) {
 }
 
 func TestRsiCurrentValue(t *testing.T) {
-	candles, _ := readCandles()
+	candles, _ := readCandles("test_data/input_data.csv")
 	expectedParsedData, _ := readData("test_data/rsi/output_default.csv", []int{1}, 8)
 	indicator, _ := talive.NewRSI(14)
 	for i := 0; i < 15; i++ {
@@ -88,7 +88,7 @@ func Benchmark_Rsi_Init_Allocations(benchmark *testing.B) {
 }
 
 func Benchmark_Rsi_Next_Allocations(benchmark *testing.B) {
-	candles, _ := readCandles()
+	candles, _ := readCandles("test_data/input_data.csv")
 	dataLen := len(candles)
 	benchmark.Run("RSI 2", func(benchmark *testing.B) {
 		indicator, _ := talive.NewRSI(2)
@@ -120,7 +120,7 @@ func Benchmark_Rsi_Next_Allocations(benchmark *testing.B) {
 }
 
 func Benchmark_Rsi_Current_Allocations(benchmark *testing.B) {
-	candles, _ := readCandles()
+	candles, _ := readCandles("test_data/input_data.csv")
 	dataLen := len(candles)
 	benchmark.Run("RSI 2", func(benchmark *testing.B) {
 		indicator, _ := talive.NewRSI(2)

@@ -75,7 +75,7 @@ func errorCount(candles []*testCandle, refTail [][]float64, factory indicatorFac
 
 func runWarmUpAnalysis(t *testing.T, name string, factory indicatorFactory, params []int, multipliers []int) {
 	t.Helper()
-	candles, err := readCandles()
+	candles, err := readCandles("test_data/input_data.csv")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -206,6 +206,22 @@ func Test_WarmUpAnalyze_MACD(t *testing.T) {
 		params = append(params, i)
 	}
 	runWarmUpAnalysis(t, "MACD", factory, params, []int{5, 6, 7, 8, 9})
+}
+
+// ============================================================
+// BBands with EMA (vary period, devUp=2.0, devDown=2.0)
+// ============================================================
+
+// ============================================================
+// Stochastic (vary kLen, kSmooth=3, dSmooth=3)
+// ============================================================
+
+func Test_WarmUpAnalyze_Stochastic(t *testing.T) {
+	factory := func(kLen int) (func(c *testCandle) []float64, int, int) {
+		ind, _ := talive.NewStochastic(kLen, 3, 3)
+		return func(c *testCandle) []float64 { return ind.Next(c) }, 2, ind.IdlePeriod()
+	}
+	runWarmUpAnalysis(t, "Stochastic", factory, periods2to99(), []int{1, 2, 3, 4, 5})
 }
 
 // ============================================================
