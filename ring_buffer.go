@@ -8,7 +8,6 @@ import (
 type ringBuffer struct {
 	buffer   []float64
 	Sum      float64
-	lastElem float64
 	capacity int
 	writeIdx int
 }
@@ -25,7 +24,6 @@ func newRingBuffer(capacity int) *ringBuffer {
 	return &ringBuffer{
 		buffer:   make([]float64, capacity),
 		Sum:      0.0,
-		lastElem: 0.0,
 		capacity: capacity,
 		writeIdx: 0,
 	}
@@ -40,6 +38,10 @@ func (buf *ringBuffer) Push(el float64) {
 
 func (buf *ringBuffer) SumExceptLast() float64 {
 	return buf.Sum - buf.buffer[buf.writeIdx]
+}
+
+func (buf *ringBuffer) Last() float64 {
+	return buf.buffer[buf.writeIdx]
 }
 
 func (buf *ringBuffer) incrWriteIdx() {
