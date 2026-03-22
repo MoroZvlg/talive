@@ -247,3 +247,15 @@ func Test_WarmUpAnalyze_CCI(t *testing.T) {
 	}
 	runWarmUpAnalysis(t, "CCI", factory, periods2to99(), []int{0, 1, 2, 3})
 }
+
+// ============================================================
+// ADX
+// ============================================================
+
+func Test_WarmUpAnalyze_ADX(t *testing.T) {
+	factory := func(period int) (func(c *testCandle) []float64, int, int) {
+		ind, _ := talive.NewADX(period)
+		return func(c *testCandle) []float64 { return ind.Next(c) }, 1, ind.IdlePeriod()
+	}
+	runWarmUpAnalysis(t, "ADX", factory, periods2to99(), []int{8})
+}
