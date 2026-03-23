@@ -249,6 +249,18 @@ func Test_WarmUpAnalyze_CCI(t *testing.T) {
 }
 
 // ============================================================
+// SMMA
+// ============================================================
+
+func Test_WarmUpAnalyze_SMMA(t *testing.T) {
+	factory := func(period int) (func(c *testCandle) []float64, int, int) {
+		ind, _ := talive.NewSMMA(period)
+		return func(c *testCandle) []float64 { return ind.Next(c) }, 1, ind.IdlePeriod()
+	}
+	runWarmUpAnalysis(t, "SMMA", factory, periods2to99(), []int{5, 6, 7, 8, 9, 10})
+}
+
+// ============================================================
 // ADX
 // ============================================================
 

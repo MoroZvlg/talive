@@ -72,5 +72,5 @@ func (smma *SMMA) IsWarmedUp() bool {
 }
 
 func (smma *SMMA) WarmUpPeriod() int {
-	return smma.IdlePeriod()
+	return smma.IdlePeriod() + smma.Period*6
 }
