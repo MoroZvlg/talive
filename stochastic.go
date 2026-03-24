@@ -40,7 +40,8 @@ func (stoch *Stochastic) Next(candle ICandle) []float64 {
 		return stoch.out
 	}
 
-	value := (candle.Close() - stoch.lowest.Min()) / (stoch.highest.Max() - stoch.lowest.Min()) * 100.0
+	lowestLow := stoch.lowest.Min()
+	value := (candle.Close() - lowestLow) / (stoch.highest.Max() - lowestLow) * 100.0
 	kSmooth := stoch.kSMA.next(value)
 	dSmooth := stoch.dSMA.next(kSmooth)
 	stoch.out[0] = kSmooth
