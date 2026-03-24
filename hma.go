@@ -9,9 +9,9 @@ import (
 type HMA struct {
 	Period      int
 	valueNumber int
-	halfWma     *WMA
-	fullWma     *WMA
-	sqrtWma     *WMA
+	halfWma     MA
+	fullWma     MA
+	sqrtWma     MA
 	out         []float64
 }
 

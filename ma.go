@@ -12,6 +12,9 @@ const (
 	SMAtype MaType = iota
 	EMAtype
 	SMMAtype
+	WMAtype
+	// VWMAtype — requires volume, doesn't fit next(float64) interface
+
 )
 
 // MA is the common interface for moving average indicators.
@@ -30,6 +33,8 @@ func NewMa(period int, maType MaType) (MA, error) {
 		return NewEMA(period)
 	case SMMAtype:
 		return NewSMMA(period)
+	case WMAtype:
+		return NewWMA(period)
 	}
 	return nil, fmt.Errorf("invalid ma type")
 }

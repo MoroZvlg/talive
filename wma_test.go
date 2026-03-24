@@ -67,7 +67,7 @@ func TestWmaCurrentValue(t *testing.T) {
 	}
 }
 
-var wmaDummy *talive.WMA
+var wmaDummy talive.MA
 
 func Benchmark_Wma_Init_Allocations(b *testing.B) {
 	b.Run("WMA(2)", func(b *testing.B) {

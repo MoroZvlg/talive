@@ -17,7 +17,7 @@ type WMA struct {
 }
 
 // NewWMA creates a new WMA indicator with the given period.
-func NewWMA(period int) (*WMA, error) {
+func NewWMA(period int) (MA, error) {
 	if period < 1 {
 		return nil, fmt.Errorf("period should be greater than 0")
 	}
