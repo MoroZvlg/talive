@@ -52,14 +52,42 @@ type ICandle interface {
 
 ## Indicators
 
+### Trend
+
 | Indicator | Constructor | Output |
 |-----------|-------------|--------|
 | EMA | `NewEMA(period)` | `[ema]` |
 | SMA | `NewSMA(period)` | `[sma]` |
-| RSI | `NewRSI(period)` | `[rsi]` |
+| SMMA | `NewSMMA(period)` | `[smma]` |
+| WMA | `NewWMA(period)` | `[wma]` |
+| HMA | `NewHMA(period)` | `[hma]` |
+| VWMA | `NewVWMA(period)` | `[vwma]` |
 | MACD | `NewMACD(fast, slow, signal)` | `[macd, signal, hist]` |
 | Bollinger Bands | `NewBBands(period, upMult, downMult, maType)` | `[upper, mid, lower]` |
+| Parabolic SAR | `NewSAR(start, increment, maxAF)` | `[sar]` |
+| Ichimoku Cloud | `NewIchimoku(conv, base, spanB, shift)` | `[tenkan, kijun, spanA, spanB]` |
+| ADX | `NewADX(period)` | `[adx]` |
+
+### Momentum
+
+| Indicator | Constructor | Output |
+|-----------|-------------|--------|
+| RSI | `NewRSI(period)` | `[rsi]` |
+| Stochastic | `NewStochastic(kLen, kSmooth, dSmooth)` | `[k, d]` |
+| Stochastic RSI | `NewStochasticRSI(rsiPeriod, stochLen, kSmooth, dSmooth)` | `[k, d]` |
+| CCI | `NewCCI(period)` | `[cci]` |
 | MFI | `NewMFI(period)` | `[mfi]` |
+| Williams %R | `NewWilliams(period)` | `[williams]` |
+| Ultimate Oscillator | `NewUO(periodMin, periodMid, periodMax)` | `[uo]` |
+| Awesome Oscillator | `NewAO()` | `[ao]` |
+| Momentum | `NewMomentum(period)` | `[momentum]` |
+| Bull Bear Power | `NewBullBearPower(period)` | `[bbp]` |
+
+### Volatility
+
+| Indicator | Constructor | Output |
+|-----------|-------------|--------|
+| ATR | `NewATR(period)` | `[atr]` |
 | StdDev | `NewStdDev(period, ddof)` | `[stddev]` |
 | Variance | `NewVariance(period)` | `[variance]` |
 
@@ -68,12 +96,26 @@ type ICandle interface {
 Measured on Apple M3 Pro:
 
 ```
-BenchmarkEMANext      ~2.7 ns/op    0 B/op    0 allocs/op
-BenchmarkSMANext      ~4.2 ns/op    0 B/op    0 allocs/op
-BenchmarkRSINext      ~7.6 ns/op    0 B/op    0 allocs/op
-BenchmarkMACDNext     ~6.8 ns/op    0 B/op    0 allocs/op
-BenchmarkBBandsNext   ~9.3 ns/op    0 B/op    0 allocs/op
-BenchmarkMFINext     ~11.0 ns/op    0 B/op    0 allocs/op
+EMA              ~2.8 ns/op    0 B/op    0 allocs/op
+SMMA             ~2.8 ns/op    0 B/op    0 allocs/op
+SMA              ~4.2 ns/op    0 B/op    0 allocs/op
+WMA              ~4.5 ns/op    0 B/op    0 allocs/op
+Momentum         ~4.3 ns/op    0 B/op    0 allocs/op
+BullBearPower    ~4.8 ns/op    0 B/op    0 allocs/op
+VWMA             ~5.7 ns/op    0 B/op    0 allocs/op
+ATR              ~6.9 ns/op    0 B/op    0 allocs/op
+MACD             ~7.0 ns/op    0 B/op    0 allocs/op
+AO               ~8.6 ns/op    0 B/op    0 allocs/op
+BBands          ~10.4 ns/op    0 B/op    0 allocs/op
+RSI             ~10.5 ns/op    0 B/op    0 allocs/op
+MFI             ~12.5 ns/op    0 B/op    0 allocs/op
+HMA             ~12.7 ns/op    0 B/op    0 allocs/op
+Williams        ~15.1 ns/op    0 B/op    0 allocs/op
+SAR             ~15.8 ns/op    0 B/op    0 allocs/op
+UO              ~16.0 ns/op    0 B/op    0 allocs/op
+ADX             ~21.3 ns/op    0 B/op    0 allocs/op
+Ichimoku        ~50.1 ns/op    0 B/op    0 allocs/op
+StochasticRSI   ~68.5 ns/op    0 B/op    0 allocs/op
 ```
 
 Zero allocations in the hot path — output slices are pre-allocated in constructors and reused on every call.
