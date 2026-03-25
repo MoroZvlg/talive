@@ -47,6 +47,15 @@ func TestEmaIdle(t *testing.T) {
 	if !reflect.DeepEqual(result, []string{"true", "true", "false", "false"}) {
 		t.Fatal(`[EMA(3)] wrong idle value `, result)
 	}
+	trueCount := 0
+	for _, v := range result {
+		if v == "true" {
+			trueCount++
+		}
+	}
+	if trueCount != indicator.IdlePeriod() {
+		t.Fatalf("[EMA(3)] IdlePeriod() = %d, but IsIdle() was true %d times", indicator.IdlePeriod(), trueCount)
+	}
 }
 
 func TestEmaCurrentValue(t *testing.T) {

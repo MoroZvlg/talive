@@ -45,6 +45,15 @@ func TestAoIdle(t *testing.T) {
 	if !reflect.DeepEqual(result, expected) {
 		t.Fatal(`[AO] wrong idle value `, result)
 	}
+	trueCount := 0
+	for _, v := range result {
+		if v == "true" {
+			trueCount++
+		}
+	}
+	if trueCount != indicator.IdlePeriod() {
+		t.Fatalf("[AO] IdlePeriod() = %d, but IsIdle() was true %d times", indicator.IdlePeriod(), trueCount)
+	}
 }
 
 func TestAoCurrentValue(t *testing.T) {

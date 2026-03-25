@@ -48,6 +48,15 @@ func TestAdxIdle(t *testing.T) {
 	if !reflect.DeepEqual(result, []string{"true", "true", "true", "true", "true", "false", "false"}) {
 		t.Fatal(`[ADX(3)] wrong idle value `, result)
 	}
+	trueCount := 0
+	for _, v := range result {
+		if v == "true" {
+			trueCount++
+		}
+	}
+	if trueCount != indicator.IdlePeriod() {
+		t.Fatalf("[ADX(3)] IdlePeriod() = %d, but IsIdle() was true %d times", indicator.IdlePeriod(), trueCount)
+	}
 }
 
 func TestAdxCurrentValue(t *testing.T) {

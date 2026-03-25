@@ -50,18 +50,27 @@ func TestStochasticMin(t *testing.T) {
 }
 
 func TestStochasticIdle(t *testing.T) {
-	indicator, _ := talive.NewStochastic(3, 1, 2)
+	indicator, _ := talive.NewStochastic(5, 3, 4)
 	var result []string
-	for i := 0; i < 5; i++ {
-		indicator.Next(&testCandle{close: float64(i)})
+	for i := 0; i < 12; i++ {
+		indicator.Next(&testCandle{close: float64(i + 1)})
 		if indicator.IsIdle() {
 			result = append(result, "true")
 		} else {
 			result = append(result, "false")
 		}
 	}
-	if !reflect.DeepEqual(result, []string{"true", "true", "true", "false", "false"}) {
-		t.Fatal(`[Stochastic(3, 1, 2)] wrong idle value `, result)
+	if !reflect.DeepEqual(result, []string{"true", "true", "true", "true", "true", "true", "true", "false", "false", "false", "false", "false"}) {
+		t.Fatal(`[Stochastic(5,3,4)] wrong idle value `, result)
+	}
+	trueCount := 0
+	for _, v := range result {
+		if v == "true" {
+			trueCount++
+		}
+	}
+	if trueCount != indicator.IdlePeriod() {
+		t.Fatalf("[Stochastic(5,3,4)] IdlePeriod() = %d, but IsIdle() was true %d times", indicator.IdlePeriod(), trueCount)
 	}
 }
 

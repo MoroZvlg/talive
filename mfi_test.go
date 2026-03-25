@@ -58,6 +58,15 @@ func TestMfiIdle(t *testing.T) {
 	if !reflect.DeepEqual(result, []string{"true", "true", "true", "false"}) {
 		t.Fatal(`[MFI(3)] wrong idle value `, result)
 	}
+	trueCount := 0
+	for _, v := range result {
+		if v == "true" {
+			trueCount++
+		}
+	}
+	if trueCount != indicator.IdlePeriod() {
+		t.Fatalf("[MFI(3)] IdlePeriod() = %d, but IsIdle() was true %d times", indicator.IdlePeriod(), trueCount)
+	}
 }
 
 func TestMfiCurrentValue(t *testing.T) {

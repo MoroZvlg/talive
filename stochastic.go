@@ -68,7 +68,7 @@ func (stoch *Stochastic) Current(candle ICandle) []float64 {
 }
 
 func (stoch *Stochastic) IsIdle() bool {
-	return stoch.valueNumber <= stoch.KLen
+	return stoch.dSMA.IsIdle()
 }
 
 func (stoch *Stochastic) IsWarmedUp() bool {
@@ -76,7 +76,7 @@ func (stoch *Stochastic) IsWarmedUp() bool {
 }
 
 func (stoch *Stochastic) IdlePeriod() int {
-	return stoch.KLen - 1 + stoch.DSmooth - 1
+	return stoch.KLen - 1 + stoch.dSMA.IdlePeriod()
 }
 
 func (stoch *Stochastic) WarmUpPeriod() int {

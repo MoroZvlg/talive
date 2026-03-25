@@ -47,6 +47,15 @@ func TestSmmaIdle(t *testing.T) {
 	if !reflect.DeepEqual(result, []string{"true", "true", "false", "false"}) {
 		t.Fatal(`[SMMA(3)] wrong idle value `, result)
 	}
+	trueCount := 0
+	for _, v := range result {
+		if v == "true" {
+			trueCount++
+		}
+	}
+	if trueCount != indicator.IdlePeriod() {
+		t.Fatalf("[SMMA(3)] IdlePeriod() = %d, but IsIdle() was true %d times", indicator.IdlePeriod(), trueCount)
+	}
 }
 
 func TestSmmaCurrentValue(t *testing.T) {

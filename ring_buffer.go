@@ -22,7 +22,7 @@ func (buf *ringBuffer) String() string {
 
 func newRingBuffer(capacity int) *ringBuffer {
 	return &ringBuffer{
-		buffer:   make([]float64, capacity),
+		buffer:   make([]float64, 0, capacity),
 		Sum:      0.0,
 		capacity: capacity,
 		writeIdx: 0,
@@ -30,6 +30,11 @@ func newRingBuffer(capacity int) *ringBuffer {
 }
 
 func (buf *ringBuffer) Push(el float64) {
+	if len(buf.buffer) < cap(buf.buffer) {
+		buf.buffer = append(buf.buffer, el)
+		buf.Sum += el
+		return
+	}
 	tailElement := buf.buffer[buf.writeIdx]
 	buf.buffer[buf.writeIdx] = el
 	buf.Sum = buf.Sum - tailElement + el
@@ -37,19 +42,14 @@ func (buf *ringBuffer) Push(el float64) {
 }
 
 func (buf *ringBuffer) SumExceptLast() float64 {
-	return buf.Sum - buf.buffer[buf.writeIdx]
+	return buf.Sum - buf.Last()
 }
 
 func (buf *ringBuffer) Last() float64 {
-	return buf.buffer[buf.writeIdx]
-}
-
-func (buf *ringBuffer) incrWriteIdx() {
-	if buf.writeIdx == (buf.capacity - 1) {
-		buf.writeIdx = 0
-	} else {
-		buf.writeIdx++
+	if len(buf.buffer) < cap(buf.buffer) {
+		return 0.0
 	}
+	return buf.buffer[buf.writeIdx]
 }
 
 func (buf *ringBuffer) Min() float64 {
@@ -96,4 +96,47 @@ func (buf *ringBuffer) MaxExceptLast() float64 {
 		}
 	}
 	return maxV
+}
+
+func (buf *ringBuffer) MinMax() (float64, float64) {
+	minV := math.Inf(1)
+	maxV := math.Inf(-1)
+	for _, el := range buf.buffer {
+		if el < minV {
+			minV = el
+		}
+		if el > maxV {
+			maxV = el
+		}
+	}
+	return minV, maxV
+}
+
+func (buf *ringBuffer) MinMaxExceptLast() (float64, float64) {
+	minV := math.Inf(1)
+	maxV := math.Inf(-1)
+	for i, el := range buf.buffer {
+		if i == buf.writeIdx {
+			continue
+		}
+		if el < minV {
+			minV = el
+		}
+		if el > maxV {
+			maxV = el
+		}
+	}
+	return minV, maxV
+}
+
+func (buf *ringBuffer) Len() int {
+	return len(buf.buffer)
+}
+
+func (buf *ringBuffer) incrWriteIdx() {
+	if buf.writeIdx == (buf.capacity - 1) {
+		buf.writeIdx = 0
+	} else {
+		buf.writeIdx++
+	}
 }

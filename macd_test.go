@@ -75,6 +75,15 @@ func TestMacdIdle(t *testing.T) {
 	if !reflect.DeepEqual(result, []string{"true", "true", "true", "true", "false", "false"}) {
 		t.Fatal(`[MACD(2, 3, 2)] wrong idle value `, result)
 	}
+	trueCount := 0
+	for _, v := range result {
+		if v == "true" {
+			trueCount++
+		}
+	}
+	if trueCount != indicator.IdlePeriod() {
+		t.Fatalf("[MACD(3, 4, 2)] IdlePeriod() = %d, but IsIdle() was true %d times", indicator.IdlePeriod(), trueCount)
+	}
 }
 
 func TestMacdCurrentValue(t *testing.T) {

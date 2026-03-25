@@ -47,6 +47,15 @@ func TestVarianceIsIdle(t *testing.T) {
 	if !reflect.DeepEqual(result, []string{"true", "true", "true", "false", "false", "false"}) {
 		t.Fatal(`[Variance(5)] wrong idle value `, result)
 	}
+	trueCount := 0
+	for _, v := range result {
+		if v == "true" {
+			trueCount++
+		}
+	}
+	if trueCount != variance.IdlePeriod() {
+		t.Fatalf("[Variance(4)] IdlePeriod() = %d, but IsIdle() was true %d times", variance.IdlePeriod(), trueCount)
+	}
 }
 
 func TestVarianceCurrent(t *testing.T) {

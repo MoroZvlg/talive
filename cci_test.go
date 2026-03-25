@@ -47,6 +47,15 @@ func TestCciIdle(t *testing.T) {
 	if !reflect.DeepEqual(result, []string{"true", "true", "false", "false"}) {
 		t.Fatal(`[CCI(3)] wrong idle value `, result)
 	}
+	trueCount := 0
+	for _, v := range result {
+		if v == "true" {
+			trueCount++
+		}
+	}
+	if trueCount != indicator.IdlePeriod() {
+		t.Fatalf("[CCI(3)] IdlePeriod() = %d, but IsIdle() was true %d times", indicator.IdlePeriod(), trueCount)
+	}
 }
 
 func TestCciCurrentValue(t *testing.T) {
