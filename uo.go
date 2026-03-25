@@ -18,16 +18,16 @@ type UO struct {
 }
 
 // NewUO creates a new Ultimate Oscillator indicator.
-func NewUO(PeriodMin, PeriodMid, PeriodMax int) (*UO, error) {
-	if PeriodMin < 1 || PeriodMid < 1 || PeriodMax < 1 {
+func NewUO(periodMin, periodMid, periodMax int) (*UO, error) {
+	if periodMin < 1 || periodMid < 1 || periodMax < 1 {
 		return nil, fmt.Errorf("periods should be greater than 0")
 	}
 	return &UO{
-		PeriodMin: PeriodMin,
-		PeriodMid: PeriodMid,
-		PeriodMax: PeriodMax,
-		bpBuf:     [3]*ringBuffer{newRingBuffer(PeriodMin), newRingBuffer(PeriodMid), newRingBuffer(PeriodMax)},
-		trBuf:     [3]*ringBuffer{newRingBuffer(PeriodMin), newRingBuffer(PeriodMid), newRingBuffer(PeriodMax)},
+		PeriodMin: periodMin,
+		PeriodMid: periodMid,
+		PeriodMax: periodMax,
+		bpBuf:     [3]*ringBuffer{newRingBuffer(periodMin), newRingBuffer(periodMid), newRingBuffer(periodMax)},
+		trBuf:     [3]*ringBuffer{newRingBuffer(periodMin), newRingBuffer(periodMid), newRingBuffer(periodMax)},
 		out:       make([]float64, 1),
 	}, nil
 }

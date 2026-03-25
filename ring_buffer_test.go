@@ -131,7 +131,7 @@ func TestRingBuffer_Len(t *testing.T) {
 	}
 }
 
-func TestRingBuffer_ReadersNoPanicOnPartialFill(t *testing.T) {
+func TestRingBuffer_ReadersNoPanicOnPartialFill(_ *testing.T) {
 	capacity := 5
 	rb := newRingBuffer(capacity)
 	for i := 0; i < capacity; i++ {
