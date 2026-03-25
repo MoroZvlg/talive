@@ -8,7 +8,7 @@ import (
 )
 
 func TestSmaDefault(t *testing.T) {
-	candles, _ := readCandles()
+	candles, _ := readCandles("test_data/input_data.csv")
 	expectedParsedData, _ := readData("test_data/sma/output_default.csv", []int{1}, 8)
 	indicator, _ := talive.NewSMA(9)
 	result := make([]float64, len(candles))
@@ -21,7 +21,7 @@ func TestSmaDefault(t *testing.T) {
 }
 
 func TestSmaMin(t *testing.T) {
-	candles, _ := readCandles()
+	candles, _ := readCandles("test_data/input_data.csv")
 	expectedParsedData, _ := readData("test_data/sma/output_min.csv", []int{1}, 8)
 	indicator, _ := talive.NewSMA(2)
 	result := make([]float64, len(candles))
@@ -47,10 +47,19 @@ func TestSmaIdle(t *testing.T) {
 	if !reflect.DeepEqual(result, []string{"true", "true", "false", "false"}) {
 		t.Fatal(`[SMA(3)] wrong idle value `, result)
 	}
+	trueCount := 0
+	for _, v := range result {
+		if v == "true" {
+			trueCount++
+		}
+	}
+	if trueCount != indicator.IdlePeriod() {
+		t.Fatalf("[SMA(3)] IdlePeriod() = %d, but IsIdle() was true %d times", indicator.IdlePeriod(), trueCount)
+	}
 }
 
 func TestSmaCurrentValue(t *testing.T) {
-	candles, _ := readCandles()
+	candles, _ := readCandles("test_data/input_data.csv")
 	expectedParsedData, _ := readData("test_data/sma/output_default.csv", []int{1}, 8)
 	indicator, _ := talive.NewSMA(9)
 	for i := 0; i < 9; i++ {
@@ -93,7 +102,7 @@ func Benchmark_Sma_Init_Allocations(benchmark *testing.B) {
 }
 
 func Benchmark_Sma_Next_Allocations(benchmark *testing.B) {
-	candles, _ := readCandles()
+	candles, _ := readCandles("test_data/input_data.csv")
 	dataLen := len(candles)
 	benchmark.Run("SMA 2", func(benchmark *testing.B) {
 		indicator, _ := talive.NewSMA(2)
@@ -134,7 +143,7 @@ func Benchmark_Sma_Next_Allocations(benchmark *testing.B) {
 }
 
 func Benchmark_Sma_Current_Allocations(benchmark *testing.B) {
-	candles, _ := readCandles()
+	candles, _ := readCandles("test_data/input_data.csv")
 	dataLen := len(candles)
 	benchmark.Run("SMA 2", func(benchmark *testing.B) {
 		indicator, _ := talive.NewSMA(2)

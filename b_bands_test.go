@@ -8,7 +8,7 @@ import (
 )
 
 func TestBBandsDefault(t *testing.T) {
-	candles, _ := readCandles()
+	candles, _ := readCandles("test_data/input_data.csv")
 	expectedParsedData, _ := readData("test_data/b_bands/output_default.csv", []int{1, 2, 3}, 4)
 	indicator, _ := talive.NewBBands(20, 2.0, 2.0, talive.SMAtype)
 	result := [][]float64{
@@ -35,7 +35,7 @@ func TestBBandsDefault(t *testing.T) {
 }
 
 func TestBBandsMin(t *testing.T) {
-	candles, _ := readCandles()
+	candles, _ := readCandles("test_data/input_data.csv")
 	expectedParsedData, _ := readData("test_data/b_bands/output_min.csv", []int{1, 2, 3}, 5)
 	indicator, _ := talive.NewBBands(2, 0.1, 0.1, talive.SMAtype)
 	result := [][]float64{
@@ -75,10 +75,19 @@ func TestBBandsIdle(t *testing.T) {
 	if !reflect.DeepEqual(result, []string{"true", "true", "true", "true", "false", "false"}) {
 		t.Fatal(`[MACD(2, 3, 2)] wrong idle value `, result)
 	}
+	trueCount := 0
+	for _, v := range result {
+		if v == "true" {
+			trueCount++
+		}
+	}
+	if trueCount != indicator.IdlePeriod() {
+		t.Fatalf("[BBands(5)] IdlePeriod() = %d, but IsIdle() was true %d times", indicator.IdlePeriod(), trueCount)
+	}
 }
 
 func TestBBandsCurrentValue(t *testing.T) {
-	candles, _ := readCandles()
+	candles, _ := readCandles("test_data/input_data.csv")
 	expectedParsedData, _ := readData("test_data/b_bands/output_default.csv", []int{1, 2, 3}, 8)
 	indicator, _ := talive.NewBBands(20, 2.0, 2.0, talive.SMAtype)
 	for i := 0; i < 22; i++ {
@@ -136,7 +145,7 @@ func Benchmark_BBands_Init_Allocations(benchmark *testing.B) {
 }
 
 func Benchmark_BBands_Next_Allocations(benchmark *testing.B) {
-	candles, _ := readCandles()
+	candles, _ := readCandles("test_data/input_data.csv")
 	dataLen := len(candles)
 	benchmark.Run("BBands (20, 2.0, 2.0, SMA)", func(benchmark *testing.B) {
 		indicator, _ := talive.NewBBands(20, 2.0, 2.0, talive.SMAtype)
@@ -168,7 +177,7 @@ func Benchmark_BBands_Next_Allocations(benchmark *testing.B) {
 }
 
 func Benchmark_BBands_Current_Allocations(benchmark *testing.B) {
-	candles, _ := readCandles()
+	candles, _ := readCandles("test_data/input_data.csv")
 	dataLen := len(candles)
 	benchmark.Run("BBands (20, 2.0, 2.0, SMA)", func(benchmark *testing.B) {
 		indicator, _ := talive.NewBBands(20, 2.0, 2.0, talive.SMAtype)

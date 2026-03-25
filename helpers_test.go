@@ -37,8 +37,8 @@ func difference(leftSlice, rightSlice []float64) map[int][]float64 {
 	return result
 }
 
-func readCandles() ([]*testCandle, error) {
-	file, err := os.Open("test_data/input_data.csv")
+func readCandles(filePath string) ([]*testCandle, error) {
+	file, err := os.Open(filePath)
 	if err != nil {
 		return nil, err
 	}

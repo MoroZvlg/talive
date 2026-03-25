@@ -1,9 +1,5 @@
 package talive
 
-import (
-	"fmt"
-)
-
 // SMA is a Simple Moving Average indicator.
 type SMA struct {
 	Period      int
@@ -14,9 +10,6 @@ type SMA struct {
 
 // NewSMA creates a new SMA indicator with the given period.
 func NewSMA(period int) (MA, error) {
-	if period < 2 {
-		return nil, fmt.Errorf("period should be greater than 1")
-	}
 	return &SMA{
 		Period:      period,
 		valueNumber: 0,
@@ -35,12 +28,10 @@ func (sma *SMA) next(value float64) float64 {
 }
 
 func (sma *SMA) current(value float64) float64 {
-	sma.valueNumber++
 	if sma.IsIdle() {
 		return 0.0
 	}
 	result := (sma.buffer.SumExceptLast() + value) / float64(sma.Period)
-	sma.valueNumber--
 	return result
 }
 

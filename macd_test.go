@@ -8,7 +8,7 @@ import (
 )
 
 func TestMacdDefault(t *testing.T) {
-	candles, _ := readCandles()
+	candles, _ := readCandles("test_data/input_data.csv")
 	expectedParsedData, _ := readData("test_data/macd/output_default.csv", []int{1, 2, 3}, 7)
 	indicator, _ := talive.NewMACD(12, 26, 9)
 	result := [][]float64{
@@ -35,7 +35,7 @@ func TestMacdDefault(t *testing.T) {
 }
 
 func TestMacdMin(t *testing.T) {
-	candles, _ := readCandles()
+	candles, _ := readCandles("test_data/input_data.csv")
 	expectedParsedData, _ := readData("test_data/macd/output_min.csv", []int{1, 2, 3}, 7)
 	indicator, _ := talive.NewMACD(2, 3, 2)
 	result := [][]float64{
@@ -75,10 +75,19 @@ func TestMacdIdle(t *testing.T) {
 	if !reflect.DeepEqual(result, []string{"true", "true", "true", "true", "false", "false"}) {
 		t.Fatal(`[MACD(2, 3, 2)] wrong idle value `, result)
 	}
+	trueCount := 0
+	for _, v := range result {
+		if v == "true" {
+			trueCount++
+		}
+	}
+	if trueCount != indicator.IdlePeriod() {
+		t.Fatalf("[MACD(3, 4, 2)] IdlePeriod() = %d, but IsIdle() was true %d times", indicator.IdlePeriod(), trueCount)
+	}
 }
 
 func TestMacdCurrentValue(t *testing.T) {
-	candles, _ := readCandles()
+	candles, _ := readCandles("test_data/input_data.csv")
 	expectedParsedData, _ := readData("test_data/macd/output_default.csv", []int{1, 2, 3}, 7)
 	indicator, _ := talive.NewMACD(12, 26, 9)
 	for i := 0; i < 34; i++ {
@@ -137,7 +146,7 @@ func Benchmark_MACD_Init_Allocations(benchmark *testing.B) {
 }
 
 func Benchmark_MACD_Next_Allocations(benchmark *testing.B) {
-	candles, _ := readCandles()
+	candles, _ := readCandles("test_data/input_data.csv")
 	dataLen := len(candles)
 	benchmark.Run("MACD (12, 26, 9)", func(benchmark *testing.B) {
 		indicator, _ := talive.NewMACD(12, 26, 9)
@@ -169,7 +178,7 @@ func Benchmark_MACD_Next_Allocations(benchmark *testing.B) {
 }
 
 func Benchmark_MACD_Current_Allocations(benchmark *testing.B) {
-	candles, _ := readCandles()
+	candles, _ := readCandles("test_data/input_data.csv")
 	dataLen := len(candles)
 	benchmark.Run("MACD (12, 26, 9)", func(benchmark *testing.B) {
 		indicator, _ := talive.NewMACD(12, 26, 9)
