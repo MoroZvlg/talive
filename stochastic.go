@@ -1,5 +1,7 @@
 package talive
 
+import "fmt"
+
 // Stochastic is a Stochastic Oscillator indicator.
 type Stochastic struct {
 	KLen        int
@@ -28,6 +30,10 @@ func NewStochastic(kLen, kSmooth, dSmooth int) (*Stochastic, error) {
 		dSMA:        dSMA,
 		out:         make([]float64, 2),
 	}, nil
+}
+
+func (stoch *Stochastic) String() string {
+	return fmt.Sprintf("Stochastic(%d,%d,%d)", stoch.KLen, stoch.KSmooth, stoch.DSmooth)
 }
 
 func (stoch *Stochastic) Next(candle ICandle) []float64 {

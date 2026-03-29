@@ -7,6 +7,20 @@ import (
 // MaType defines the type of moving average.
 type MaType int
 
+func (mt MaType) String() string {
+	switch mt {
+	case SMAtype:
+		return "SMA"
+	case EMAtype:
+		return "EMA"
+	case SMMAtype:
+		return "SMMA"
+	case WMAtype:
+		return "WMA"
+	}
+	return "UnknownMA"
+}
+
 // Supported moving average types.
 const (
 	SMAtype MaType = iota

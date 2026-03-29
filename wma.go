@@ -29,6 +29,10 @@ func NewWMA(period int) (MA, error) {
 	}, nil
 }
 
+func (wma *WMA) String() string {
+	return fmt.Sprintf("WMA(%d)", wma.Period)
+}
+
 func (wma *WMA) next(value float64) float64 {
 	wma.valueNumber++
 	wma.weightedSum += value*float64(wma.Period) - wma.buffer.Sum

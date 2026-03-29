@@ -38,6 +38,10 @@ func NewStochasticRSI(rsiPeriod, stochLen, kSmooth, dSmooth int) (*StochasticRSI
 	}, nil
 }
 
+func (sr *StochasticRSI) String() string {
+	return fmt.Sprintf("StochasticRSI(%d,%d,%d,%d)", sr.RSIPeriod, sr.StochLen, sr.KSmooth, sr.DSmooth)
+}
+
 func (sr *StochasticRSI) Next(candle ICandle) []float64 {
 	sr.valueNumber++
 	rsiValue := sr.rsi.Next(candle)[0]

@@ -29,6 +29,10 @@ func NewRSI(period int) (*RSI, error) {
 	}, nil
 }
 
+func (rsi *RSI) String() string {
+	return fmt.Sprintf("RSI(%d)", rsi.Period)
+}
+
 func (rsi *RSI) Next(candle ICandle) []float64 {
 	rsi.valueNumber++
 

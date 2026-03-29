@@ -22,6 +22,10 @@ func NewMomentum(period int) (*Momentum, error) {
 	}, nil
 }
 
+func (m *Momentum) String() string {
+	return fmt.Sprintf("Momentum(%d)", m.Period)
+}
+
 func (m *Momentum) Next(candle ICandle) []float64 {
 	m.valueNumber++
 

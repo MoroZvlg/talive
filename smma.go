@@ -23,6 +23,10 @@ func NewSMMA(period int) (MA, error) {
 	}, nil
 }
 
+func (smma *SMMA) String() string {
+	return fmt.Sprintf("SMMA(%d)", smma.Period)
+}
+
 func (smma *SMMA) next(value float64) float64 {
 	smma.valuesNumber++
 	if smma.IsIdle() {
