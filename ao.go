@@ -8,14 +8,18 @@ type AO struct {
 }
 
 // NewAO creates a new Awesome Oscillator indicator.
-func NewAO() *AO {
+func NewAO() (*AO, error) {
 	fastSma, _ := NewSMA(5)
 	slowSma, _ := NewSMA(34)
 	return &AO{
 		fastSma: fastSma,
 		slowSma: slowSma,
 		out:     make([]float64, 1),
-	}
+	}, nil
+}
+
+func (ao *AO) String() string {
+	return "AO()"
 }
 
 func (ao *AO) Next(candle ICandle) []float64 {

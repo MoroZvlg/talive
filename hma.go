@@ -40,50 +40,54 @@ func NewHMA(period int) (*HMA, error) {
 	}, nil
 }
 
-func (h *HMA) Next(candle ICandle) []float64 {
-	h.valueNumber++
-	halfVal := h.halfWma.next(candle.Close())
-	fullVal := h.fullWma.next(candle.Close())
+func (hma *HMA) String() string {
+	return fmt.Sprintf("HullMA(%d)", hma.Period)
+}
 
-	if h.fullWma.IsIdle() {
-		return h.out
+func (hma *HMA) Next(candle ICandle) []float64 {
+	hma.valueNumber++
+	halfVal := hma.halfWma.next(candle.Close())
+	fullVal := hma.fullWma.next(candle.Close())
+
+	if hma.fullWma.IsIdle() {
+		return hma.out
 	}
 
 	diff := 2*halfVal - fullVal
-	hma := h.sqrtWma.next(diff)
+	hmaV := hma.sqrtWma.next(diff)
 
-	if h.sqrtWma.IsIdle() {
-		return h.out
+	if hma.sqrtWma.IsIdle() {
+		return hma.out
 	}
 
-	h.out[0] = hma
-	return h.out
+	hma.out[0] = hmaV
+	return hma.out
 }
 
-func (h *HMA) Current(candle ICandle) []float64 {
-	if h.IsIdle() {
-		return h.out
+func (hma *HMA) Current(candle ICandle) []float64 {
+	if hma.IsIdle() {
+		return hma.out
 	}
 
-	halfVal := h.halfWma.current(candle.Close())
-	fullVal := h.fullWma.current(candle.Close())
+	halfVal := hma.halfWma.current(candle.Close())
+	fullVal := hma.fullWma.current(candle.Close())
 	diff := 2*halfVal - fullVal
-	h.out[0] = h.sqrtWma.current(diff)
-	return h.out
+	hma.out[0] = hma.sqrtWma.current(diff)
+	return hma.out
 }
 
-func (h *HMA) IsIdle() bool {
-	return h.sqrtWma.IsIdle()
+func (hma *HMA) IsIdle() bool {
+	return hma.sqrtWma.IsIdle()
 }
 
-func (h *HMA) IdlePeriod() int {
-	return h.fullWma.IdlePeriod() + h.sqrtWma.IdlePeriod()
+func (hma *HMA) IdlePeriod() int {
+	return hma.fullWma.IdlePeriod() + hma.sqrtWma.IdlePeriod()
 }
 
-func (h *HMA) IsWarmedUp() bool {
-	return !h.IsIdle()
+func (hma *HMA) IsWarmedUp() bool {
+	return !hma.IsIdle()
 }
 
-func (h *HMA) WarmUpPeriod() int {
-	return h.IdlePeriod()
+func (hma *HMA) WarmUpPeriod() int {
+	return hma.IdlePeriod()
 }

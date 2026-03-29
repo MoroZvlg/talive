@@ -1,6 +1,9 @@
 package talive
 
-import "math"
+import (
+	"fmt"
+	"math"
+)
 
 // CCI is a Commodity Channel Index indicator.
 type CCI struct {
@@ -18,6 +21,10 @@ func NewCCI(period int) (*CCI, error) {
 		buffer:      newRingBuffer(period),
 		out:         make([]float64, 1),
 	}, nil
+}
+
+func (cci *CCI) String() string {
+	return fmt.Sprintf("CCI(%d)", cci.Period)
 }
 
 func (cci *CCI) Next(candle ICandle) []float64 {

@@ -23,6 +23,10 @@ func NewBullBearPower(period int) (*BullBearPower, error) {
 	}, nil
 }
 
+func (bbp *BullBearPower) String() string {
+	return fmt.Sprintf("BullBearPower(%d)", bbp.Period)
+}
+
 func (bbp *BullBearPower) Next(candle ICandle) []float64 {
 	emaVal := bbp.ema.next(candle.Close())
 

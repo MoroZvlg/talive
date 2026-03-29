@@ -32,63 +32,67 @@ func NewUO(periodMin, periodMid, periodMax int) (*UO, error) {
 	}, nil
 }
 
-func (u *UO) Next(candle ICandle) []float64 {
-	u.valueNumber++
+func (uo *UO) String() string {
+	return fmt.Sprintf("UO(%d,%d,%d)", uo.PeriodMid, uo.PeriodMin, uo.PeriodMax)
+}
 
-	if u.valueNumber == 1 {
-		u.prevClose = candle.Close()
-		return u.out
+func (uo *UO) Next(candle ICandle) []float64 {
+	uo.valueNumber++
+
+	if uo.valueNumber == 1 {
+		uo.prevClose = candle.Close()
+		return uo.out
 	}
 
-	bp := candle.Close() - math.Min(candle.Low(), u.prevClose)
-	tr := math.Max(candle.High(), u.prevClose) - math.Min(candle.Low(), u.prevClose)
-	u.prevClose = candle.Close()
+	bp := candle.Close() - math.Min(candle.Low(), uo.prevClose)
+	tr := math.Max(candle.High(), uo.prevClose) - math.Min(candle.Low(), uo.prevClose)
+	uo.prevClose = candle.Close()
 
 	for i := 0; i < 3; i++ {
-		u.bpBuf[i].Push(bp)
-		u.trBuf[i].Push(tr)
+		uo.bpBuf[i].Push(bp)
+		uo.trBuf[i].Push(tr)
 	}
 
-	if u.IsIdle() {
-		return u.out
+	if uo.IsIdle() {
+		return uo.out
 	}
 
-	avgMin := u.bpBuf[0].Sum / u.trBuf[0].Sum
-	avgMid := u.bpBuf[1].Sum / u.trBuf[1].Sum
-	avgMax := u.bpBuf[2].Sum / u.trBuf[2].Sum
-	u.out[0] = 100 * (4*avgMin + 2*avgMid + avgMax) / 7
-	return u.out
+	avgMin := uo.bpBuf[0].Sum / uo.trBuf[0].Sum
+	avgMid := uo.bpBuf[1].Sum / uo.trBuf[1].Sum
+	avgMax := uo.bpBuf[2].Sum / uo.trBuf[2].Sum
+	uo.out[0] = 100 * (4*avgMin + 2*avgMid + avgMax) / 7
+	return uo.out
 }
 
-func (u *UO) Current(candle ICandle) []float64 {
-	if u.IsIdle() {
-		return u.out
+func (uo *UO) Current(candle ICandle) []float64 {
+	if uo.IsIdle() {
+		return uo.out
 	}
 
-	bp := candle.Close() - math.Min(candle.Low(), u.prevClose)
-	tr := math.Max(candle.High(), u.prevClose) - math.Min(candle.Low(), u.prevClose)
+	bp := candle.Close() - math.Min(candle.Low(), uo.prevClose)
+	tr := math.Max(candle.High(), uo.prevClose) - math.Min(candle.Low(), uo.prevClose)
 
-	avgMin := (u.bpBuf[0].SumExceptLast() + bp) / (u.trBuf[0].SumExceptLast() + tr)
-	avgMid := (u.bpBuf[1].SumExceptLast() + bp) / (u.trBuf[1].SumExceptLast() + tr)
-	avgMax := (u.bpBuf[2].SumExceptLast() + bp) / (u.trBuf[2].SumExceptLast() + tr)
+	avgMin := (uo.bpBuf[0].SumExceptLast() + bp) / (uo.trBuf[0].SumExceptLast() + tr)
+	avgMid := (uo.bpBuf[1].SumExceptLast() + bp) / (uo.trBuf[1].SumExceptLast() + tr)
+	avgMax := (uo.bpBuf[2].SumExceptLast() + bp) / (uo.trBuf[2].SumExceptLast() + tr)
 
-	u.out[0] = 100 * (4*avgMin + 2*avgMid + avgMax) / 7
-	return u.out
+	uo.out[0] = 100 * (4*avgMin + 2*avgMid + avgMax) / 7
+	return uo.out
 }
 
-func (u *UO) IsIdle() bool {
-	maxPeriod := max(u.PeriodMin, max(u.PeriodMid, u.PeriodMax))
-	return u.valueNumber <= maxPeriod
+func (uo *UO) IsIdle() bool {
+	maxPeriod := max(uo.PeriodMin, max(uo.PeriodMid, uo.PeriodMax))
+	return uo.valueNumber <= maxPeriod
 }
 
-func (u *UO) IdlePeriod() int {
-	return max(u.PeriodMin, max(u.PeriodMid, u.PeriodMax))
+func (uo *UO) IdlePeriod() int {
+	return max(uo.PeriodMin, max(uo.PeriodMid, uo.PeriodMax))
 }
 
-func (u *UO) IsWarmedUp() bool {
-	return !u.IsIdle()
+func (uo *UO) IsWarmedUp() bool {
+	return !uo.IsIdle()
 }
 
-func (u *UO) WarmUpPeriod() int {
-	return u.IdlePeriod()
+func (uo *UO) WarmUpPeriod() int {
+	return uo.IdlePeriod()
 }

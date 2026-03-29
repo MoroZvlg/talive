@@ -10,7 +10,7 @@ import (
 func TestIchimokuDefault(t *testing.T) {
 	candles, _ := readCandles("test_data/input_data2.csv")
 	expectedParsedData, _ := readData("test_data/ichimoku/output_default.csv", []int{1, 2, 4, 5}, 7)
-	indicator := talive.NewIchimoku(9, 26, 52, 26)
+	indicator, _ := talive.NewIchimoku(9, 26, 52, 26)
 	results := make([][]float64, 4)
 	for i := range results {
 		results[i] = make([]float64, len(candles))
@@ -32,7 +32,7 @@ func TestIchimokuDefault(t *testing.T) {
 func TestIchimokuMin(t *testing.T) {
 	candles, _ := readCandles("test_data/input_data2.csv")
 	expectedParsedData, _ := readData("test_data/ichimoku/output_min.csv", []int{1, 2, 4, 5}, 7)
-	indicator := talive.NewIchimoku(2, 3, 4, 5)
+	indicator, _ := talive.NewIchimoku(2, 3, 4, 5)
 	results := make([][]float64, 4)
 	for i := range results {
 		results[i] = make([]float64, len(candles))
@@ -52,7 +52,7 @@ func TestIchimokuMin(t *testing.T) {
 }
 
 func TestIchimokuIdle(t *testing.T) {
-	indicator := talive.NewIchimoku(2, 3, 4, 5)
+	indicator, _ := talive.NewIchimoku(2, 3, 4, 5)
 	// IdlePeriod = max(3,4) + 5 - 2 = 7, first non-idle at bar 7
 	var result []string
 	for i := 0; i < 10; i++ {
@@ -80,7 +80,7 @@ func TestIchimokuIdle(t *testing.T) {
 func TestIchimokuCurrentValue(t *testing.T) {
 	candles, _ := readCandles("test_data/input_data2.csv")
 	expectedParsedData, _ := readData("test_data/ichimoku/output_default.csv", []int{1, 2, 4, 5}, 8)
-	indicator := talive.NewIchimoku(9, 26, 52, 26)
+	indicator, _ := talive.NewIchimoku(9, 26, 52, 26)
 	// Process past the idle period (76)
 	for i := 0; i < 80; i++ {
 		indicator.Next(candles[i])
@@ -110,12 +110,12 @@ var ichimokuDummy *talive.Ichimoku
 func Benchmark_Ichimoku_Init_Allocations(benchmark *testing.B) {
 	benchmark.Run("Ichimoku 9,26,52,26", func(benchmark *testing.B) {
 		for i := 0; i < benchmark.N; i++ {
-			ichimokuDummy = talive.NewIchimoku(9, 26, 52, 26)
+			ichimokuDummy, _ = talive.NewIchimoku(9, 26, 52, 26)
 		}
 	})
 	benchmark.Run("Ichimoku 2,3,4,5", func(benchmark *testing.B) {
 		for i := 0; i < benchmark.N; i++ {
-			ichimokuDummy = talive.NewIchimoku(2, 3, 4, 5)
+			ichimokuDummy, _ = talive.NewIchimoku(2, 3, 4, 5)
 		}
 	})
 }
@@ -124,7 +124,7 @@ func Benchmark_Ichimoku_Next_Allocations(benchmark *testing.B) {
 	candles, _ := readCandles("test_data/input_data2.csv")
 	dataLen := len(candles)
 	benchmark.Run("Ichimoku 9,26,52,26", func(benchmark *testing.B) {
-		indicator := talive.NewIchimoku(9, 26, 52, 26)
+		indicator, _ := talive.NewIchimoku(9, 26, 52, 26)
 		dataIndex := 0
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {
@@ -133,7 +133,7 @@ func Benchmark_Ichimoku_Next_Allocations(benchmark *testing.B) {
 		}
 	})
 	benchmark.Run("Ichimoku 2,3,4,5", func(benchmark *testing.B) {
-		indicator := talive.NewIchimoku(2, 3, 4, 5)
+		indicator, _ := talive.NewIchimoku(2, 3, 4, 5)
 		dataIndex := 0
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {
@@ -147,7 +147,7 @@ func Benchmark_Ichimoku_Current_Allocations(benchmark *testing.B) {
 	candles, _ := readCandles("test_data/input_data2.csv")
 	dataLen := len(candles)
 	benchmark.Run("Ichimoku 9,26,52,26", func(benchmark *testing.B) {
-		indicator := talive.NewIchimoku(9, 26, 52, 26)
+		indicator, _ := talive.NewIchimoku(9, 26, 52, 26)
 		dataIndex := 0
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {
@@ -156,7 +156,7 @@ func Benchmark_Ichimoku_Current_Allocations(benchmark *testing.B) {
 		}
 	})
 	benchmark.Run("Ichimoku 2,3,4,5", func(benchmark *testing.B) {
-		indicator := talive.NewIchimoku(2, 3, 4, 5)
+		indicator, _ := talive.NewIchimoku(2, 3, 4, 5)
 		dataIndex := 0
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {

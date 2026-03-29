@@ -25,6 +25,10 @@ func NewEMA(period int) (MA, error) {
 	}, nil
 }
 
+func (ema *EMA) String() string {
+	return fmt.Sprintf("EMA(%d)", ema.Period)
+}
+
 func (ema *EMA) next(value float64) float64 {
 	ema.valuesNumber++
 	if ema.IsIdle() {

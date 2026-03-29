@@ -1,6 +1,9 @@
 package talive
 
-import "math"
+import (
+	"fmt"
+	"math"
+)
 
 // Ichimoku is an Ichimoku Cloud indicator.
 // Outputs: [Conversion Line, Base Line, Leading Span A, Leading Span B].
@@ -25,7 +28,7 @@ type Ichimoku struct {
 }
 
 // NewIchimoku creates a new Ichimoku Cloud indicator.
-func NewIchimoku(convPeriod, basePeriod, spanBPeriod, shift int) *Ichimoku {
+func NewIchimoku(convPeriod, basePeriod, spanBPeriod, shift int) (*Ichimoku, error) {
 	ich := &Ichimoku{
 		ConvPeriod:  convPeriod,
 		BasePeriod:  basePeriod,
@@ -43,7 +46,11 @@ func NewIchimoku(convPeriod, basePeriod, spanBPeriod, shift int) *Ichimoku {
 		ich.leadABuf = newRingBuffer(shift - 1)
 		ich.leadBBuf = newRingBuffer(shift - 1)
 	}
-	return ich
+	return ich, nil
+}
+
+func (ich *Ichimoku) String() string {
+	return fmt.Sprintf("Ichimoku(%d,%d,%d,%d)", ich.ConvPeriod, ich.BasePeriod, ich.SpanBPeriod, ich.Shift)
 }
 
 func (ich *Ichimoku) Next(candle ICandle) []float64 {

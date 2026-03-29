@@ -27,50 +27,54 @@ func NewVWMA(period int) (*VWMA, error) {
 	}, nil
 }
 
-func (v *VWMA) Next(candle ICandle) []float64 {
-	v.valueNumber++
+func (vwma *VWMA) String() string {
+	return fmt.Sprintf("VWMA(%d)", vwma.Period)
+}
+
+func (vwma *VWMA) Next(candle ICandle) []float64 {
+	vwma.valueNumber++
 
 	cv := candle.Close() * candle.Volume()
 	vol := candle.Volume()
-	v.closeVolBuffer.Push(cv)
-	v.volBuffer.Push(vol)
+	vwma.closeVolBuffer.Push(cv)
+	vwma.volBuffer.Push(vol)
 
-	if v.IsIdle() {
-		v.out[0] = 0.0
-		return v.out
+	if vwma.IsIdle() {
+		vwma.out[0] = 0.0
+		return vwma.out
 	}
 
-	v.out[0] = v.closeVolBuffer.Sum / v.volBuffer.Sum
-	return v.out
+	vwma.out[0] = vwma.closeVolBuffer.Sum / vwma.volBuffer.Sum
+	return vwma.out
 }
 
-func (v *VWMA) Current(candle ICandle) []float64 {
-	if v.IsIdle() {
-		v.out[0] = 0.0
-		return v.out
+func (vwma *VWMA) Current(candle ICandle) []float64 {
+	if vwma.IsIdle() {
+		vwma.out[0] = 0.0
+		return vwma.out
 	}
 
 	cv := candle.Close() * candle.Volume()
 	vol := candle.Volume()
-	cvSum := v.closeVolBuffer.SumExceptLast() + cv
-	vSum := v.volBuffer.SumExceptLast() + vol
+	cvSum := vwma.closeVolBuffer.SumExceptLast() + cv
+	vSum := vwma.volBuffer.SumExceptLast() + vol
 
-	v.out[0] = cvSum / vSum
-	return v.out
+	vwma.out[0] = cvSum / vSum
+	return vwma.out
 }
 
-func (v *VWMA) IsIdle() bool {
-	return v.valueNumber < v.Period
+func (vwma *VWMA) IsIdle() bool {
+	return vwma.valueNumber < vwma.Period
 }
 
-func (v *VWMA) IdlePeriod() int {
-	return v.Period - 1
+func (vwma *VWMA) IdlePeriod() int {
+	return vwma.Period - 1
 }
 
-func (v *VWMA) IsWarmedUp() bool {
-	return !v.IsIdle()
+func (vwma *VWMA) IsWarmedUp() bool {
+	return !vwma.IsIdle()
 }
 
-func (v *VWMA) WarmUpPeriod() int {
-	return v.IdlePeriod()
+func (vwma *VWMA) WarmUpPeriod() int {
+	return vwma.IdlePeriod()
 }

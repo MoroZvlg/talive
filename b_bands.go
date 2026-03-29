@@ -1,5 +1,7 @@
 package talive
 
+import "fmt"
+
 // BBands is a Bollinger Bands indicator.
 type BBands struct {
 	Period         int
@@ -31,6 +33,10 @@ func NewBBands(period int, devUp, devDown float64, maType MaType) (*BBands, erro
 		basicDeviation: basicDeviation,
 		out:            make([]float64, 3),
 	}, nil
+}
+
+func (bb *BBands) String() string {
+	return fmt.Sprintf("BBands(%d,%.2f,%.2f,%s)", bb.Period, bb.DevUp, bb.DevDown, bb.ma)
 }
 
 func (bb *BBands) Next(candle ICandle) []float64 {

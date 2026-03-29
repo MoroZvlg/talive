@@ -1,6 +1,9 @@
 package talive
 
-import "math"
+import (
+	"fmt"
+	"math"
+)
 
 // SAR is a Parabolic SAR indicator.
 type SAR struct {
@@ -22,115 +25,119 @@ type SAR struct {
 }
 
 // NewSAR creates a new Parabolic SAR indicator.
-func NewSAR(start, increment, maxAF float64) *SAR {
+func NewSAR(start, increment, maxAF float64) (*SAR, error) {
 	return &SAR{
 		AfStart:     start,
 		AfIncrement: increment,
 		AfMax:       maxAF,
 		out:         make([]float64, 1),
-	}
+	}, nil
 }
 
-func (s *SAR) Next(candle ICandle) []float64 {
-	s.valueNumber++
+func (sar *SAR) String() string {
+	return fmt.Sprintf("SAR(%.2f,%.2f,%.2f)", sar.AfStart, sar.AfIncrement, sar.AfMax)
+}
 
-	if s.valueNumber == 1 {
-		s.prevHigh = candle.High()
-		s.prevLow = candle.Low()
-		s.prevClose = candle.Close()
+func (sar *SAR) Next(candle ICandle) []float64 {
+	sar.valueNumber++
 
-		return s.out
+	if sar.valueNumber == 1 {
+		sar.prevHigh = candle.High()
+		sar.prevLow = candle.Low()
+		sar.prevClose = candle.Close()
+
+		return sar.out
 	}
 
 	var currSar float64
-	ep := s.prevEp
-	af := s.prevAf
+	ep := sar.prevEp
+	af := sar.prevAf
 
-	if s.valueNumber == 2 {
-		if candle.Close() > s.prevClose {
-			s.inUpTrend = true
-			ep = math.Max(s.prevHigh, candle.High())
-			currSar = math.Min(s.prevLow, candle.Low())
+	if sar.valueNumber == 2 {
+		if candle.Close() > sar.prevClose {
+			sar.inUpTrend = true
+			ep = math.Max(sar.prevHigh, candle.High())
+			currSar = math.Min(sar.prevLow, candle.Low())
 		} else {
-			s.inUpTrend = false
-			ep = math.Min(s.prevLow, candle.Low())
-			currSar = math.Max(s.prevHigh, candle.High())
+			sar.inUpTrend = false
+			ep = math.Min(sar.prevLow, candle.Low())
+			currSar = math.Max(sar.prevHigh, candle.High())
 		}
-		af = s.AfStart
-		s.out[0] = currSar
+		af = sar.AfStart
+		sar.out[0] = currSar
 
-		s.prevPrevHigh = s.prevHigh
-		s.prevPrevLow = s.prevLow
-		s.prevEp = ep
-		s.prevSar = currSar
-		s.prevAf = af
-		s.prevHigh = candle.High()
-		s.prevLow = candle.Low()
-		s.prevClose = candle.Close()
+		sar.prevPrevHigh = sar.prevHigh
+		sar.prevPrevLow = sar.prevLow
+		sar.prevEp = ep
+		sar.prevSar = currSar
+		sar.prevAf = af
+		sar.prevHigh = candle.High()
+		sar.prevLow = candle.Low()
+		sar.prevClose = candle.Close()
 
-		return s.out
+		return sar.out
 	}
 
-	currSar = s.prevSar + s.prevAf*(s.prevEp-s.prevSar)
+	currSar = sar.prevSar + sar.prevAf*(sar.prevEp-sar.prevSar)
 
-	if s.inUpTrend {
-		if candle.High() > s.prevEp {
+	if sar.inUpTrend {
+		if candle.High() > sar.prevEp {
 			ep = candle.High()
-			af = math.Min(s.prevAf+s.AfIncrement, s.AfMax)
+			af = math.Min(sar.prevAf+sar.AfIncrement, sar.AfMax)
 		}
 		if currSar > candle.Low() {
-			s.inUpTrend = false
+			sar.inUpTrend = false
 			currSar = ep
 			ep = candle.Low()
-			af = s.AfStart
+			af = sar.AfStart
 		} else {
-			currSar = math.Min(currSar, math.Min(s.prevLow, s.prevPrevLow))
+			currSar = math.Min(currSar, math.Min(sar.prevLow, sar.prevPrevLow))
 		}
 	} else {
-		if candle.Low() < s.prevEp {
+		if candle.Low() < sar.prevEp {
 			ep = candle.Low()
-			af = math.Min(s.prevAf+s.AfIncrement, s.AfMax)
+			af = math.Min(sar.prevAf+sar.AfIncrement, sar.AfMax)
 		}
 		if currSar < candle.High() {
-			s.inUpTrend = true
+			sar.inUpTrend = true
 			currSar = ep
 			ep = candle.High()
-			af = s.AfStart
+			af = sar.AfStart
 		} else {
-			currSar = math.Max(currSar, math.Max(s.prevHigh, s.prevPrevHigh))
+			currSar = math.Max(currSar, math.Max(sar.prevHigh, sar.prevPrevHigh))
 		}
 	}
 
-	s.out[0] = currSar
+	sar.out[0] = currSar
 
-	s.prevSar = currSar
-	s.prevAf = af
-	s.prevEp = ep
-	s.prevPrevHigh = s.prevHigh
-	s.prevPrevLow = s.prevLow
-	s.prevHigh = candle.High()
-	s.prevLow = candle.Low()
-	s.prevClose = candle.Close()
+	sar.prevSar = currSar
+	sar.prevAf = af
+	sar.prevEp = ep
+	sar.prevPrevHigh = sar.prevHigh
+	sar.prevPrevLow = sar.prevLow
+	sar.prevHigh = candle.High()
+	sar.prevLow = candle.Low()
+	sar.prevClose = candle.Close()
 
-	return s.out
+	return sar.out
 }
 
-func (s *SAR) Current(candle ICandle) []float64 {
-	if s.IsIdle() {
-		return s.out
+func (sar *SAR) Current(candle ICandle) []float64 {
+	if sar.IsIdle() {
+		return sar.out
 	}
 
-	currSar := s.prevSar + s.prevAf*(s.prevEp-s.prevSar)
-	ep := s.prevEp
+	currSar := sar.prevSar + sar.prevAf*(sar.prevEp-sar.prevSar)
+	ep := sar.prevEp
 
-	if s.inUpTrend {
+	if sar.inUpTrend {
 		if candle.High() > ep {
 			ep = candle.High()
 		}
 		if currSar > candle.Low() {
 			currSar = ep
 		} else {
-			currSar = math.Min(currSar, math.Min(s.prevLow, s.prevPrevLow))
+			currSar = math.Min(currSar, math.Min(sar.prevLow, sar.prevPrevLow))
 		}
 	} else {
 		if candle.Low() < ep {
@@ -139,29 +146,29 @@ func (s *SAR) Current(candle ICandle) []float64 {
 		if currSar < candle.High() {
 			currSar = ep
 		} else {
-			currSar = math.Max(currSar, math.Max(s.prevHigh, s.prevPrevHigh))
+			currSar = math.Max(currSar, math.Max(sar.prevHigh, sar.prevPrevHigh))
 		}
 	}
 
-	s.out[0] = currSar
-	return s.out
+	sar.out[0] = currSar
+	return sar.out
 }
 
-func (s *SAR) IsIdle() bool {
-	return s.valueNumber <= s.IdlePeriod()
+func (sar *SAR) IsIdle() bool {
+	return sar.valueNumber <= sar.IdlePeriod()
 }
 
-func (s *SAR) IdlePeriod() int {
+func (sar *SAR) IdlePeriod() int {
 	return 1
 }
 
-func (s *SAR) IsWarmedUp() bool {
-	return s.valueNumber > s.WarmUpPeriod()
+func (sar *SAR) IsWarmedUp() bool {
+	return sar.valueNumber > sar.WarmUpPeriod()
 }
 
 // WarmUpPeriod returns a conservative warmup estimate.
-// SAR warmup depends on data (trend length), not on formula parameters.
+// SAR warmup depends on data (trend length), not on formula parametersar.
 // Bigger AfStart and AfIncrement reduce warmup (faster trend flips), but the dependency is not linear.
-func (s *SAR) WarmUpPeriod() int {
+func (sar *SAR) WarmUpPeriod() int {
 	return 100
 }

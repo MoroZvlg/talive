@@ -35,7 +35,10 @@ func NewMACD(fastPeriod int, slowPeriod int, signalPeriod int) (*MACD, error) {
 		signalEMA:    signalEMA,
 		out:          make([]float64, 3),
 	}, nil
+}
 
+func (macd *MACD) String() string {
+	return fmt.Sprintf("MACD(%d,%d,%d)", macd.FastPeriod, macd.SlowPeriod, macd.SignalPeriod)
 }
 
 func (macd *MACD) Next(candle ICandle) []float64 {

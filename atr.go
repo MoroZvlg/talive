@@ -29,6 +29,10 @@ func NewATR(period int) (*ATR, error) {
 	}, nil
 }
 
+func (atr *ATR) String() string {
+	return fmt.Sprintf("ATR(%d)", atr.Period)
+}
+
 func (atr *ATR) Next(candle ICandle) []float64 {
 	atr.valueNumber++
 
