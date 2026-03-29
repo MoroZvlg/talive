@@ -1,5 +1,5 @@
-github.com/MoroZvlg/talive v0.1.2 h1:Jjixk7zB4Js15HVuca7+yACnw+uxAjIsaTpD5GbO5Xc=
-github.com/MoroZvlg/talive v0.1.2/go.mod h1:Htwcigf6EuEpgh1EUe8t2laQJn7lzIHtVaZo666Pvos=
+github.com/MoroZvlg/talive v0.1.3 h1:2F3Qbtf7AeadcWFuu+jrZC1dZ1PKpnjMjdoa+D1prs4=
+github.com/MoroZvlg/talive v0.1.3/go.mod h1:ju3RP9UjrYgenOs9o0augbbgfQavFvKlnTYGPpiDWUw=
 github.com/gorilla/websocket v1.5.3 h1:saDtZ6Pbx/0u+bgYQ3q96pZgCzfhKXGPqt7kZ72aNNg=
 github.com/gorilla/websocket v1.5.3/go.mod h1:YR8l580nyteQvAITg2hZ9XVh4b55+EU/adAjf1fMHhE=
 github.com/joho/godotenv v1.5.1 h1:7eLL/+HRGLY0ldzfGMeQkb7vMd0as4CfYvUVzLqw0N0=
