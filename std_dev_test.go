@@ -9,7 +9,7 @@ import (
 
 func TestStdDev(t *testing.T) {
 	inputData := []float64{1, 2, 7, 3, 12, 9}
-	variance, _ := talive.NewStdDev(5, 1.0)
+	variance, _ := talive.NewStdDev(5, 1.0, talive.SourceClose)
 	var result []float64
 	for _, data := range inputData {
 		result = append(result, roundFloat(variance.Next(&testCandle{close: data})[0], 2))
@@ -22,7 +22,7 @@ func TestStdDev(t *testing.T) {
 
 func TestVarianceNext(t *testing.T) {
 	inputData := []float64{1, 2, 7, 3, 12, 9}
-	variance, _ := talive.NewVariance(5)
+	variance, _ := talive.NewVariance(5, talive.SourceClose)
 	var result []float64
 	for _, data := range inputData {
 		result = append(result, roundFloat(variance.Next(&testCandle{close: data})[0], 2))
@@ -34,7 +34,7 @@ func TestVarianceNext(t *testing.T) {
 }
 
 func TestVarianceIsIdle(t *testing.T) {
-	variance, _ := talive.NewVariance(4)
+	variance, _ := talive.NewVariance(4, talive.SourceClose)
 	var result []string
 	for i := 0; i < 6; i++ {
 		variance.Next(&testCandle{close: float64(i)})
@@ -61,7 +61,7 @@ func TestVarianceIsIdle(t *testing.T) {
 func TestVarianceCurrent(t *testing.T) {
 	inputParsedData := []float64{1, 2, 7, 3, 12, 9}
 	expectedParsedData := []float64{0.0, 0.0, 0.0, 0.0, 16.4, 13.84}
-	indicator, _ := talive.NewVariance(5)
+	indicator, _ := talive.NewVariance(5, talive.SourceClose)
 	for i := 0; i < 5; i++ {
 		indicator.Next(&testCandle{close: inputParsedData[i]})
 	}

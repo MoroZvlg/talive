@@ -6,19 +6,24 @@ import "fmt"
 type EMA struct {
 	Period       int
 	Alpha        float64
+	SourceFunc   SourceFunc
 	valuesNumber int
 	prevEma      float64
 	out          []float64
 }
 
 // NewEMA creates a new EMA indicator with the given period.
-func NewEMA(period int) (MA, error) {
+func NewEMA(period int, source SourceFunc) (MA, error) {
 	if period < 2 {
 		return nil, fmt.Errorf("period should be greater than 1")
+	}
+	if source == nil {
+		source = SourceClose
 	}
 	return &EMA{
 		Period:       period,
 		Alpha:        2.0 / float64(period+1),
+		SourceFunc:   source,
 		valuesNumber: 0,
 		prevEma:      0.0,
 		out:          make([]float64, 1),
@@ -59,12 +64,12 @@ func (ema *EMA) current(value float64) float64 {
 }
 
 func (ema *EMA) Next(candle ICandle) []float64 {
-	ema.out[0] = ema.next(candle.Close())
+	ema.out[0] = ema.next(ema.SourceFunc(candle))
 	return ema.out
 }
 
 func (ema *EMA) Current(candle ICandle) []float64 {
-	ema.out[0] = ema.current(candle.Close())
+	ema.out[0] = ema.current(ema.SourceFunc(candle))
 	return ema.out
 }
 

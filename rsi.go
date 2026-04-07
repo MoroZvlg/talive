@@ -7,6 +7,7 @@ import (
 // RSI is a Relative Strength Index indicator.
 type RSI struct {
 	Period      int
+	SourceFunc  SourceFunc
 	valueNumber int
 	prevPrice   float64
 	gainSmma    MA
@@ -15,17 +16,21 @@ type RSI struct {
 }
 
 // NewRSI creates a new RSI indicator with the given period.
-func NewRSI(period int) (*RSI, error) {
+func NewRSI(period int, source SourceFunc) (*RSI, error) {
 	if period < 2 {
 		return nil, fmt.Errorf("period should be greater than 1")
 	}
-	gainSmma, _ := NewSMMA(period)
-	lossSmma, _ := NewSMMA(period)
+	if source == nil {
+		source = SourceClose
+	}
+	gainSmma, _ := NewSMMA(period, nil)
+	lossSmma, _ := NewSMMA(period, nil)
 	return &RSI{
-		Period:   period,
-		gainSmma: gainSmma,
-		lossSmma: lossSmma,
-		out:      make([]float64, 1),
+		Period:     period,
+		SourceFunc: source,
+		gainSmma:   gainSmma,
+		lossSmma:   lossSmma,
+		out:        make([]float64, 1),
 	}, nil
 }
 
@@ -36,13 +41,14 @@ func (rsi *RSI) String() string {
 func (rsi *RSI) Next(candle ICandle) []float64 {
 	rsi.valueNumber++
 
+	price := rsi.SourceFunc(candle)
 	if rsi.valueNumber == 1 {
-		rsi.prevPrice = candle.Close()
+		rsi.prevPrice = price
 		return rsi.out
 	}
 
-	gain, loss := rsi.gainLoss(candle.Close())
-	rsi.prevPrice = candle.Close()
+	gain, loss := rsi.gainLoss(price)
+	rsi.prevPrice = price
 
 	avgGain := rsi.gainSmma.next(gain)
 	avgLoss := rsi.lossSmma.next(loss)
@@ -60,7 +66,7 @@ func (rsi *RSI) Current(candle ICandle) []float64 {
 		return rsi.out
 	}
 
-	gain, loss := rsi.gainLoss(candle.Close())
+	gain, loss := rsi.gainLoss(rsi.SourceFunc(candle))
 	avgGain := rsi.gainSmma.current(gain)
 	avgLoss := rsi.lossSmma.current(loss)
 

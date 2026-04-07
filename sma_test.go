@@ -10,7 +10,7 @@ import (
 func TestSmaDefault(t *testing.T) {
 	candles, _ := readCandles("test_data/input_data.csv")
 	expectedParsedData, _ := readData("test_data/sma/output_default.csv", []int{1}, 8)
-	indicator, _ := talive.NewSMA(9)
+	indicator, _ := talive.NewSMA(9, talive.SourceClose)
 	result := make([]float64, len(candles))
 	for i, candle := range candles {
 		result[i] = roundFloat(indicator.Next(candle)[0], 8)
@@ -23,7 +23,7 @@ func TestSmaDefault(t *testing.T) {
 func TestSmaMin(t *testing.T) {
 	candles, _ := readCandles("test_data/input_data.csv")
 	expectedParsedData, _ := readData("test_data/sma/output_min.csv", []int{1}, 8)
-	indicator, _ := talive.NewSMA(2)
+	indicator, _ := talive.NewSMA(2, talive.SourceClose)
 	result := make([]float64, len(candles))
 	for i, candle := range candles {
 		result[i] = roundFloat(indicator.Next(candle)[0], 8)
@@ -34,7 +34,7 @@ func TestSmaMin(t *testing.T) {
 }
 
 func TestSmaIdle(t *testing.T) {
-	indicator, _ := talive.NewSMA(3)
+	indicator, _ := talive.NewSMA(3, talive.SourceClose)
 	var result []string
 	for i := 0; i < 4; i++ {
 		indicator.Next(&testCandle{close: float64(i)})
@@ -61,7 +61,7 @@ func TestSmaIdle(t *testing.T) {
 func TestSmaCurrentValue(t *testing.T) {
 	candles, _ := readCandles("test_data/input_data.csv")
 	expectedParsedData, _ := readData("test_data/sma/output_default.csv", []int{1}, 8)
-	indicator, _ := talive.NewSMA(9)
+	indicator, _ := talive.NewSMA(9, talive.SourceClose)
 	for i := 0; i < 9; i++ {
 		indicator.Next(candles[i])
 	}
@@ -81,22 +81,22 @@ var smaDummy talive.MA
 func Benchmark_Sma_Init_Allocations(benchmark *testing.B) {
 	benchmark.Run("SMA 2", func(benchmark *testing.B) {
 		for i := 0; i < benchmark.N; i++ {
-			smaDummy, _ = talive.NewSMA(2)
+			smaDummy, _ = talive.NewSMA(2, talive.SourceClose)
 		}
 	})
 	benchmark.Run("SMA 50", func(benchmark *testing.B) {
 		for i := 0; i < benchmark.N; i++ {
-			smaDummy, _ = talive.NewSMA(50)
+			smaDummy, _ = talive.NewSMA(50, talive.SourceClose)
 		}
 	})
 	benchmark.Run("SMA 100", func(benchmark *testing.B) {
 		for i := 0; i < benchmark.N; i++ {
-			smaDummy, _ = talive.NewSMA(100)
+			smaDummy, _ = talive.NewSMA(100, talive.SourceClose)
 		}
 	})
 	benchmark.Run("SMA 1000", func(benchmark *testing.B) {
 		for i := 0; i < benchmark.N; i++ {
-			smaDummy, _ = talive.NewSMA(1000)
+			smaDummy, _ = talive.NewSMA(1000, talive.SourceClose)
 		}
 	})
 }
@@ -105,7 +105,7 @@ func Benchmark_Sma_Next_Allocations(benchmark *testing.B) {
 	candles, _ := readCandles("test_data/input_data.csv")
 	dataLen := len(candles)
 	benchmark.Run("SMA 2", func(benchmark *testing.B) {
-		indicator, _ := talive.NewSMA(2)
+		indicator, _ := talive.NewSMA(2, talive.SourceClose)
 		dataIndex := 0
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {
@@ -114,7 +114,7 @@ func Benchmark_Sma_Next_Allocations(benchmark *testing.B) {
 		}
 	})
 	benchmark.Run("SMA 50", func(benchmark *testing.B) {
-		indicator, _ := talive.NewSMA(50)
+		indicator, _ := talive.NewSMA(50, talive.SourceClose)
 		dataIndex := 0
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {
@@ -123,7 +123,7 @@ func Benchmark_Sma_Next_Allocations(benchmark *testing.B) {
 		}
 	})
 	benchmark.Run("SMA 100", func(benchmark *testing.B) {
-		indicator, _ := talive.NewSMA(100)
+		indicator, _ := talive.NewSMA(100, talive.SourceClose)
 		dataIndex := 0
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {
@@ -132,7 +132,7 @@ func Benchmark_Sma_Next_Allocations(benchmark *testing.B) {
 		}
 	})
 	benchmark.Run("SMA 1000", func(benchmark *testing.B) {
-		indicator, _ := talive.NewSMA(1000)
+		indicator, _ := talive.NewSMA(1000, talive.SourceClose)
 		dataIndex := 0
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {
@@ -146,7 +146,7 @@ func Benchmark_Sma_Current_Allocations(benchmark *testing.B) {
 	candles, _ := readCandles("test_data/input_data.csv")
 	dataLen := len(candles)
 	benchmark.Run("SMA 2", func(benchmark *testing.B) {
-		indicator, _ := talive.NewSMA(2)
+		indicator, _ := talive.NewSMA(2, talive.SourceClose)
 		dataIndex := 0
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {
@@ -155,7 +155,7 @@ func Benchmark_Sma_Current_Allocations(benchmark *testing.B) {
 		}
 	})
 	benchmark.Run("SMA 50", func(benchmark *testing.B) {
-		indicator, _ := talive.NewSMA(50)
+		indicator, _ := talive.NewSMA(50, talive.SourceClose)
 		dataIndex := 0
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {
@@ -164,7 +164,7 @@ func Benchmark_Sma_Current_Allocations(benchmark *testing.B) {
 		}
 	})
 	benchmark.Run("SMA 100", func(benchmark *testing.B) {
-		indicator, _ := talive.NewSMA(100)
+		indicator, _ := talive.NewSMA(100, talive.SourceClose)
 		dataIndex := 0
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {
@@ -173,7 +173,7 @@ func Benchmark_Sma_Current_Allocations(benchmark *testing.B) {
 		}
 	})
 	benchmark.Run("SMA 1000", func(benchmark *testing.B) {
-		indicator, _ := talive.NewSMA(1000)
+		indicator, _ := talive.NewSMA(1000, talive.SourceClose)
 		dataIndex := 0
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {

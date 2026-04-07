@@ -5,20 +5,25 @@ import "fmt"
 // Momentum is a Momentum indicator.
 type Momentum struct {
 	Period      int
+	SourceFunc  SourceFunc
 	valueNumber int
 	buffer      *ringBuffer
 	out         []float64
 }
 
 // NewMomentum creates a new Momentum indicator with the given period.
-func NewMomentum(period int) (*Momentum, error) {
+func NewMomentum(period int, source SourceFunc) (*Momentum, error) {
 	if period < 1 {
 		return nil, fmt.Errorf("period should be greater than 0")
 	}
+	if source == nil {
+		source = SourceClose
+	}
 	return &Momentum{
-		Period: period,
-		buffer: newRingBuffer(period),
-		out:    make([]float64, 1),
+		Period:     period,
+		SourceFunc: source,
+		buffer:     newRingBuffer(period),
+		out:        make([]float64, 1),
 	}, nil
 }
 
@@ -29,14 +34,15 @@ func (m *Momentum) String() string {
 func (m *Momentum) Next(candle ICandle) []float64 {
 	m.valueNumber++
 
+	value := m.SourceFunc(candle)
 	oldest := m.buffer.Last()
-	m.buffer.Push(candle.Close())
+	m.buffer.Push(value)
 
 	if m.IsIdle() {
 		return m.out
 	}
 
-	m.out[0] = candle.Close() - oldest
+	m.out[0] = value - oldest
 	return m.out
 }
 
@@ -45,8 +51,7 @@ func (m *Momentum) Current(candle ICandle) []float64 {
 		return m.out
 	}
 
-	oldest := m.buffer.Last()
-	m.out[0] = candle.Close() - oldest
+	m.out[0] = m.SourceFunc(candle) - m.buffer.Last()
 	return m.out
 }
 

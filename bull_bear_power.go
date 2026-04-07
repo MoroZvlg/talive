@@ -4,22 +4,27 @@ import "fmt"
 
 // BullBearPower is an Elder's Bull Bear Power indicator.
 type BullBearPower struct {
-	Period int
+	Period     int
+	SourceFunc SourceFunc
 
 	ema MA
 	out []float64
 }
 
 // NewBullBearPower creates a new Bull Bear Power indicator with the given period.
-func NewBullBearPower(period int) (*BullBearPower, error) {
+func NewBullBearPower(period int, source SourceFunc) (*BullBearPower, error) {
 	if period < 2 {
 		return nil, fmt.Errorf("period should be greater than 1")
 	}
-	ema, _ := NewEMA(period)
+	if source == nil {
+		source = SourceClose
+	}
+	ema, _ := NewEMA(period, nil)
 	return &BullBearPower{
-		Period: period,
-		ema:    ema,
-		out:    make([]float64, 1),
+		Period:     period,
+		SourceFunc: source,
+		ema:        ema,
+		out:        make([]float64, 1),
 	}, nil
 }
 
@@ -28,7 +33,7 @@ func (bbp *BullBearPower) String() string {
 }
 
 func (bbp *BullBearPower) Next(candle ICandle) []float64 {
-	emaVal := bbp.ema.next(candle.Close())
+	emaVal := bbp.ema.next(bbp.SourceFunc(candle))
 
 	if bbp.ema.IsIdle() {
 		return bbp.out
@@ -43,7 +48,7 @@ func (bbp *BullBearPower) Current(candle ICandle) []float64 {
 		return bbp.out
 	}
 
-	emaVal := bbp.ema.current(candle.Close())
+	emaVal := bbp.ema.current(bbp.SourceFunc(candle))
 	bbp.out[0] = candle.High() + candle.Low() - 2*emaVal
 	return bbp.out
 }

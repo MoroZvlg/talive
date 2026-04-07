@@ -10,7 +10,7 @@ import (
 func TestEmaDefault(t *testing.T) {
 	candles, _ := readCandles("test_data/input_data.csv")
 	expectedParsedData, _ := readData("test_data/ema/output_default.csv", []int{1}, 7)
-	indicator, _ := talive.NewEMA(9)
+	indicator, _ := talive.NewEMA(9, talive.SourceClose)
 	result := make([]float64, len(candles))
 	for i, candle := range candles {
 		result[i] = roundFloat(indicator.Next(candle)[0], 7)
@@ -23,7 +23,7 @@ func TestEmaDefault(t *testing.T) {
 func TestEmaMin(t *testing.T) {
 	candles, _ := readCandles("test_data/input_data.csv")
 	expectedParsedData, _ := readData("test_data/ema/output_min.csv", []int{1}, 8)
-	indicator, _ := talive.NewEMA(2)
+	indicator, _ := talive.NewEMA(2, talive.SourceClose)
 	result := make([]float64, len(candles))
 	for i, candle := range candles {
 		result[i] = roundFloat(indicator.Next(candle)[0], 8)
@@ -34,7 +34,7 @@ func TestEmaMin(t *testing.T) {
 }
 
 func TestEmaIdle(t *testing.T) {
-	indicator, _ := talive.NewEMA(3)
+	indicator, _ := talive.NewEMA(3, talive.SourceClose)
 	var result []string
 	for i := 0; i < 4; i++ {
 		indicator.Next(&testCandle{close: float64(i)})
@@ -61,7 +61,7 @@ func TestEmaIdle(t *testing.T) {
 func TestEmaCurrentValue(t *testing.T) {
 	candles, _ := readCandles("test_data/input_data.csv")
 	expectedParsedData, _ := readData("test_data/ema/output_default.csv", []int{1}, 8)
-	indicator, _ := talive.NewEMA(9)
+	indicator, _ := talive.NewEMA(9, talive.SourceClose)
 	for i := 0; i < 9; i++ {
 		indicator.Next(candles[i])
 	}
@@ -81,22 +81,22 @@ var emaDummy talive.MA
 func Benchmark_Ema_Init_Allocations(benchmark *testing.B) {
 	benchmark.Run("EMA 2", func(benchmark *testing.B) {
 		for i := 0; i < benchmark.N; i++ {
-			emaDummy, _ = talive.NewEMA(2)
+			emaDummy, _ = talive.NewEMA(2, talive.SourceClose)
 		}
 	})
 	benchmark.Run("EMA 50", func(benchmark *testing.B) {
 		for i := 0; i < benchmark.N; i++ {
-			emaDummy, _ = talive.NewEMA(50)
+			emaDummy, _ = talive.NewEMA(50, talive.SourceClose)
 		}
 	})
 	benchmark.Run("EMA 100", func(benchmark *testing.B) {
 		for i := 0; i < benchmark.N; i++ {
-			emaDummy, _ = talive.NewEMA(100)
+			emaDummy, _ = talive.NewEMA(100, talive.SourceClose)
 		}
 	})
 	benchmark.Run("EMA 1000", func(benchmark *testing.B) {
 		for i := 0; i < benchmark.N; i++ {
-			emaDummy, _ = talive.NewEMA(1000)
+			emaDummy, _ = talive.NewEMA(1000, talive.SourceClose)
 		}
 	})
 }
@@ -105,7 +105,7 @@ func Benchmark_Ema_Next_Allocations(benchmark *testing.B) {
 	candles, _ := readCandles("test_data/input_data.csv")
 	dataLen := len(candles)
 	benchmark.Run("EMA 2", func(benchmark *testing.B) {
-		indicator, _ := talive.NewEMA(2)
+		indicator, _ := talive.NewEMA(2, talive.SourceClose)
 		dataIndex := 0
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {
@@ -114,7 +114,7 @@ func Benchmark_Ema_Next_Allocations(benchmark *testing.B) {
 		}
 	})
 	benchmark.Run("EMA 50", func(benchmark *testing.B) {
-		indicator, _ := talive.NewEMA(50)
+		indicator, _ := talive.NewEMA(50, talive.SourceClose)
 		dataIndex := 0
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {
@@ -123,7 +123,7 @@ func Benchmark_Ema_Next_Allocations(benchmark *testing.B) {
 		}
 	})
 	benchmark.Run("EMA 100", func(benchmark *testing.B) {
-		indicator, _ := talive.NewEMA(100)
+		indicator, _ := talive.NewEMA(100, talive.SourceClose)
 		dataIndex := 0
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {
@@ -132,7 +132,7 @@ func Benchmark_Ema_Next_Allocations(benchmark *testing.B) {
 		}
 	})
 	benchmark.Run("EMA 1000", func(benchmark *testing.B) {
-		indicator, _ := talive.NewEMA(1000)
+		indicator, _ := talive.NewEMA(1000, talive.SourceClose)
 		dataIndex := 0
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {
@@ -146,7 +146,7 @@ func Benchmark_Ema_Current_Allocations(benchmark *testing.B) {
 	candles, _ := readCandles("test_data/input_data.csv")
 	dataLen := len(candles)
 	benchmark.Run("EMA 2", func(benchmark *testing.B) {
-		indicator, _ := talive.NewEMA(2)
+		indicator, _ := talive.NewEMA(2, talive.SourceClose)
 		dataIndex := 0
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {
@@ -155,7 +155,7 @@ func Benchmark_Ema_Current_Allocations(benchmark *testing.B) {
 		}
 	})
 	benchmark.Run("EMA 50", func(benchmark *testing.B) {
-		indicator, _ := talive.NewEMA(50)
+		indicator, _ := talive.NewEMA(50, talive.SourceClose)
 		dataIndex := 0
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {
@@ -164,7 +164,7 @@ func Benchmark_Ema_Current_Allocations(benchmark *testing.B) {
 		}
 	})
 	benchmark.Run("EMA 100", func(benchmark *testing.B) {
-		indicator, _ := talive.NewEMA(100)
+		indicator, _ := talive.NewEMA(100, talive.SourceClose)
 		dataIndex := 0
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {
@@ -173,7 +173,7 @@ func Benchmark_Ema_Current_Allocations(benchmark *testing.B) {
 		}
 	})
 	benchmark.Run("EMA 1000", func(benchmark *testing.B) {
-		indicator, _ := talive.NewEMA(1000)
+		indicator, _ := talive.NewEMA(1000, talive.SourceClose)
 		dataIndex := 0
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {

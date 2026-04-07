@@ -10,7 +10,7 @@ import (
 func TestMomentumDefault(t *testing.T) {
 	candles, _ := readCandles("test_data/input_data2.csv")
 	expectedParsedData, _ := readData("test_data/momentum/output_default.csv", []int{1}, 7)
-	indicator, _ := talive.NewMomentum(10)
+	indicator, _ := talive.NewMomentum(10, talive.SourceClose)
 	result := make([]float64, len(candles))
 	for i, candle := range candles {
 		result[i] = roundFloat(indicator.Next(candle)[0], 7)
@@ -23,7 +23,7 @@ func TestMomentumDefault(t *testing.T) {
 func TestMomentumMin(t *testing.T) {
 	candles, _ := readCandles("test_data/input_data2.csv")
 	expectedParsedData, _ := readData("test_data/momentum/output_min.csv", []int{1}, 7)
-	indicator, _ := talive.NewMomentum(2)
+	indicator, _ := talive.NewMomentum(2, talive.SourceClose)
 	result := make([]float64, len(candles))
 	for i, candle := range candles {
 		result[i] = roundFloat(indicator.Next(candle)[0], 7)
@@ -34,7 +34,7 @@ func TestMomentumMin(t *testing.T) {
 }
 
 func TestMomentumIdle(t *testing.T) {
-	indicator, _ := talive.NewMomentum(3)
+	indicator, _ := talive.NewMomentum(3, talive.SourceClose)
 	var result []string
 	for i := 0; i < 5; i++ {
 		indicator.Next(&testCandle{close: float64(i)})
@@ -61,7 +61,7 @@ func TestMomentumIdle(t *testing.T) {
 func TestMomentumCurrentValue(t *testing.T) {
 	candles, _ := readCandles("test_data/input_data2.csv")
 	expectedParsedData, _ := readData("test_data/momentum/output_default.csv", []int{1}, 8)
-	indicator, _ := talive.NewMomentum(10)
+	indicator, _ := talive.NewMomentum(10, talive.SourceClose)
 	for i := 0; i < 11; i++ {
 		indicator.Next(candles[i])
 	}
@@ -81,12 +81,12 @@ var momentumDummy *talive.Momentum
 func Benchmark_Momentum_Init_Allocations(benchmark *testing.B) {
 	benchmark.Run("Momentum 2", func(benchmark *testing.B) {
 		for i := 0; i < benchmark.N; i++ {
-			momentumDummy, _ = talive.NewMomentum(2)
+			momentumDummy, _ = talive.NewMomentum(2, talive.SourceClose)
 		}
 	})
 	benchmark.Run("Momentum 50", func(benchmark *testing.B) {
 		for i := 0; i < benchmark.N; i++ {
-			momentumDummy, _ = talive.NewMomentum(50)
+			momentumDummy, _ = talive.NewMomentum(50, talive.SourceClose)
 		}
 	})
 }
@@ -95,7 +95,7 @@ func Benchmark_Momentum_Next_Allocations(benchmark *testing.B) {
 	candles, _ := readCandles("test_data/input_data2.csv")
 	dataLen := len(candles)
 	benchmark.Run("Momentum 2", func(benchmark *testing.B) {
-		indicator, _ := talive.NewMomentum(2)
+		indicator, _ := talive.NewMomentum(2, talive.SourceClose)
 		dataIndex := 0
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {
@@ -104,7 +104,7 @@ func Benchmark_Momentum_Next_Allocations(benchmark *testing.B) {
 		}
 	})
 	benchmark.Run("Momentum 50", func(benchmark *testing.B) {
-		indicator, _ := talive.NewMomentum(50)
+		indicator, _ := talive.NewMomentum(50, talive.SourceClose)
 		dataIndex := 0
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {
@@ -118,7 +118,7 @@ func Benchmark_Momentum_Current_Allocations(benchmark *testing.B) {
 	candles, _ := readCandles("test_data/input_data2.csv")
 	dataLen := len(candles)
 	benchmark.Run("Momentum 2", func(benchmark *testing.B) {
-		indicator, _ := talive.NewMomentum(2)
+		indicator, _ := talive.NewMomentum(2, talive.SourceClose)
 		dataIndex := 0
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {
@@ -127,7 +127,7 @@ func Benchmark_Momentum_Current_Allocations(benchmark *testing.B) {
 		}
 	})
 	benchmark.Run("Momentum 50", func(benchmark *testing.B) {
-		indicator, _ := talive.NewMomentum(50)
+		indicator, _ := talive.NewMomentum(50, talive.SourceClose)
 		dataIndex := 0
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {

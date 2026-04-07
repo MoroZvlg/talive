@@ -10,7 +10,7 @@ import (
 func TestBullBearPowerDefault(t *testing.T) {
 	candles, _ := readCandles("test_data/input_data2.csv")
 	expectedParsedData, _ := readData("test_data/bull_bear_power/output_default.csv", []int{1}, 7)
-	indicator, _ := talive.NewBullBearPower(13)
+	indicator, _ := talive.NewBullBearPower(13, talive.SourceClose)
 	result := make([]float64, len(candles))
 	for i, candle := range candles {
 		result[i] = roundFloat(indicator.Next(candle)[0], 7)
@@ -23,7 +23,7 @@ func TestBullBearPowerDefault(t *testing.T) {
 func TestBullBearPowerMin(t *testing.T) {
 	candles, _ := readCandles("test_data/input_data2.csv")
 	expectedParsedData, _ := readData("test_data/bull_bear_power/output_min.csv", []int{1}, 7)
-	indicator, _ := talive.NewBullBearPower(2)
+	indicator, _ := talive.NewBullBearPower(2, talive.SourceClose)
 	result := make([]float64, len(candles))
 	for i, candle := range candles {
 		result[i] = roundFloat(indicator.Next(candle)[0], 7)
@@ -34,7 +34,7 @@ func TestBullBearPowerMin(t *testing.T) {
 }
 
 func TestBullBearPowerIdle(t *testing.T) {
-	indicator, _ := talive.NewBullBearPower(3)
+	indicator, _ := talive.NewBullBearPower(3, talive.SourceClose)
 	var result []string
 	for i := 0; i < 4; i++ {
 		indicator.Next(&testCandle{high: float64(i + 2), low: float64(i), close: float64(i + 1)})
@@ -61,7 +61,7 @@ func TestBullBearPowerIdle(t *testing.T) {
 func TestBullBearPowerCurrentValue(t *testing.T) {
 	candles, _ := readCandles("test_data/input_data2.csv")
 	expectedParsedData, _ := readData("test_data/bull_bear_power/output_default.csv", []int{1}, 8)
-	indicator, _ := talive.NewBullBearPower(13)
+	indicator, _ := talive.NewBullBearPower(13, talive.SourceClose)
 	for i := 0; i < 13; i++ {
 		indicator.Next(candles[i])
 	}
@@ -81,12 +81,12 @@ var bbpDummy *talive.BullBearPower
 func Benchmark_BullBearPower_Init_Allocations(b *testing.B) {
 	b.Run("BBPower(2)", func(b *testing.B) {
 		for i := 0; i < b.N; i++ {
-			bbpDummy, _ = talive.NewBullBearPower(2)
+			bbpDummy, _ = talive.NewBullBearPower(2, talive.SourceClose)
 		}
 	})
 	b.Run("BBPower(50)", func(b *testing.B) {
 		for i := 0; i < b.N; i++ {
-			bbpDummy, _ = talive.NewBullBearPower(50)
+			bbpDummy, _ = talive.NewBullBearPower(50, talive.SourceClose)
 		}
 	})
 }
@@ -95,7 +95,7 @@ func Benchmark_BullBearPower_Next_Allocations(b *testing.B) {
 	candles, _ := readCandles("test_data/input_data2.csv")
 	dataLen := len(candles)
 	b.Run("BBPower(2)", func(b *testing.B) {
-		indicator, _ := talive.NewBullBearPower(2)
+		indicator, _ := talive.NewBullBearPower(2, talive.SourceClose)
 		dataIndex := 0
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
@@ -104,7 +104,7 @@ func Benchmark_BullBearPower_Next_Allocations(b *testing.B) {
 		}
 	})
 	b.Run("BBPower(50)", func(b *testing.B) {
-		indicator, _ := talive.NewBullBearPower(50)
+		indicator, _ := talive.NewBullBearPower(50, talive.SourceClose)
 		dataIndex := 0
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
@@ -118,7 +118,7 @@ func Benchmark_BullBearPower_Current_Allocations(b *testing.B) {
 	candles, _ := readCandles("test_data/input_data2.csv")
 	dataLen := len(candles)
 	b.Run("BBPower(2)", func(b *testing.B) {
-		indicator, _ := talive.NewBullBearPower(2)
+		indicator, _ := talive.NewBullBearPower(2, talive.SourceClose)
 		dataIndex := 0
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
@@ -127,7 +127,7 @@ func Benchmark_BullBearPower_Current_Allocations(b *testing.B) {
 		}
 	})
 	b.Run("BBPower(50)", func(b *testing.B) {
-		indicator, _ := talive.NewBullBearPower(50)
+		indicator, _ := talive.NewBullBearPower(50, talive.SourceClose)
 		dataIndex := 0
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {

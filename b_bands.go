@@ -7,6 +7,7 @@ type BBands struct {
 	Period         int
 	DevUp, DevDown float64
 	MaType         MaType
+	SourceFunc     SourceFunc
 	valueNumber    int
 	ma             MA
 	basicDeviation *StdDev
@@ -14,12 +15,15 @@ type BBands struct {
 }
 
 // NewBBands creates a new Bollinger Bands indicator with the given parameters.
-func NewBBands(period int, devUp, devDown float64, maType MaType) (*BBands, error) {
-	ma, err := NewMa(period, maType)
+func NewBBands(period int, devUp, devDown float64, maType MaType, source SourceFunc) (*BBands, error) {
+	if source == nil {
+		source = SourceClose
+	}
+	ma, err := NewMa(period, maType, nil)
 	if err != nil {
 		return nil, err
 	}
-	basicDeviation, err := NewStdDev(period, 1.0)
+	basicDeviation, err := NewStdDev(period, 1.0, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -28,6 +32,7 @@ func NewBBands(period int, devUp, devDown float64, maType MaType) (*BBands, erro
 		DevUp:          devUp,
 		DevDown:        devDown,
 		MaType:         maType,
+		SourceFunc:     source,
 		valueNumber:    0,
 		ma:             ma,
 		basicDeviation: basicDeviation,
@@ -40,7 +45,7 @@ func (bb *BBands) String() string {
 }
 
 func (bb *BBands) Next(candle ICandle) []float64 {
-	value := candle.Close()
+	value := bb.SourceFunc(candle)
 	bb.valueNumber++
 	ma := bb.ma.next(value)
 	devBase := bb.basicDeviation.next(value)
@@ -59,7 +64,7 @@ func (bb *BBands) Next(candle ICandle) []float64 {
 }
 
 func (bb *BBands) Current(candle ICandle) []float64 {
-	value := candle.Close()
+	value := bb.SourceFunc(candle)
 	bb.valueNumber++
 	ma := bb.ma.current(value)
 	devBase := bb.basicDeviation.current(value)

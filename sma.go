@@ -5,15 +5,20 @@ import "fmt"
 // SMA is a Simple Moving Average indicator.
 type SMA struct {
 	Period      int
+	SourceFunc  SourceFunc
 	valueNumber int
 	buffer      *ringBuffer
 	out         []float64
 }
 
 // NewSMA creates a new SMA indicator with the given period.
-func NewSMA(period int) (MA, error) {
+func NewSMA(period int, source SourceFunc) (MA, error) {
+	if source == nil {
+		source = SourceClose
+	}
 	return &SMA{
 		Period:      period,
+		SourceFunc:  source,
 		valueNumber: 0,
 		buffer:      newRingBuffer(period),
 		out:         make([]float64, 1),
@@ -42,12 +47,12 @@ func (sma *SMA) current(value float64) float64 {
 }
 
 func (sma *SMA) Next(candle ICandle) []float64 {
-	sma.out[0] = sma.next(candle.Close())
+	sma.out[0] = sma.next(sma.SourceFunc(candle))
 	return sma.out
 }
 
 func (sma *SMA) Current(candle ICandle) []float64 {
-	sma.out[0] = sma.current(candle.Close())
+	sma.out[0] = sma.current(sma.SourceFunc(candle))
 	return sma.out
 }
 

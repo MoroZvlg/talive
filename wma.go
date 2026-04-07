@@ -9,6 +9,7 @@ import "fmt"
 // So: weightedSum += newValue*period - buffer.Sum
 type WMA struct {
 	Period      int
+	SourceFunc  SourceFunc
 	valueNumber int
 	denominator float64
 	weightedSum float64
@@ -17,12 +18,16 @@ type WMA struct {
 }
 
 // NewWMA creates a new WMA indicator with the given period.
-func NewWMA(period int) (MA, error) {
+func NewWMA(period int, source SourceFunc) (MA, error) {
 	if period < 1 {
 		return nil, fmt.Errorf("period should be greater than 0")
 	}
+	if source == nil {
+		source = SourceClose
+	}
 	return &WMA{
 		Period:      period,
+		SourceFunc:  source,
 		denominator: float64(period) * float64(period+1) / 2,
 		buffer:      newRingBuffer(period),
 		out:         make([]float64, 1),
@@ -53,12 +58,12 @@ func (wma *WMA) current(value float64) float64 {
 }
 
 func (wma *WMA) Next(candle ICandle) []float64 {
-	wma.out[0] = wma.next(candle.Close())
+	wma.out[0] = wma.next(wma.SourceFunc(candle))
 	return wma.out
 }
 
 func (wma *WMA) Current(candle ICandle) []float64 {
-	wma.out[0] = wma.current(candle.Close())
+	wma.out[0] = wma.current(wma.SourceFunc(candle))
 	return wma.out
 }
 

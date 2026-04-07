@@ -10,7 +10,7 @@ import (
 func TestWmaDefault(t *testing.T) {
 	candles, _ := readCandles("test_data/input_data2.csv")
 	expectedParsedData, _ := readData("test_data/wma/output_default.csv", []int{1}, 6)
-	indicator, _ := talive.NewWMA(9)
+	indicator, _ := talive.NewWMA(9, talive.SourceClose)
 	result := make([]float64, len(candles))
 	for i, candle := range candles {
 		result[i] = roundFloat(indicator.Next(candle)[0], 6)
@@ -23,7 +23,7 @@ func TestWmaDefault(t *testing.T) {
 func TestWmaMin(t *testing.T) {
 	candles, _ := readCandles("test_data/input_data2.csv")
 	expectedParsedData, _ := readData("test_data/wma/output_min.csv", []int{1}, 7)
-	indicator, _ := talive.NewWMA(2)
+	indicator, _ := talive.NewWMA(2, talive.SourceClose)
 	result := make([]float64, len(candles))
 	for i, candle := range candles {
 		result[i] = roundFloat(indicator.Next(candle)[0], 7)
@@ -34,7 +34,7 @@ func TestWmaMin(t *testing.T) {
 }
 
 func TestWmaIdle(t *testing.T) {
-	indicator, _ := talive.NewWMA(4)
+	indicator, _ := talive.NewWMA(4, talive.SourceClose)
 	var result []string
 	for i := 0; i < 6; i++ {
 		indicator.Next(&testCandle{close: float64(i + 1)})
@@ -61,7 +61,7 @@ func TestWmaIdle(t *testing.T) {
 func TestWmaCurrentValue(t *testing.T) {
 	candles, _ := readCandles("test_data/input_data2.csv")
 	expectedParsedData, _ := readData("test_data/wma/output_default.csv", []int{1}, 8)
-	indicator, _ := talive.NewWMA(9)
+	indicator, _ := talive.NewWMA(9, talive.SourceClose)
 	for i := 0; i < 10; i++ {
 		indicator.Next(candles[i])
 	}
@@ -81,12 +81,12 @@ var wmaDummy talive.MA
 func Benchmark_Wma_Init_Allocations(b *testing.B) {
 	b.Run("WMA(2)", func(b *testing.B) {
 		for i := 0; i < b.N; i++ {
-			wmaDummy, _ = talive.NewWMA(2)
+			wmaDummy, _ = talive.NewWMA(2, talive.SourceClose)
 		}
 	})
 	b.Run("WMA(50)", func(b *testing.B) {
 		for i := 0; i < b.N; i++ {
-			wmaDummy, _ = talive.NewWMA(50)
+			wmaDummy, _ = talive.NewWMA(50, talive.SourceClose)
 		}
 	})
 }
@@ -95,7 +95,7 @@ func Benchmark_Wma_Next_Allocations(b *testing.B) {
 	candles, _ := readCandles("test_data/input_data2.csv")
 	dataLen := len(candles)
 	b.Run("WMA(2)", func(b *testing.B) {
-		indicator, _ := talive.NewWMA(2)
+		indicator, _ := talive.NewWMA(2, talive.SourceClose)
 		dataIndex := 0
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
@@ -104,7 +104,7 @@ func Benchmark_Wma_Next_Allocations(b *testing.B) {
 		}
 	})
 	b.Run("WMA(50)", func(b *testing.B) {
-		indicator, _ := talive.NewWMA(50)
+		indicator, _ := talive.NewWMA(50, talive.SourceClose)
 		dataIndex := 0
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
@@ -118,7 +118,7 @@ func Benchmark_Wma_Current_Allocations(b *testing.B) {
 	candles, _ := readCandles("test_data/input_data2.csv")
 	dataLen := len(candles)
 	b.Run("WMA(2)", func(b *testing.B) {
-		indicator, _ := talive.NewWMA(2)
+		indicator, _ := talive.NewWMA(2, talive.SourceClose)
 		dataIndex := 0
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
@@ -127,7 +127,7 @@ func Benchmark_Wma_Current_Allocations(b *testing.B) {
 		}
 	})
 	b.Run("WMA(50)", func(b *testing.B) {
-		indicator, _ := talive.NewWMA(50)
+		indicator, _ := talive.NewWMA(50, talive.SourceClose)
 		dataIndex := 0
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {

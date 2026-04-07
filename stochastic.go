@@ -17,8 +17,8 @@ type Stochastic struct {
 
 // NewStochastic creates a new Stochastic Oscillator indicator with the given params.
 func NewStochastic(kLen, kSmooth, dSmooth int) (*Stochastic, error) {
-	kSMA, _ := NewSMA(kSmooth)
-	dSMA, _ := NewSMA(dSmooth)
+	kSMA, _ := NewSMA(kSmooth, nil)
+	dSMA, _ := NewSMA(dSmooth, nil)
 	return &Stochastic{
 		KLen:        kLen,
 		KSmooth:     kSmooth,

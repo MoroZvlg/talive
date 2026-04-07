@@ -25,10 +25,10 @@ type DMI struct {
 
 // NewDMI creates a new DMI indicator with the given periodmi.
 func NewDMI(period int) (*DMI, error) {
-	plusDMSmma, _ := NewSMMA(period)
-	minusDMSmma, _ := NewSMMA(period)
-	trSmma, _ := NewSMMA(period)
-	adxSmma, _ := NewSMMA(period)
+	plusDMSmma, _ := NewSMMA(period, nil)
+	minusDMSmma, _ := NewSMMA(period, nil)
+	trSmma, _ := NewSMMA(period, nil)
+	adxSmma, _ := NewSMMA(period, nil)
 	return &DMI{
 		Period:      period,
 		plusDMSmma:  plusDMSmma,

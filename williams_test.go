@@ -10,7 +10,7 @@ import (
 func TestWilliamsDefault(t *testing.T) {
 	candles, _ := readCandles("test_data/input_data2.csv")
 	expectedParsedData, _ := readData("test_data/williams/output_default.csv", []int{1}, 7)
-	indicator, _ := talive.NewWilliams(14)
+	indicator, _ := talive.NewWilliams(14, talive.SourceClose)
 	result := make([]float64, len(candles))
 	for i, candle := range candles {
 		result[i] = roundFloat(indicator.Next(candle)[0], 7)
@@ -23,7 +23,7 @@ func TestWilliamsDefault(t *testing.T) {
 func TestWilliamsMin(t *testing.T) {
 	candles, _ := readCandles("test_data/input_data2.csv")
 	expectedParsedData, _ := readData("test_data/williams/output_min.csv", []int{1}, 7)
-	indicator, _ := talive.NewWilliams(2)
+	indicator, _ := talive.NewWilliams(2, talive.SourceClose)
 	result := make([]float64, len(candles))
 	for i, candle := range candles {
 		result[i] = roundFloat(indicator.Next(candle)[0], 7)
@@ -34,7 +34,7 @@ func TestWilliamsMin(t *testing.T) {
 }
 
 func TestWilliamsIdle(t *testing.T) {
-	indicator, _ := talive.NewWilliams(3)
+	indicator, _ := talive.NewWilliams(3, talive.SourceClose)
 	var result []string
 	for i := 0; i < 4; i++ {
 		indicator.Next(&testCandle{high: float64(i + 2), low: float64(i), close: float64(i + 1)})
@@ -61,7 +61,7 @@ func TestWilliamsIdle(t *testing.T) {
 func TestWilliamsCurrent(t *testing.T) {
 	candles, _ := readCandles("test_data/input_data2.csv")
 	expectedParsedData, _ := readData("test_data/williams/output_default.csv", []int{1}, 8)
-	indicator, _ := talive.NewWilliams(14)
+	indicator, _ := talive.NewWilliams(14, talive.SourceClose)
 	for i := 0; i < 14; i++ {
 		indicator.Next(candles[i])
 	}
@@ -81,12 +81,12 @@ var williamsDummy *talive.Williams
 func Benchmark_Williams_Init_Allocations(b *testing.B) {
 	b.Run("Williams(2)", func(b *testing.B) {
 		for i := 0; i < b.N; i++ {
-			williamsDummy, _ = talive.NewWilliams(2)
+			williamsDummy, _ = talive.NewWilliams(2, talive.SourceClose)
 		}
 	})
 	b.Run("Williams(50)", func(b *testing.B) {
 		for i := 0; i < b.N; i++ {
-			williamsDummy, _ = talive.NewWilliams(50)
+			williamsDummy, _ = talive.NewWilliams(50, talive.SourceClose)
 		}
 	})
 }
@@ -96,7 +96,7 @@ func Benchmark_Williams_Next_Allocations(b *testing.B) {
 	dataLen := len(candles)
 
 	b.Run("Williams(2)", func(b *testing.B) {
-		williamsDummy, _ = talive.NewWilliams(2)
+		williamsDummy, _ = talive.NewWilliams(2, talive.SourceClose)
 		dataIndex := 0
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
@@ -105,7 +105,7 @@ func Benchmark_Williams_Next_Allocations(b *testing.B) {
 		}
 	})
 	b.Run("Williams(50)", func(b *testing.B) {
-		williamsDummy, _ = talive.NewWilliams(50)
+		williamsDummy, _ = talive.NewWilliams(50, talive.SourceClose)
 		dataIndex := 0
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
@@ -120,7 +120,7 @@ func Benchmark_Williams_Current_Allocations(b *testing.B) {
 	dataLen := len(candles)
 
 	b.Run("Williams(2)", func(b *testing.B) {
-		williamsDummy, _ = talive.NewWilliams(2)
+		williamsDummy, _ = talive.NewWilliams(2, talive.SourceClose)
 		dataIndex := 0
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
@@ -129,7 +129,7 @@ func Benchmark_Williams_Current_Allocations(b *testing.B) {
 		}
 	})
 	b.Run("Williams(50)", func(b *testing.B) {
-		williamsDummy, _ = talive.NewWilliams(50)
+		williamsDummy, _ = talive.NewWilliams(50, talive.SourceClose)
 		dataIndex := 0
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {

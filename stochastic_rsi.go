@@ -4,10 +4,11 @@ import "fmt"
 
 // StochasticRSI is a Stochastic RSI indicator.
 type StochasticRSI struct {
-	RSIPeriod int
-	StochLen  int
-	KSmooth   int
-	DSmooth   int
+	RSIPeriod  int
+	StochLen   int
+	KSmooth    int
+	DSmooth    int
+	SourceFunc SourceFunc
 
 	valueNumber int
 	rsi         *RSI
@@ -18,23 +19,27 @@ type StochasticRSI struct {
 }
 
 // NewStochasticRSI creates a new Stochastic RSI indicator.
-func NewStochasticRSI(rsiPeriod, stochLen, kSmooth, dSmooth int) (*StochasticRSI, error) {
+func NewStochasticRSI(rsiPeriod, stochLen, kSmooth, dSmooth int, source SourceFunc) (*StochasticRSI, error) {
 	if rsiPeriod < 2 || stochLen < 2 || kSmooth < 1 || dSmooth < 1 {
 		return nil, fmt.Errorf("invalid parameters")
 	}
-	rsi, _ := NewRSI(rsiPeriod)
-	kSMA, _ := NewSMA(kSmooth)
-	dSMA, _ := NewSMA(dSmooth)
+	if source == nil {
+		source = SourceClose
+	}
+	rsi, _ := NewRSI(rsiPeriod, source)
+	kSMA, _ := NewSMA(kSmooth, nil)
+	dSMA, _ := NewSMA(dSmooth, nil)
 	return &StochasticRSI{
-		RSIPeriod: rsiPeriod,
-		StochLen:  stochLen,
-		KSmooth:   kSmooth,
-		DSmooth:   dSmooth,
-		rsi:       rsi,
-		buffer:    newRingBuffer(stochLen),
-		kSMA:      kSMA,
-		dSMA:      dSMA,
-		out:       make([]float64, 2),
+		RSIPeriod:  rsiPeriod,
+		StochLen:   stochLen,
+		KSmooth:    kSmooth,
+		DSmooth:    dSmooth,
+		SourceFunc: source,
+		rsi:        rsi,
+		buffer:     newRingBuffer(stochLen),
+		kSMA:       kSMA,
+		dSMA:       dSMA,
+		out:        make([]float64, 2),
 	}, nil
 }
 

@@ -5,6 +5,7 @@ import "fmt"
 // Williams is a Williams %R indicator.
 type Williams struct {
 	Period      int
+	SourceFunc  SourceFunc
 	valueNumber int
 	lowest      *ringBuffer
 	highest     *ringBuffer
@@ -12,9 +13,13 @@ type Williams struct {
 }
 
 // NewWilliams creates a new Williams %R indicator with the given period.
-func NewWilliams(period int) (*Williams, error) {
+func NewWilliams(period int, source SourceFunc) (*Williams, error) {
+	if source == nil {
+		source = SourceClose
+	}
 	return &Williams{
 		Period:      period,
+		SourceFunc:  source,
 		valueNumber: 0,
 		lowest:      newRingBuffer(period),
 		highest:     newRingBuffer(period),
@@ -37,7 +42,7 @@ func (will *Williams) Next(candle ICandle) []float64 {
 	}
 
 	highestV := will.highest.Max()
-	will.out[0] = (highestV - candle.Close()) / (highestV - will.lowest.Min()) * -100.0
+	will.out[0] = (highestV - will.SourceFunc(candle)) / (highestV - will.lowest.Min()) * -100.0
 
 	return will.out
 }
@@ -50,7 +55,7 @@ func (will *Williams) Current(candle ICandle) []float64 {
 	lowestV := min(will.lowest.MinExceptLast(), candle.Low())
 	highestV := max(will.highest.MaxExceptLast(), candle.High())
 
-	will.out[0] = (highestV - candle.Close()) / (highestV - lowestV) * -100.0
+	will.out[0] = (highestV - will.SourceFunc(candle)) / (highestV - lowestV) * -100.0
 
 	return will.out
 }

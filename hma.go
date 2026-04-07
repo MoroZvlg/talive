@@ -7,18 +7,26 @@ import (
 
 // HMA is a Hull Moving Average indicator.
 type HMA struct {
-	Period      int
-	valueNumber int
-	halfWma     MA
-	fullWma     MA
-	sqrtWma     MA
-	out         []float64
+	Period         int
+	HalfSourceFunc SourceFunc
+	FullSourceFunc SourceFunc
+	valueNumber    int
+	halfWma        MA
+	fullWma        MA
+	sqrtWma        MA
+	out            []float64
 }
 
 // NewHMA creates a new Hull Moving Average indicator with the given period.
-func NewHMA(period int) (*HMA, error) {
+func NewHMA(period int, halfSource, fullSource SourceFunc) (*HMA, error) {
 	if period < 2 {
 		return nil, fmt.Errorf("period should be greater than 1")
+	}
+	if halfSource == nil {
+		halfSource = SourceClose
+	}
+	if fullSource == nil {
+		fullSource = SourceClose
 	}
 	halfPeriod := period / 2
 	if halfPeriod < 1 {
@@ -28,15 +36,17 @@ func NewHMA(period int) (*HMA, error) {
 	if sqrtPeriod < 1 {
 		sqrtPeriod = 1
 	}
-	halfWma, _ := NewWMA(halfPeriod)
-	fullWma, _ := NewWMA(period)
-	sqrtWma, _ := NewWMA(sqrtPeriod)
+	halfWma, _ := NewWMA(halfPeriod, halfSource)
+	fullWma, _ := NewWMA(period, fullSource)
+	sqrtWma, _ := NewWMA(sqrtPeriod, nil)
 	return &HMA{
-		Period:  period,
-		halfWma: halfWma,
-		fullWma: fullWma,
-		sqrtWma: sqrtWma,
-		out:     make([]float64, 1),
+		Period:         period,
+		HalfSourceFunc: halfSource,
+		FullSourceFunc: fullSource,
+		halfWma:        halfWma,
+		fullWma:        fullWma,
+		sqrtWma:        sqrtWma,
+		out:            make([]float64, 1),
 	}, nil
 }
 
@@ -46,8 +56,8 @@ func (hma *HMA) String() string {
 
 func (hma *HMA) Next(candle ICandle) []float64 {
 	hma.valueNumber++
-	halfVal := hma.halfWma.next(candle.Close())
-	fullVal := hma.fullWma.next(candle.Close())
+	halfVal := hma.halfWma.Next(candle)[0]
+	fullVal := hma.fullWma.Next(candle)[0]
 
 	if hma.fullWma.IsIdle() {
 		return hma.out
@@ -69,8 +79,8 @@ func (hma *HMA) Current(candle ICandle) []float64 {
 		return hma.out
 	}
 
-	halfVal := hma.halfWma.current(candle.Close())
-	fullVal := hma.fullWma.current(candle.Close())
+	halfVal := hma.halfWma.Current(candle)[0]
+	fullVal := hma.fullWma.Current(candle)[0]
 	diff := 2*halfVal - fullVal
 	hma.out[0] = hma.sqrtWma.current(diff)
 	return hma.out

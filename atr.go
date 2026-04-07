@@ -21,7 +21,7 @@ func NewATR(period int) (*ATR, error) {
 	if period < 2 {
 		return nil, fmt.Errorf("period should be greater than 1")
 	}
-	smma, _ := NewSMMA(period)
+	smma, _ := NewSMMA(period, nil)
 	return &ATR{
 		Period: period,
 		smma:   smma,

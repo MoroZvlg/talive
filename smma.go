@@ -6,20 +6,25 @@ import "fmt"
 type SMMA struct {
 	Period       int
 	Alpha        float64
+	SourceFunc   SourceFunc
 	valuesNumber int
 	prev         float64
 	out          []float64
 }
 
 // NewSMMA creates a new SMMA indicator with the given period.
-func NewSMMA(period int) (MA, error) {
+func NewSMMA(period int, source SourceFunc) (MA, error) {
 	if period < 2 {
 		return nil, fmt.Errorf("period should be greater than 1")
 	}
+	if source == nil {
+		source = SourceClose
+	}
 	return &SMMA{
-		Period: period,
-		Alpha:  1.0 / float64(period),
-		out:    make([]float64, 1),
+		Period:     period,
+		Alpha:      1.0 / float64(period),
+		SourceFunc: source,
+		out:        make([]float64, 1),
 	}, nil
 }
 
@@ -54,12 +59,12 @@ func (smma *SMMA) current(value float64) float64 {
 }
 
 func (smma *SMMA) Next(candle ICandle) []float64 {
-	smma.out[0] = smma.next(candle.Close())
+	smma.out[0] = smma.next(smma.SourceFunc(candle))
 	return smma.out
 }
 
 func (smma *SMMA) Current(candle ICandle) []float64 {
-	smma.out[0] = smma.current(candle.Close())
+	smma.out[0] = smma.current(smma.SourceFunc(candle))
 	return smma.out
 }
 

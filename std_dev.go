@@ -4,24 +4,29 @@ import "math"
 
 // StdDev is a Standard Deviation indicator.
 type StdDev struct {
-	period    int
-	deviation float64
-	variance  *Variance
-	out       []float64
+	SourceFunc SourceFunc
+	period     int
+	deviation  float64
+	variance   *Variance
+	out        []float64
 }
 
 // NewStdDev creates a new Standard Deviation indicator.
-func NewStdDev(period int, deviation float64) (*StdDev, error) {
+func NewStdDev(period int, deviation float64, source SourceFunc) (*StdDev, error) {
 	// TODO: add validations
-	variance, err := NewVariance(period)
+	if source == nil {
+		source = SourceClose
+	}
+	variance, err := NewVariance(period, nil)
 	if err != nil {
 		return nil, err
 	}
 	return &StdDev{
-		period:    period,
-		deviation: deviation,
-		variance:  variance,
-		out:       make([]float64, 1),
+		SourceFunc: source,
+		period:     period,
+		deviation:  deviation,
+		variance:   variance,
+		out:        make([]float64, 1),
 	}, nil
 }
 
@@ -36,12 +41,12 @@ func (stdDev *StdDev) current(value float64) float64 {
 }
 
 func (stdDev *StdDev) Next(candle ICandle) []float64 {
-	stdDev.out[0] = stdDev.next(candle.Close())
+	stdDev.out[0] = stdDev.next(stdDev.SourceFunc(candle))
 	return stdDev.out
 }
 
 func (stdDev *StdDev) Current(candle ICandle) []float64 {
-	stdDev.out[0] = stdDev.current(candle.Close())
+	stdDev.out[0] = stdDev.current(stdDev.SourceFunc(candle))
 	return stdDev.out
 }
 
@@ -63,6 +68,7 @@ func (stdDev *StdDev) WarmUpPeriod() int {
 
 // Variance is a Variance indicator.
 type Variance struct {
+	SourceFunc      SourceFunc
 	valueNumber     int
 	period          int
 	buffer          *ringBuffer
@@ -71,9 +77,13 @@ type Variance struct {
 }
 
 // NewVariance creates a new Variance indicator with the given period.
-func NewVariance(period int) (*Variance, error) {
+func NewVariance(period int, source SourceFunc) (*Variance, error) {
 	// TODO: add validations
+	if source == nil {
+		source = SourceClose
+	}
 	return &Variance{
+		SourceFunc:      source,
 		valueNumber:     0,
 		period:          period,
 		buffer:          newRingBuffer(period),
@@ -108,12 +118,12 @@ func (variance *Variance) current(value float64) float64 {
 }
 
 func (variance *Variance) Next(candle ICandle) []float64 {
-	variance.out[0] = variance.next(candle.Close())
+	variance.out[0] = variance.next(variance.SourceFunc(candle))
 	return variance.out
 }
 
 func (variance *Variance) Current(candle ICandle) []float64 {
-	variance.out[0] = variance.current(candle.Close())
+	variance.out[0] = variance.current(variance.SourceFunc(candle))
 	return variance.out
 }
 

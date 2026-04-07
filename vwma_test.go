@@ -10,7 +10,7 @@ import (
 func TestVwmaDefault(t *testing.T) {
 	candles, _ := readCandles("test_data/input_data2.csv")
 	expectedParsedData, _ := readData("test_data/vwma/output_default.csv", []int{1}, 6)
-	indicator, _ := talive.NewVWMA(20)
+	indicator, _ := talive.NewVWMA(20, talive.SourceClose)
 	result := make([]float64, len(candles))
 	for i, candle := range candles {
 		result[i] = roundFloat(indicator.Next(candle)[0], 6)
@@ -23,7 +23,7 @@ func TestVwmaDefault(t *testing.T) {
 func TestVwmaMin(t *testing.T) {
 	candles, _ := readCandles("test_data/input_data2.csv")
 	expectedParsedData, _ := readData("test_data/vwma/output_min.csv", []int{1}, 6)
-	indicator, _ := talive.NewVWMA(2)
+	indicator, _ := talive.NewVWMA(2, talive.SourceClose)
 	result := make([]float64, len(candles))
 	for i, candle := range candles {
 		result[i] = roundFloat(indicator.Next(candle)[0], 6)
@@ -34,7 +34,7 @@ func TestVwmaMin(t *testing.T) {
 }
 
 func TestVwmaIdle(t *testing.T) {
-	indicator, _ := talive.NewVWMA(3)
+	indicator, _ := talive.NewVWMA(3, talive.SourceClose)
 	var result []string
 	for i := 0; i < 4; i++ {
 		indicator.Next(&testCandle{open: float64(i + 1), high: float64(i + 1), low: float64(i + 1), close: float64(i + 1), volume: 1.0})
@@ -61,7 +61,7 @@ func TestVwmaIdle(t *testing.T) {
 func TestVwmaCurrentValue(t *testing.T) {
 	candles, _ := readCandles("test_data/input_data2.csv")
 	expectedParsedData, _ := readData("test_data/vwma/output_default.csv", []int{1}, 8)
-	indicator, _ := talive.NewVWMA(20)
+	indicator, _ := talive.NewVWMA(20, talive.SourceClose)
 	for i := 0; i < 20; i++ {
 		indicator.Next(candles[i])
 	}
@@ -81,12 +81,12 @@ var vwmaDummy *talive.VWMA
 func Benchmark_Vwma_Init_Allocations(b *testing.B) {
 	b.Run("VWMA(2)", func(b *testing.B) {
 		for i := 0; i < b.N; i++ {
-			vwmaDummy, _ = talive.NewVWMA(2)
+			vwmaDummy, _ = talive.NewVWMA(2, talive.SourceClose)
 		}
 	})
 	b.Run("VWMA(50)", func(b *testing.B) {
 		for i := 0; i < b.N; i++ {
-			vwmaDummy, _ = talive.NewVWMA(50)
+			vwmaDummy, _ = talive.NewVWMA(50, talive.SourceClose)
 		}
 	})
 }
@@ -96,7 +96,7 @@ func Benchmark_Vwma_Next_Allocations(b *testing.B) {
 	dataLen := len(candles)
 
 	b.Run("VWMA(2)", func(b *testing.B) {
-		vwmaDummy, _ = talive.NewVWMA(2)
+		vwmaDummy, _ = talive.NewVWMA(2, talive.SourceClose)
 		dataIndex := 0
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
@@ -105,7 +105,7 @@ func Benchmark_Vwma_Next_Allocations(b *testing.B) {
 		}
 	})
 	b.Run("VWMA(50)", func(b *testing.B) {
-		vwmaDummy, _ = talive.NewVWMA(50)
+		vwmaDummy, _ = talive.NewVWMA(50, talive.SourceClose)
 		dataIndex := 0
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
@@ -120,7 +120,7 @@ func Benchmark_Vwma_Current_Allocations(b *testing.B) {
 	dataLen := len(candles)
 
 	b.Run("VWMA(2)", func(b *testing.B) {
-		vwmaDummy, _ = talive.NewVWMA(2)
+		vwmaDummy, _ = talive.NewVWMA(2, talive.SourceClose)
 		dataIndex := 0
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
@@ -129,7 +129,7 @@ func Benchmark_Vwma_Current_Allocations(b *testing.B) {
 		}
 	})
 	b.Run("VWMA(50)", func(b *testing.B) {
-		vwmaDummy, _ = talive.NewVWMA(50)
+		vwmaDummy, _ = talive.NewVWMA(50, talive.SourceClose)
 		dataIndex := 0
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {

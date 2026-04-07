@@ -10,7 +10,7 @@ import (
 func TestRsiDefault(t *testing.T) {
 	candles, _ := readCandles("test_data/input_data.csv")
 	expectedParsedData, _ := readData("test_data/rsi/output_default.csv", []int{1}, 8)
-	indicator, _ := talive.NewRSI(14)
+	indicator, _ := talive.NewRSI(14, talive.SourceClose)
 	result := make([]float64, len(candles))
 	for i, candle := range candles {
 		result[i] = roundFloat(indicator.Next(candle)[0], 8)
@@ -23,7 +23,7 @@ func TestRsiDefault(t *testing.T) {
 func TestRsiMin(t *testing.T) {
 	candles, _ := readCandles("test_data/input_data.csv")
 	expectedParsedData, _ := readData("test_data/rsi/output_min.csv", []int{1}, 8)
-	indicator, _ := talive.NewRSI(2)
+	indicator, _ := talive.NewRSI(2, talive.SourceClose)
 	result := make([]float64, len(candles))
 	for i, candle := range candles {
 		result[i] = roundFloat(indicator.Next(candle)[0], 8)
@@ -34,7 +34,7 @@ func TestRsiMin(t *testing.T) {
 }
 
 func TestRsiIdle(t *testing.T) {
-	indicator, _ := talive.NewRSI(3)
+	indicator, _ := talive.NewRSI(3, talive.SourceClose)
 	var result []string
 	for i := 0; i < 4; i++ {
 		indicator.Next(&testCandle{close: float64(i)})
@@ -61,7 +61,7 @@ func TestRsiIdle(t *testing.T) {
 func TestRsiCurrentValue(t *testing.T) {
 	candles, _ := readCandles("test_data/input_data.csv")
 	expectedParsedData, _ := readData("test_data/rsi/output_default.csv", []int{1}, 8)
-	indicator, _ := talive.NewRSI(14)
+	indicator, _ := talive.NewRSI(14, talive.SourceClose)
 	for i := 0; i < 15; i++ {
 		indicator.Next(candles[i])
 	}
@@ -81,17 +81,17 @@ var rsiDummy *talive.RSI
 func Benchmark_Rsi_Init_Allocations(benchmark *testing.B) {
 	benchmark.Run("RSI 2", func(benchmark *testing.B) {
 		for i := 0; i < benchmark.N; i++ {
-			rsiDummy, _ = talive.NewRSI(2)
+			rsiDummy, _ = talive.NewRSI(2, talive.SourceClose)
 		}
 	})
 	benchmark.Run("RSI 14", func(benchmark *testing.B) {
 		for i := 0; i < benchmark.N; i++ {
-			rsiDummy, _ = talive.NewRSI(14)
+			rsiDummy, _ = talive.NewRSI(14, talive.SourceClose)
 		}
 	})
 	benchmark.Run("RSI 100", func(benchmark *testing.B) {
 		for i := 0; i < benchmark.N; i++ {
-			rsiDummy, _ = talive.NewRSI(100)
+			rsiDummy, _ = talive.NewRSI(100, talive.SourceClose)
 		}
 	})
 }
@@ -100,7 +100,7 @@ func Benchmark_Rsi_Next_Allocations(benchmark *testing.B) {
 	candles, _ := readCandles("test_data/input_data.csv")
 	dataLen := len(candles)
 	benchmark.Run("RSI 2", func(benchmark *testing.B) {
-		indicator, _ := talive.NewRSI(2)
+		indicator, _ := talive.NewRSI(2, talive.SourceClose)
 		dataIndex := 0
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {
@@ -109,7 +109,7 @@ func Benchmark_Rsi_Next_Allocations(benchmark *testing.B) {
 		}
 	})
 	benchmark.Run("RSI 14", func(benchmark *testing.B) {
-		indicator, _ := talive.NewRSI(14)
+		indicator, _ := talive.NewRSI(14, talive.SourceClose)
 		dataIndex := 0
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {
@@ -118,7 +118,7 @@ func Benchmark_Rsi_Next_Allocations(benchmark *testing.B) {
 		}
 	})
 	benchmark.Run("RSI 100", func(benchmark *testing.B) {
-		indicator, _ := talive.NewRSI(100)
+		indicator, _ := talive.NewRSI(100, talive.SourceClose)
 		dataIndex := 0
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {
@@ -132,7 +132,7 @@ func Benchmark_Rsi_Current_Allocations(benchmark *testing.B) {
 	candles, _ := readCandles("test_data/input_data.csv")
 	dataLen := len(candles)
 	benchmark.Run("RSI 2", func(benchmark *testing.B) {
-		indicator, _ := talive.NewRSI(2)
+		indicator, _ := talive.NewRSI(2, talive.SourceClose)
 		dataIndex := 0
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {
@@ -141,7 +141,7 @@ func Benchmark_Rsi_Current_Allocations(benchmark *testing.B) {
 		}
 	})
 	benchmark.Run("RSI 14", func(benchmark *testing.B) {
-		indicator, _ := talive.NewRSI(14)
+		indicator, _ := talive.NewRSI(14, talive.SourceClose)
 		dataIndex := 0
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {
@@ -150,7 +150,7 @@ func Benchmark_Rsi_Current_Allocations(benchmark *testing.B) {
 		}
 	})
 	benchmark.Run("RSI 100", func(benchmark *testing.B) {
-		indicator, _ := talive.NewRSI(100)
+		indicator, _ := talive.NewRSI(100, talive.SourceClose)
 		dataIndex := 0
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {

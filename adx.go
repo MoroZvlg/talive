@@ -24,10 +24,10 @@ type ADX struct {
 
 // NewADX creates a new ADX indicator with the given period.
 func NewADX(period int) (*ADX, error) {
-	plusDMSmma, _ := NewSMMA(period)
-	minusDMSmma, _ := NewSMMA(period)
-	trSmma, _ := NewSMMA(period)
-	adxSmma, _ := NewSMMA(period)
+	plusDMSmma, _ := NewSMMA(period, nil)
+	minusDMSmma, _ := NewSMMA(period, nil)
+	trSmma, _ := NewSMMA(period, nil)
+	adxSmma, _ := NewSMMA(period, nil)
 	return &ADX{
 		Period:      period,
 		plusDMSmma:  plusDMSmma,

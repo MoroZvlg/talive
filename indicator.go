@@ -40,3 +40,25 @@ type IIndicator interface {
 	// the indicator output is reliable. This value always includes IdlePeriod.
 	WarmUpPeriod() int
 }
+
+// SourceFunc selects which price value an indicator reads from a candle.
+// Pass one of the predefined sources or a custom function to derive the price series.
+type SourceFunc func(ICandle) float64
+
+// SourceClose returns Candle's Close price
+func SourceClose(candle ICandle) float64 { return candle.Close() }
+
+// SourceOpen returns Candle's Open price
+func SourceOpen(candle ICandle) float64 { return candle.Open() }
+
+// SourceHigh returns Candle's High price
+func SourceHigh(candle ICandle) float64 { return candle.High() }
+
+// SourceLow returns Candle's Low price
+func SourceLow(candle ICandle) float64 { return candle.Low() }
+
+// SourceHLC3 returns the candle's typical price (high + low + close) / 3.
+func SourceHLC3(candle ICandle) float64 { return (candle.High() + candle.Low() + candle.Close()) / 3 }
+
+// SourceHL2 returns the candle's median price (high + low) / 2.
+func SourceHL2(candle ICandle) float64 { return (candle.High() + candle.Low()) / 2 }

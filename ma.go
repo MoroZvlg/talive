@@ -39,16 +39,16 @@ type MA interface {
 }
 
 // NewMa creates a moving average indicator of the given type.
-func NewMa(period int, maType MaType) (MA, error) {
+func NewMa(period int, maType MaType, source SourceFunc) (MA, error) {
 	switch maType {
 	case SMAtype:
-		return NewSMA(period)
+		return NewSMA(period, source)
 	case EMAtype:
-		return NewEMA(period)
+		return NewEMA(period, source)
 	case SMMAtype:
-		return NewSMMA(period)
+		return NewSMMA(period, source)
 	case WMAtype:
-		return NewWMA(period)
+		return NewWMA(period, source)
 	}
 	return nil, fmt.Errorf("invalid ma type")
 }

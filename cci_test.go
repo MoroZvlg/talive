@@ -10,7 +10,7 @@ import (
 func TestCciDefault(t *testing.T) {
 	candles, _ := readCandles("test_data/input_data2.csv")
 	expectedParsedData, _ := readData("test_data/cci/output_default.csv", []int{1}, 7)
-	indicator, _ := talive.NewCCI(20)
+	indicator, _ := talive.NewCCI(20, talive.SourceHLC3)
 	result := make([]float64, len(candles))
 	for i, candle := range candles {
 		result[i] = roundFloat(indicator.Next(candle)[0], 7)
@@ -23,7 +23,7 @@ func TestCciDefault(t *testing.T) {
 func TestCciMin(t *testing.T) {
 	candles, _ := readCandles("test_data/input_data2.csv")
 	expectedParsedData, _ := readData("test_data/cci/output_min.csv", []int{1}, 6)
-	indicator, _ := talive.NewCCI(2)
+	indicator, _ := talive.NewCCI(2, talive.SourceHLC3)
 	result := make([]float64, len(candles))
 	for i, candle := range candles {
 		result[i] = roundFloat(indicator.Next(candle)[0], 6)
@@ -34,7 +34,7 @@ func TestCciMin(t *testing.T) {
 }
 
 func TestCciIdle(t *testing.T) {
-	indicator, _ := talive.NewCCI(3)
+	indicator, _ := talive.NewCCI(3, talive.SourceHLC3)
 	var result []string
 	for i := 0; i < 4; i++ {
 		indicator.Next(&testCandle{close: float64(i)})
@@ -61,7 +61,7 @@ func TestCciIdle(t *testing.T) {
 func TestCciCurrentValue(t *testing.T) {
 	candles, _ := readCandles("test_data/input_data2.csv")
 	expectedParsedData, _ := readData("test_data/cci/output_default.csv", []int{1}, 8)
-	indicator, _ := talive.NewCCI(20)
+	indicator, _ := talive.NewCCI(20, talive.SourceHLC3)
 	for i := 0; i < 20; i++ {
 		indicator.Next(candles[i])
 	}
@@ -81,17 +81,17 @@ var cciDummy *talive.CCI
 func Benchmark_CCI_Init_Allocations(b *testing.B) {
 	b.Run("CCI(2)", func(b *testing.B) {
 		for i := 0; i < b.N; i++ {
-			cciDummy, _ = talive.NewCCI(2)
+			cciDummy, _ = talive.NewCCI(2, talive.SourceHLC3)
 		}
 	})
 	b.Run("CCI(20)", func(b *testing.B) {
 		for i := 0; i < b.N; i++ {
-			cciDummy, _ = talive.NewCCI(20)
+			cciDummy, _ = talive.NewCCI(20, talive.SourceHLC3)
 		}
 	})
 	b.Run("CCI(50)", func(b *testing.B) {
 		for i := 0; i < b.N; i++ {
-			cciDummy, _ = talive.NewCCI(50)
+			cciDummy, _ = talive.NewCCI(50, talive.SourceHLC3)
 		}
 	})
 }
@@ -101,7 +101,7 @@ func Benchmark_CCI_Next_Allocations(b *testing.B) {
 	dataLen := len(candles)
 
 	b.Run("CCI(2)", func(b *testing.B) {
-		cciDummy, _ = talive.NewCCI(2)
+		cciDummy, _ = talive.NewCCI(2, talive.SourceHLC3)
 		dataIndex := 0
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
@@ -110,7 +110,7 @@ func Benchmark_CCI_Next_Allocations(b *testing.B) {
 		}
 	})
 	b.Run("CCI(20)", func(b *testing.B) {
-		cciDummy, _ = talive.NewCCI(20)
+		cciDummy, _ = talive.NewCCI(20, talive.SourceHLC3)
 		dataIndex := 0
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
@@ -119,7 +119,7 @@ func Benchmark_CCI_Next_Allocations(b *testing.B) {
 		}
 	})
 	b.Run("CCI(50)", func(b *testing.B) {
-		cciDummy, _ = talive.NewCCI(50)
+		cciDummy, _ = talive.NewCCI(50, talive.SourceHLC3)
 		dataIndex := 0
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
@@ -134,7 +134,7 @@ func Benchmark_CCI_Current_Allocations(b *testing.B) {
 	dataLen := len(candles)
 
 	b.Run("CCI(2)", func(b *testing.B) {
-		cciDummy, _ = talive.NewCCI(2)
+		cciDummy, _ = talive.NewCCI(2, talive.SourceHLC3)
 		dataIndex := 0
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
@@ -143,7 +143,7 @@ func Benchmark_CCI_Current_Allocations(b *testing.B) {
 		}
 	})
 	b.Run("CCI(20)", func(b *testing.B) {
-		cciDummy, _ = talive.NewCCI(20)
+		cciDummy, _ = talive.NewCCI(20, talive.SourceHLC3)
 		dataIndex := 0
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
@@ -152,7 +152,7 @@ func Benchmark_CCI_Current_Allocations(b *testing.B) {
 		}
 	})
 	b.Run("CCI(50)", func(b *testing.B) {
-		cciDummy, _ = talive.NewCCI(50)
+		cciDummy, _ = talive.NewCCI(50, talive.SourceHLC3)
 		dataIndex := 0
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {

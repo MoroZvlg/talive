@@ -7,6 +7,7 @@ import "fmt"
 // 1 division instead of 3 (Sum1 / Sum2 instead of (Sum1/period) / (Sum2 / period))
 type VWMA struct {
 	Period         int
+	SourceFunc     SourceFunc
 	valueNumber    int
 	closeVolBuffer *ringBuffer
 	volBuffer      *ringBuffer
@@ -14,12 +15,16 @@ type VWMA struct {
 }
 
 // NewVWMA creates a new VWMA indicator with the given period.
-func NewVWMA(period int) (*VWMA, error) {
+func NewVWMA(period int, source SourceFunc) (*VWMA, error) {
 	if period < 2 {
 		return nil, fmt.Errorf("period should be greater than 1")
 	}
+	if source == nil {
+		source = SourceClose
+	}
 	return &VWMA{
 		Period:         period,
+		SourceFunc:     source,
 		valueNumber:    0,
 		closeVolBuffer: newRingBuffer(period),
 		volBuffer:      newRingBuffer(period),
@@ -34,7 +39,7 @@ func (vwma *VWMA) String() string {
 func (vwma *VWMA) Next(candle ICandle) []float64 {
 	vwma.valueNumber++
 
-	cv := candle.Close() * candle.Volume()
+	cv := vwma.SourceFunc(candle) * candle.Volume()
 	vol := candle.Volume()
 	vwma.closeVolBuffer.Push(cv)
 	vwma.volBuffer.Push(vol)
@@ -54,7 +59,7 @@ func (vwma *VWMA) Current(candle ICandle) []float64 {
 		return vwma.out
 	}
 
-	cv := candle.Close() * candle.Volume()
+	cv := vwma.SourceFunc(candle) * candle.Volume()
 	vol := candle.Volume()
 	cvSum := vwma.closeVolBuffer.SumExceptLast() + cv
 	vSum := vwma.volBuffer.SumExceptLast() + vol

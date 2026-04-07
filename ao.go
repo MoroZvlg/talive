@@ -9,8 +9,8 @@ type AO struct {
 
 // NewAO creates a new Awesome Oscillator indicator.
 func NewAO() (*AO, error) {
-	fastSma, _ := NewSMA(5)
-	slowSma, _ := NewSMA(34)
+	fastSma, _ := NewSMA(5, nil)
+	slowSma, _ := NewSMA(34, nil)
 	return &AO{
 		fastSma: fastSma,
 		slowSma: slowSma,

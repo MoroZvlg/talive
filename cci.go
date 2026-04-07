@@ -8,15 +8,22 @@ import (
 // CCI is a Commodity Channel Index indicator.
 type CCI struct {
 	Period      int
+	SourceFunc  SourceFunc
 	valueNumber int
 	buffer      *ringBuffer
 	out         []float64
 }
 
 // NewCCI creates a new CCI indicator with the given period.
-func NewCCI(period int) (*CCI, error) {
+// source replaces the typical price used in the formula. Pass nil to default
+// to the classical HLC3 typical price.
+func NewCCI(period int, source SourceFunc) (*CCI, error) {
+	if source == nil {
+		source = SourceHLC3
+	}
 	return &CCI{
 		Period:      period,
+		SourceFunc:  source,
 		valueNumber: 0,
 		buffer:      newRingBuffer(period),
 		out:         make([]float64, 1),
@@ -30,7 +37,7 @@ func (cci *CCI) String() string {
 func (cci *CCI) Next(candle ICandle) []float64 {
 	cci.valueNumber++
 
-	typicalPrice := (candle.High() + candle.Low() + candle.Close()) / 3.0
+	typicalPrice := cci.SourceFunc(candle)
 	cci.buffer.Push(typicalPrice)
 
 	if cci.IsIdle() {
@@ -57,7 +64,7 @@ func (cci *CCI) Current(candle ICandle) []float64 {
 		return cci.out
 	}
 
-	typicalPrice := (candle.High() + candle.Low() + candle.Close()) / 3.0
+	typicalPrice := cci.SourceFunc(candle)
 
 	// SMA replacement for optimisation
 	// TODO: can be moved to RingBuffer??

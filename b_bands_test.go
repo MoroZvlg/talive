@@ -10,7 +10,7 @@ import (
 func TestBBandsDefault(t *testing.T) {
 	candles, _ := readCandles("test_data/input_data.csv")
 	expectedParsedData, _ := readData("test_data/b_bands/output_default.csv", []int{1, 2, 3}, 4)
-	indicator, _ := talive.NewBBands(20, 2.0, 2.0, talive.SMAtype)
+	indicator, _ := talive.NewBBands(20, 2.0, 2.0, talive.SMAtype, talive.SourceClose)
 	result := [][]float64{
 		make([]float64, len(candles)),
 		make([]float64, len(candles)),
@@ -37,7 +37,7 @@ func TestBBandsDefault(t *testing.T) {
 func TestBBandsMin(t *testing.T) {
 	candles, _ := readCandles("test_data/input_data.csv")
 	expectedParsedData, _ := readData("test_data/b_bands/output_min.csv", []int{1, 2, 3}, 5)
-	indicator, _ := talive.NewBBands(2, 0.1, 0.1, talive.SMAtype)
+	indicator, _ := talive.NewBBands(2, 0.1, 0.1, talive.SMAtype, talive.SourceClose)
 	result := [][]float64{
 		make([]float64, len(candles)),
 		make([]float64, len(candles)),
@@ -62,7 +62,7 @@ func TestBBandsMin(t *testing.T) {
 }
 
 func TestBBandsIdle(t *testing.T) {
-	indicator, _ := talive.NewBBands(5, 2.0, 2.0, talive.SMAtype)
+	indicator, _ := talive.NewBBands(5, 2.0, 2.0, talive.SMAtype, talive.SourceClose)
 	var result []string
 	for i := 0; i < 6; i++ {
 		indicator.Next(&testCandle{close: float64(i)})
@@ -89,7 +89,7 @@ func TestBBandsIdle(t *testing.T) {
 func TestBBandsCurrentValue(t *testing.T) {
 	candles, _ := readCandles("test_data/input_data.csv")
 	expectedParsedData, _ := readData("test_data/b_bands/output_default.csv", []int{1, 2, 3}, 8)
-	indicator, _ := talive.NewBBands(20, 2.0, 2.0, talive.SMAtype)
+	indicator, _ := talive.NewBBands(20, 2.0, 2.0, talive.SMAtype, talive.SourceClose)
 	for i := 0; i < 22; i++ {
 		indicator.Next(candles[i])
 	}
@@ -129,17 +129,17 @@ var bBandsDummy *talive.BBands
 func Benchmark_BBands_Init_Allocations(benchmark *testing.B) {
 	benchmark.Run("BBands (20, 2.0, 2.0, SMA)", func(benchmark *testing.B) {
 		for i := 0; i < benchmark.N; i++ {
-			bBandsDummy, _ = talive.NewBBands(20, 2.0, 2.0, talive.SMAtype)
+			bBandsDummy, _ = talive.NewBBands(20, 2.0, 2.0, talive.SMAtype, talive.SourceClose)
 		}
 	})
 	benchmark.Run("BBands (2, 0.1, 0.1, SMA)", func(benchmark *testing.B) {
 		for i := 0; i < benchmark.N; i++ {
-			bBandsDummy, _ = talive.NewBBands(2, 0.1, 0.1, talive.SMAtype)
+			bBandsDummy, _ = talive.NewBBands(2, 0.1, 0.1, talive.SMAtype, talive.SourceClose)
 		}
 	})
 	benchmark.Run("BBands (30, 3.0, 3.0, EMA)", func(benchmark *testing.B) {
 		for i := 0; i < benchmark.N; i++ {
-			bBandsDummy, _ = talive.NewBBands(30, 3.0, 3.0, talive.EMAtype)
+			bBandsDummy, _ = talive.NewBBands(30, 3.0, 3.0, talive.EMAtype, talive.SourceClose)
 		}
 	})
 }
@@ -148,7 +148,7 @@ func Benchmark_BBands_Next_Allocations(benchmark *testing.B) {
 	candles, _ := readCandles("test_data/input_data.csv")
 	dataLen := len(candles)
 	benchmark.Run("BBands (20, 2.0, 2.0, SMA)", func(benchmark *testing.B) {
-		indicator, _ := talive.NewBBands(20, 2.0, 2.0, talive.SMAtype)
+		indicator, _ := talive.NewBBands(20, 2.0, 2.0, talive.SMAtype, talive.SourceClose)
 		dataIndex := 0
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {
@@ -157,7 +157,7 @@ func Benchmark_BBands_Next_Allocations(benchmark *testing.B) {
 		}
 	})
 	benchmark.Run("BBands (2, 0.1, 0.1, SMA)", func(benchmark *testing.B) {
-		indicator, _ := talive.NewBBands(2, 0.1, 0.1, talive.SMAtype)
+		indicator, _ := talive.NewBBands(2, 0.1, 0.1, talive.SMAtype, talive.SourceClose)
 		dataIndex := 0
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {
@@ -166,7 +166,7 @@ func Benchmark_BBands_Next_Allocations(benchmark *testing.B) {
 		}
 	})
 	benchmark.Run("BBands (30, 3.0, 3.0, EMA)", func(benchmark *testing.B) {
-		indicator, _ := talive.NewBBands(30, 3.0, 3.0, talive.EMAtype)
+		indicator, _ := talive.NewBBands(30, 3.0, 3.0, talive.EMAtype, talive.SourceClose)
 		dataIndex := 0
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {
@@ -180,7 +180,7 @@ func Benchmark_BBands_Current_Allocations(benchmark *testing.B) {
 	candles, _ := readCandles("test_data/input_data.csv")
 	dataLen := len(candles)
 	benchmark.Run("BBands (20, 2.0, 2.0, SMA)", func(benchmark *testing.B) {
-		indicator, _ := talive.NewBBands(20, 2.0, 2.0, talive.SMAtype)
+		indicator, _ := talive.NewBBands(20, 2.0, 2.0, talive.SMAtype, talive.SourceClose)
 		dataIndex := 0
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {
@@ -189,7 +189,7 @@ func Benchmark_BBands_Current_Allocations(benchmark *testing.B) {
 		}
 	})
 	benchmark.Run("BBands (2, 0.1, 0.1, SMA)", func(benchmark *testing.B) {
-		indicator, _ := talive.NewBBands(2, 0.1, 0.1, talive.SMAtype)
+		indicator, _ := talive.NewBBands(2, 0.1, 0.1, talive.SMAtype, talive.SourceClose)
 		dataIndex := 0
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {
@@ -198,7 +198,7 @@ func Benchmark_BBands_Current_Allocations(benchmark *testing.B) {
 		}
 	})
 	benchmark.Run("BBands (30, 3.0, 3.0, EMA)", func(benchmark *testing.B) {
-		indicator, _ := talive.NewBBands(30, 3.0, 3.0, talive.EMAtype)
+		indicator, _ := talive.NewBBands(30, 3.0, 3.0, talive.EMAtype, talive.SourceClose)
 		dataIndex := 0
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {
