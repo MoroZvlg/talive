@@ -13,13 +13,10 @@ type Williams struct {
 }
 
 // NewWilliams creates a new Williams %R indicator with the given period.
-func NewWilliams(period int, source SourceFunc) (*Williams, error) {
-	if source == nil {
-		source = SourceClose
-	}
+func NewWilliams(period int) (*Williams, error) {
 	return &Williams{
 		Period:      period,
-		SourceFunc:  source,
+		SourceFunc:  SourceClose,
 		valueNumber: 0,
 		lowest:      newRingBuffer(period),
 		highest:     newRingBuffer(period),
@@ -27,11 +24,17 @@ func NewWilliams(period int, source SourceFunc) (*Williams, error) {
 	}, nil
 }
 
+// WithSource sets the price source used to extract values from candles.
+func (will *Williams) WithSource(source SourceFunc) *Williams {
+	will.SourceFunc = source
+	return will
+}
+
 func (will *Williams) String() string {
 	return fmt.Sprintf("Williams(%d)", will.Period)
 }
 
-func (will *Williams) Next(candle ICandle) []float64 {
+func (will *Williams) Next(candle OHLCV) []float64 {
 	will.valueNumber++
 
 	will.lowest.Push(candle.Low())
@@ -47,7 +50,7 @@ func (will *Williams) Next(candle ICandle) []float64 {
 	return will.out
 }
 
-func (will *Williams) Current(candle ICandle) []float64 {
+func (will *Williams) Current(candle OHLCV) []float64 {
 	if will.valueNumber < will.Period {
 		return will.out
 	}

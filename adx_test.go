@@ -59,40 +59,38 @@ func TestAdxIdle(t *testing.T) {
 	}
 }
 
-func TestAdxCurrentValue(t *testing.T) {
+func TestAdxCurrentVal(t *testing.T) {
 	candles, _ := readCandles("test_data/input_data2.csv")
 	expectedParsedData, _ := readData("test_data/adx/output_default.csv", []int{1}, 8)
 	indicator, _ := talive.NewADX(14)
 	for i := 0; i < 28; i++ {
 		indicator.Next(candles[i])
 	}
-	currentValue := roundFloat(indicator.Current(candles[28])[0], 8)
+	CurrentVal := roundFloat(indicator.Current(candles[28])[0], 8)
 	expectedValue := roundFloat(expectedParsedData[0][28], 8)
-	if currentValue != expectedValue {
-		t.Fatalf("[ADX(14)] wrong Current value %f, expected %f", currentValue, expectedValue)
+	if CurrentVal != expectedValue {
+		t.Fatalf("[ADX(14)] wrong Current value %f, expected %f", CurrentVal, expectedValue)
 	}
-	nextValue := roundFloat(indicator.Next(candles[28])[0], 8)
-	if nextValue != currentValue {
-		t.Fatalf("[ADX(14)] Current value call broke Next value %f, expected %f", nextValue, expectedValue)
+	NextVal := roundFloat(indicator.Next(candles[28])[0], 8)
+	if NextVal != CurrentVal {
+		t.Fatalf("[ADX(14)] Current value call broke Next value %f, expected %f", NextVal, expectedValue)
 	}
 }
-
-var adxDummy *talive.ADX
 
 func Benchmark_ADX_Init_Allocations(b *testing.B) {
 	b.Run("ADX(2)", func(b *testing.B) {
 		for i := 0; i < b.N; i++ {
-			adxDummy, _ = talive.NewADX(2)
+			benchSink, _ = talive.NewADX(2)
 		}
 	})
 	b.Run("ADX(14)", func(b *testing.B) {
 		for i := 0; i < b.N; i++ {
-			adxDummy, _ = talive.NewADX(14)
+			benchSink, _ = talive.NewADX(14)
 		}
 	})
 	b.Run("ADX(50)", func(b *testing.B) {
 		for i := 0; i < b.N; i++ {
-			adxDummy, _ = talive.NewADX(50)
+			benchSink, _ = talive.NewADX(50)
 		}
 	})
 }
@@ -102,30 +100,30 @@ func Benchmark_ADX_Next_Allocations(b *testing.B) {
 	dataLen := len(candles)
 
 	b.Run("ADX(2)", func(b *testing.B) {
-		adxDummy, _ = talive.NewADX(2)
+		indicator, _ := talive.NewADX(2)
 		dataIndex := 0
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)
-			sliceDummy = adxDummy.Next(candles[dataIndex])
+			sliceDummy = indicator.Next(candles[dataIndex])
 		}
 	})
 	b.Run("ADX(14)", func(b *testing.B) {
-		adxDummy, _ = talive.NewADX(14)
+		indicator, _ := talive.NewADX(14)
 		dataIndex := 0
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)
-			sliceDummy = adxDummy.Next(candles[dataIndex])
+			sliceDummy = indicator.Next(candles[dataIndex])
 		}
 	})
 	b.Run("ADX(50)", func(b *testing.B) {
-		adxDummy, _ = talive.NewADX(50)
+		indicator, _ := talive.NewADX(50)
 		dataIndex := 0
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)
-			sliceDummy = adxDummy.Next(candles[dataIndex])
+			sliceDummy = indicator.Next(candles[dataIndex])
 		}
 	})
 }
@@ -135,30 +133,30 @@ func Benchmark_ADX_Current_Allocations(b *testing.B) {
 	dataLen := len(candles)
 
 	b.Run("ADX(2)", func(b *testing.B) {
-		adxDummy, _ = talive.NewADX(2)
+		indicator, _ := talive.NewADX(2)
 		dataIndex := 0
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)
-			sliceDummy = adxDummy.Current(candles[dataIndex])
+			sliceDummy = indicator.Current(candles[dataIndex])
 		}
 	})
 	b.Run("ADX(14)", func(b *testing.B) {
-		adxDummy, _ = talive.NewADX(14)
+		indicator, _ := talive.NewADX(14)
 		dataIndex := 0
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)
-			sliceDummy = adxDummy.Current(candles[dataIndex])
+			sliceDummy = indicator.Current(candles[dataIndex])
 		}
 	})
 	b.Run("ADX(50)", func(b *testing.B) {
-		adxDummy, _ = talive.NewADX(50)
+		indicator, _ := talive.NewADX(50)
 		dataIndex := 0
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)
-			sliceDummy = adxDummy.Current(candles[dataIndex])
+			sliceDummy = indicator.Current(candles[dataIndex])
 		}
 	})
 }

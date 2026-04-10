@@ -80,7 +80,7 @@ func TestDmiIdle(t *testing.T) {
 	}
 }
 
-func TestDmiCurrentValue(t *testing.T) {
+func TestDmiCurrentVal(t *testing.T) {
 	candles, _ := readCandles("test_data/input_data2.csv")
 	expectedParsedData, _ := readData("test_data/dmi/output_default.csv", []int{1, 2, 3}, 8)
 	indicator, _ := talive.NewDMI(14)
@@ -118,22 +118,20 @@ func TestDmiCurrentValue(t *testing.T) {
 	}
 }
 
-var dmiDummy *talive.DMI
-
 func Benchmark_DMI_Init_Allocations(b *testing.B) {
 	b.Run("DMI(2)", func(b *testing.B) {
 		for i := 0; i < b.N; i++ {
-			dmiDummy, _ = talive.NewDMI(2)
+			benchSink, _ = talive.NewDMI(2)
 		}
 	})
 	b.Run("DMI(14)", func(b *testing.B) {
 		for i := 0; i < b.N; i++ {
-			dmiDummy, _ = talive.NewDMI(14)
+			benchSink, _ = talive.NewDMI(14)
 		}
 	})
 	b.Run("DMI(50)", func(b *testing.B) {
 		for i := 0; i < b.N; i++ {
-			dmiDummy, _ = talive.NewDMI(50)
+			benchSink, _ = talive.NewDMI(50)
 		}
 	})
 }
@@ -143,30 +141,30 @@ func Benchmark_DMI_Next_Allocations(b *testing.B) {
 	dataLen := len(candles)
 
 	b.Run("DMI(2)", func(b *testing.B) {
-		dmiDummy, _ = talive.NewDMI(2)
+		indicator, _ := talive.NewDMI(2)
 		dataIndex := 0
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)
-			sliceDummy = dmiDummy.Next(candles[dataIndex])
+			sliceDummy = indicator.Next(candles[dataIndex])
 		}
 	})
 	b.Run("DMI(14)", func(b *testing.B) {
-		dmiDummy, _ = talive.NewDMI(14)
+		indicator, _ := talive.NewDMI(14)
 		dataIndex := 0
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)
-			sliceDummy = dmiDummy.Next(candles[dataIndex])
+			sliceDummy = indicator.Next(candles[dataIndex])
 		}
 	})
 	b.Run("DMI(50)", func(b *testing.B) {
-		dmiDummy, _ = talive.NewDMI(50)
+		indicator, _ := talive.NewDMI(50)
 		dataIndex := 0
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)
-			sliceDummy = dmiDummy.Next(candles[dataIndex])
+			sliceDummy = indicator.Next(candles[dataIndex])
 		}
 	})
 }
@@ -176,30 +174,30 @@ func Benchmark_DMI_Current_Allocations(b *testing.B) {
 	dataLen := len(candles)
 
 	b.Run("DMI(2)", func(b *testing.B) {
-		dmiDummy, _ = talive.NewDMI(2)
+		indicator, _ := talive.NewDMI(2)
 		dataIndex := 0
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)
-			sliceDummy = dmiDummy.Current(candles[dataIndex])
+			sliceDummy = indicator.Current(candles[dataIndex])
 		}
 	})
 	b.Run("DMI(14)", func(b *testing.B) {
-		dmiDummy, _ = talive.NewDMI(14)
+		indicator, _ := talive.NewDMI(14)
 		dataIndex := 0
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)
-			sliceDummy = dmiDummy.Current(candles[dataIndex])
+			sliceDummy = indicator.Current(candles[dataIndex])
 		}
 	})
 	b.Run("DMI(50)", func(b *testing.B) {
-		dmiDummy, _ = talive.NewDMI(50)
+		indicator, _ := talive.NewDMI(50)
 		dataIndex := 0
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)
-			sliceDummy = dmiDummy.Current(candles[dataIndex])
+			sliceDummy = indicator.Current(candles[dataIndex])
 		}
 	})
 }

@@ -9,7 +9,7 @@ import (
 
 func TestStdDev(t *testing.T) {
 	inputData := []float64{1, 2, 7, 3, 12, 9}
-	variance, _ := talive.NewStdDev(5, 1.0, talive.SourceClose)
+	variance, _ := talive.NewStdDev(5, 1.0)
 	var result []float64
 	for _, data := range inputData {
 		result = append(result, roundFloat(variance.Next(&testCandle{close: data})[0], 2))
@@ -22,7 +22,7 @@ func TestStdDev(t *testing.T) {
 
 func TestVarianceNext(t *testing.T) {
 	inputData := []float64{1, 2, 7, 3, 12, 9}
-	variance, _ := talive.NewVariance(5, talive.SourceClose)
+	variance, _ := talive.NewVariance(5)
 	var result []float64
 	for _, data := range inputData {
 		result = append(result, roundFloat(variance.Next(&testCandle{close: data})[0], 2))
@@ -34,7 +34,7 @@ func TestVarianceNext(t *testing.T) {
 }
 
 func TestVarianceIsIdle(t *testing.T) {
-	variance, _ := talive.NewVariance(4, talive.SourceClose)
+	variance, _ := talive.NewVariance(4)
 	var result []string
 	for i := 0; i < 6; i++ {
 		variance.Next(&testCandle{close: float64(i)})
@@ -61,17 +61,17 @@ func TestVarianceIsIdle(t *testing.T) {
 func TestVarianceCurrent(t *testing.T) {
 	inputParsedData := []float64{1, 2, 7, 3, 12, 9}
 	expectedParsedData := []float64{0.0, 0.0, 0.0, 0.0, 16.4, 13.84}
-	indicator, _ := talive.NewVariance(5, talive.SourceClose)
+	indicator, _ := talive.NewVariance(5)
 	for i := 0; i < 5; i++ {
 		indicator.Next(&testCandle{close: inputParsedData[i]})
 	}
-	currentValue := roundFloat(indicator.Current(&testCandle{close: inputParsedData[5]})[0], 8)
+	CurrentVal := roundFloat(indicator.Current(&testCandle{close: inputParsedData[5]})[0], 8)
 	expectedValue := roundFloat(expectedParsedData[5], 8)
-	if currentValue != expectedValue {
-		t.Fatalf("[Variance(5)] wrong Current value %f, expected %f", currentValue, expectedValue)
+	if CurrentVal != expectedValue {
+		t.Fatalf("[Variance(5)] wrong Current value %f, expected %f", CurrentVal, expectedValue)
 	}
-	nextValue := roundFloat(indicator.Next(&testCandle{close: inputParsedData[5]})[0], 8)
-	if nextValue != currentValue {
-		t.Fatalf("[Variance(5)] Current value call broke Next value %f, expected %f", nextValue, expectedValue)
+	NextVal := roundFloat(indicator.Next(&testCandle{close: inputParsedData[5]})[0], 8)
+	if NextVal != CurrentVal {
+		t.Fatalf("[Variance(5)] Current value call broke Next value %f, expected %f", NextVal, expectedValue)
 	}
 }

@@ -168,7 +168,7 @@ func periods2to99() []int {
 
 func Test_WarmUpAnalyze_RSI(t *testing.T) {
 	factory := func(period int) (func(c *testCandle) []float64, int, int) {
-		ind, _ := talive.NewRSI(period, talive.SourceClose)
+		ind, _ := talive.NewRSI(period)
 		return func(c *testCandle) []float64 { return ind.Next(c) }, 1, ind.IdlePeriod()
 	}
 	runWarmUpAnalysis(t, "RSI", factory, periods2to99(), []int{4, 5, 6, 7, 8})
@@ -180,7 +180,7 @@ func Test_WarmUpAnalyze_RSI(t *testing.T) {
 
 func Test_WarmUpAnalyze_EMA(t *testing.T) {
 	factory := func(period int) (func(c *testCandle) []float64, int, int) {
-		ind, _ := talive.NewEMA(period, talive.SourceClose)
+		ind, _ := talive.NewEMA(period)
 		return func(c *testCandle) []float64 { return ind.Next(c) }, 1, ind.IdlePeriod()
 	}
 	runWarmUpAnalysis(t, "EMA", factory, periods2to99(), []int{1, 2, 3})
@@ -197,7 +197,7 @@ func Test_WarmUpAnalyze_MACD(t *testing.T) {
 			fastPeriod = 2
 		}
 		signalPeriod := 9
-		ind, _ := talive.NewMACD(fastPeriod, slowPeriod, signalPeriod, talive.SourceClose, talive.SourceClose)
+		ind, _ := talive.NewMACD(fastPeriod, slowPeriod, signalPeriod)
 		return func(c *testCandle) []float64 { return ind.Next(c) }, 3, ind.IdlePeriod()
 	}
 	// slowPeriod from 4 to 99
@@ -230,7 +230,8 @@ func Test_WarmUpAnalyze_Stochastic(t *testing.T) {
 
 func Test_WarmUpAnalyze_BBands_EMA(t *testing.T) {
 	factory := func(period int) (func(c *testCandle) []float64, int, int) {
-		ind, _ := talive.NewBBands(period, 2.0, 2.0, talive.EMAtype, talive.SourceClose)
+		ind, _ := talive.NewBBands(period, 2.0, 2.0)
+		ind.WithMA(talive.UseEMA)
 		return func(c *testCandle) []float64 { return ind.Next(c) }, 3, ind.IdlePeriod()
 	}
 	runWarmUpAnalysis(t, "BBands(EMA)", factory, periods2to99(), []int{2, 3, 4, 5, 6})
@@ -242,7 +243,7 @@ func Test_WarmUpAnalyze_BBands_EMA(t *testing.T) {
 
 func Test_WarmUpAnalyze_CCI(t *testing.T) {
 	factory := func(period int) (func(c *testCandle) []float64, int, int) {
-		ind, _ := talive.NewCCI(period, talive.SourceHLC3)
+		ind, _ := talive.NewCCI(period)
 		return func(c *testCandle) []float64 { return ind.Next(c) }, 1, ind.IdlePeriod()
 	}
 	runWarmUpAnalysis(t, "CCI", factory, periods2to99(), []int{0, 1, 2, 3})
@@ -254,7 +255,7 @@ func Test_WarmUpAnalyze_CCI(t *testing.T) {
 
 func Test_WarmUpAnalyze_SMMA(t *testing.T) {
 	factory := func(period int) (func(c *testCandle) []float64, int, int) {
-		ind, _ := talive.NewSMMA(period, talive.SourceClose)
+		ind, _ := talive.NewSMMA(period)
 		return func(c *testCandle) []float64 { return ind.Next(c) }, 1, ind.IdlePeriod()
 	}
 	runWarmUpAnalysis(t, "SMMA", factory, periods2to99(), []int{5, 6, 7, 8, 9, 10})

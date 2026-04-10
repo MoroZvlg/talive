@@ -38,7 +38,7 @@ func (sar *SAR) String() string {
 	return fmt.Sprintf("SAR(%.2f,%.2f,%.2f)", sar.AfStart, sar.AfIncrement, sar.AfMax)
 }
 
-func (sar *SAR) Next(candle ICandle) []float64 {
+func (sar *SAR) Next(candle OHLCV) []float64 {
 	sar.valueNumber++
 
 	if sar.valueNumber == 1 {
@@ -122,7 +122,7 @@ func (sar *SAR) Next(candle ICandle) []float64 {
 	return sar.out
 }
 
-func (sar *SAR) Current(candle ICandle) []float64 {
+func (sar *SAR) Current(candle OHLCV) []float64 {
 	if sar.IsIdle() {
 		return sar.out
 	}

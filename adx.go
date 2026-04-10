@@ -14,35 +14,44 @@ type ADX struct {
 	prevLow   float64
 	prevClose float64
 
-	plusDMSmma  MA
-	minusDMSmma MA
-	trSmma      MA
-	adxSmma     MA
+	plusDMMA  Scalar
+	minusDMMA Scalar
+	trMA      Scalar
+	adxMA     Scalar
 
 	out []float64
 }
 
 // NewADX creates a new ADX indicator with the given period.
 func NewADX(period int) (*ADX, error) {
-	plusDMSmma, _ := NewSMMA(period, nil)
-	minusDMSmma, _ := NewSMMA(period, nil)
-	trSmma, _ := NewSMMA(period, nil)
-	adxSmma, _ := NewSMMA(period, nil)
+	plusDMMA, _ := NewSMMA(period)
+	minusDMMA, _ := NewSMMA(period)
+	trMA, _ := NewSMMA(period)
+	adxMA, _ := NewSMMA(period)
 	return &ADX{
-		Period:      period,
-		plusDMSmma:  plusDMSmma,
-		minusDMSmma: minusDMSmma,
-		trSmma:      trSmma,
-		adxSmma:     adxSmma,
-		out:         make([]float64, 1),
+		Period:    period,
+		plusDMMA:  plusDMMA,
+		minusDMMA: minusDMMA,
+		trMA:      trMA,
+		adxMA:     adxMA,
+		out:       make([]float64, 1),
 	}, nil
+}
+
+// WithMA replaces the internal smoothing method used for all ADX components.
+func (adx *ADX) WithMA(ma MaType) *ADX {
+	adx.plusDMMA, _ = ma.New(adx.Period)
+	adx.minusDMMA, _ = ma.New(adx.Period)
+	adx.trMA, _ = ma.New(adx.Period)
+	adx.adxMA, _ = ma.New(adx.Period)
+	return adx
 }
 
 func (adx *ADX) String() string {
 	return fmt.Sprintf("ADX(%d)", adx.Period)
 }
 
-func (adx *ADX) Next(candle ICandle) []float64 {
+func (adx *ADX) Next(candle OHLCV) []float64 {
 	adx.valueNumber++
 
 	if adx.valueNumber == 1 {
@@ -58,11 +67,11 @@ func (adx *ADX) Next(candle ICandle) []float64 {
 	adx.prevLow = candle.Low()
 	adx.prevClose = candle.Close()
 
-	sPlusDM := adx.plusDMSmma.next(plusDM)
-	sMinusDM := adx.minusDMSmma.next(minusDM)
-	sTR := adx.trSmma.next(tr)
+	sPlusDM := adx.plusDMMA.NextVal(plusDM)
+	sMinusDM := adx.minusDMMA.NextVal(minusDM)
+	sTR := adx.trMA.NextVal(tr)
 
-	if adx.trSmma.IsIdle() {
+	if adx.trMA.IsIdle() {
 		return adx.out
 	}
 
@@ -70,9 +79,9 @@ func (adx *ADX) Next(candle ICandle) []float64 {
 	minusDI := 100 * sMinusDM / sTR
 
 	dx := 100 * math.Abs(plusDI-minusDI) / (plusDI + minusDI)
-	adxV := adx.adxSmma.next(dx)
+	adxV := adx.adxMA.NextVal(dx)
 
-	if adx.adxSmma.IsIdle() {
+	if adx.adxMA.IsIdle() {
 		return adx.out
 	}
 
@@ -80,26 +89,26 @@ func (adx *ADX) Next(candle ICandle) []float64 {
 	return adx.out
 }
 
-func (adx *ADX) Current(candle ICandle) []float64 {
+func (adx *ADX) Current(candle OHLCV) []float64 {
 	if adx.IsIdle() {
 		return adx.out
 	}
 
 	plusDM, minusDM, tr := adx.computeDMTR(candle)
 
-	sPlusDM := adx.plusDMSmma.current(plusDM)
-	sMinusDM := adx.minusDMSmma.current(minusDM)
-	sTR := adx.trSmma.current(tr)
+	sPlusDM := adx.plusDMMA.CurrentVal(plusDM)
+	sMinusDM := adx.minusDMMA.CurrentVal(minusDM)
+	sTR := adx.trMA.CurrentVal(tr)
 
 	plusDI := 100 * sPlusDM / sTR
 	minusDI := 100 * sMinusDM / sTR
 
 	dx := 100 * math.Abs(plusDI-minusDI) / (plusDI + minusDI)
-	adx.out[0] = adx.adxSmma.current(dx)
+	adx.out[0] = adx.adxMA.CurrentVal(dx)
 	return adx.out
 }
 
-func (adx *ADX) computeDMTR(candle ICandle) (plusDM, minusDM, tr float64) {
+func (adx *ADX) computeDMTR(candle OHLCV) (plusDM, minusDM, tr float64) {
 	upMove := candle.High() - adx.prevHigh
 	downMove := adx.prevLow - candle.Low()
 

@@ -15,35 +15,44 @@ type DMI struct {
 	prevLow   float64
 	prevClose float64
 
-	plusDMSmma  MA
-	minusDMSmma MA
-	trSmma      MA
-	adxSmma     MA
+	plusDMMA  Scalar
+	minusDMMA Scalar
+	trMA      Scalar
+	adxMA     Scalar
 
 	out []float64
 }
 
-// NewDMI creates a new DMI indicator with the given periodmi.
+// NewDMI creates a new DMI indicator with the given period.
 func NewDMI(period int) (*DMI, error) {
-	plusDMSmma, _ := NewSMMA(period, nil)
-	minusDMSmma, _ := NewSMMA(period, nil)
-	trSmma, _ := NewSMMA(period, nil)
-	adxSmma, _ := NewSMMA(period, nil)
+	plusDMMA, _ := NewSMMA(period)
+	minusDMMA, _ := NewSMMA(period)
+	trMA, _ := NewSMMA(period)
+	adxMA, _ := NewSMMA(period)
 	return &DMI{
-		Period:      period,
-		plusDMSmma:  plusDMSmma,
-		minusDMSmma: minusDMSmma,
-		trSmma:      trSmma,
-		adxSmma:     adxSmma,
-		out:         make([]float64, 3),
+		Period:    period,
+		plusDMMA:  plusDMMA,
+		minusDMMA: minusDMMA,
+		trMA:      trMA,
+		adxMA:     adxMA,
+		out:       make([]float64, 3),
 	}, nil
+}
+
+// WithMA replaces the internal smoothing method used for all DMI components.
+func (dmi *DMI) WithMA(ma MaType) *DMI {
+	dmi.plusDMMA, _ = ma.New(dmi.Period)
+	dmi.minusDMMA, _ = ma.New(dmi.Period)
+	dmi.trMA, _ = ma.New(dmi.Period)
+	dmi.adxMA, _ = ma.New(dmi.Period)
+	return dmi
 }
 
 func (dmi *DMI) String() string {
 	return fmt.Sprintf("DMI(%d)", dmi.Period)
 }
 
-func (dmi *DMI) Next(candle ICandle) []float64 {
+func (dmi *DMI) Next(candle OHLCV) []float64 {
 	dmi.valueNumber++
 
 	if dmi.valueNumber == 1 {
@@ -59,11 +68,11 @@ func (dmi *DMI) Next(candle ICandle) []float64 {
 	dmi.prevLow = candle.Low()
 	dmi.prevClose = candle.Close()
 
-	sPlusDM := dmi.plusDMSmma.next(plusDM)
-	sMinusDM := dmi.minusDMSmma.next(minusDM)
-	sTR := dmi.trSmma.next(tr)
+	sPlusDM := dmi.plusDMMA.NextVal(plusDM)
+	sMinusDM := dmi.minusDMMA.NextVal(minusDM)
+	sTR := dmi.trMA.NextVal(tr)
 
-	if dmi.trSmma.IsIdle() {
+	if dmi.trMA.IsIdle() {
 		return dmi.out
 	}
 
@@ -74,9 +83,9 @@ func (dmi *DMI) Next(candle ICandle) []float64 {
 	dmi.out[2] = minusDI
 
 	dx := 100 * math.Abs(plusDI-minusDI) / (plusDI + minusDI)
-	adx := dmi.adxSmma.next(dx)
+	adx := dmi.adxMA.NextVal(dx)
 
-	if dmi.adxSmma.IsIdle() {
+	if dmi.adxMA.IsIdle() {
 		return dmi.out
 	}
 
@@ -84,16 +93,16 @@ func (dmi *DMI) Next(candle ICandle) []float64 {
 	return dmi.out
 }
 
-func (dmi *DMI) Current(candle ICandle) []float64 {
+func (dmi *DMI) Current(candle OHLCV) []float64 {
 	if dmi.IsIdle() {
 		return dmi.out
 	}
 
 	plusDM, minusDM, tr := dmi.computeDMTR(candle)
 
-	sPlusDM := dmi.plusDMSmma.current(plusDM)
-	sMinusDM := dmi.minusDMSmma.current(minusDM)
-	sTR := dmi.trSmma.current(tr)
+	sPlusDM := dmi.plusDMMA.CurrentVal(plusDM)
+	sMinusDM := dmi.minusDMMA.CurrentVal(minusDM)
+	sTR := dmi.trMA.CurrentVal(tr)
 
 	plusDI := 100 * sPlusDM / sTR
 	minusDI := 100 * sMinusDM / sTR
@@ -102,11 +111,11 @@ func (dmi *DMI) Current(candle ICandle) []float64 {
 	dmi.out[2] = minusDI
 
 	dx := 100 * math.Abs(plusDI-minusDI) / (plusDI + minusDI)
-	dmi.out[0] = dmi.adxSmma.current(dx)
+	dmi.out[0] = dmi.adxMA.CurrentVal(dx)
 	return dmi.out
 }
 
-func (dmi *DMI) computeDMTR(candle ICandle) (plusDM, minusDM, tr float64) {
+func (dmi *DMI) computeDMTR(candle OHLCV) (plusDM, minusDM, tr float64) {
 	upMove := candle.High() - dmi.prevHigh
 	downMove := dmi.prevLow - candle.Low()
 

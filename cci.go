@@ -15,26 +15,26 @@ type CCI struct {
 }
 
 // NewCCI creates a new CCI indicator with the given period.
-// source replaces the typical price used in the formula. Pass nil to default
-// to the classical HLC3 typical price.
-func NewCCI(period int, source SourceFunc) (*CCI, error) {
-	if source == nil {
-		source = SourceHLC3
-	}
+func NewCCI(period int) (*CCI, error) {
 	return &CCI{
-		Period:      period,
-		SourceFunc:  source,
-		valueNumber: 0,
-		buffer:      newRingBuffer(period),
-		out:         make([]float64, 1),
+		Period:     period,
+		SourceFunc: SourceHLC3,
+		buffer:     newRingBuffer(period),
+		out:        make([]float64, 1),
 	}, nil
+}
+
+// WithSource sets the price source used to extract values from candles.
+func (cci *CCI) WithSource(source SourceFunc) *CCI {
+	cci.SourceFunc = source
+	return cci
 }
 
 func (cci *CCI) String() string {
 	return fmt.Sprintf("CCI(%d)", cci.Period)
 }
 
-func (cci *CCI) Next(candle ICandle) []float64 {
+func (cci *CCI) Next(candle OHLCV) []float64 {
 	cci.valueNumber++
 
 	typicalPrice := cci.SourceFunc(candle)
@@ -59,7 +59,7 @@ func (cci *CCI) Next(candle ICandle) []float64 {
 	return cci.out
 }
 
-func (cci *CCI) Current(candle ICandle) []float64 {
+func (cci *CCI) Current(candle OHLCV) []float64 {
 	if cci.IsIdle() {
 		return cci.out
 	}

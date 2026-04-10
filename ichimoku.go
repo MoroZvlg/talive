@@ -53,7 +53,7 @@ func (ich *Ichimoku) String() string {
 	return fmt.Sprintf("Ichimoku(%d,%d,%d,%d)", ich.ConvPeriod, ich.BasePeriod, ich.SpanBPeriod, ich.Shift)
 }
 
-func (ich *Ichimoku) Next(candle ICandle) []float64 {
+func (ich *Ichimoku) Next(candle OHLCV) []float64 {
 	ich.valueNumber++
 	h, l := candle.High(), candle.Low()
 
@@ -100,7 +100,7 @@ func (ich *Ichimoku) Next(candle ICandle) []float64 {
 	return ich.out
 }
 
-func (ich *Ichimoku) Current(candle ICandle) []float64 {
+func (ich *Ichimoku) Current(candle OHLCV) []float64 {
 	if ich.IsIdle() {
 		return ich.out
 	}

@@ -69,40 +69,38 @@ func TestMfiIdle(t *testing.T) {
 	}
 }
 
-func TestMfiCurrentValue(t *testing.T) {
+func TestMfiCurrentVal(t *testing.T) {
 	candles, _ := readCandles("test_data/input_data.csv")
 	expectedParsedData, _ := readData("test_data/mfi/output_default.csv", []int{1}, 8)
 	indicator, _ := talive.NewMFI(14)
 	for i := 0; i < 15; i++ {
 		indicator.Next(candles[i])
 	}
-	currentValue := roundFloat(indicator.Current(candles[15])[0], 8)
+	CurrentVal := roundFloat(indicator.Current(candles[15])[0], 8)
 	expectedValue := roundFloat(expectedParsedData[0][15], 8)
-	if currentValue != expectedValue {
-		t.Fatalf("[MFI(14)] wrong Current value %f, expected %f", currentValue, expectedValue)
+	if CurrentVal != expectedValue {
+		t.Fatalf("[MFI(14)] wrong Current value %f, expected %f", CurrentVal, expectedValue)
 	}
-	nextValue := roundFloat(indicator.Next(candles[15])[0], 8)
-	if nextValue != currentValue {
-		t.Fatalf("[MFI(14)] Current value call broke Next value %f, expected %f", nextValue, expectedValue)
+	NextVal := roundFloat(indicator.Next(candles[15])[0], 8)
+	if NextVal != CurrentVal {
+		t.Fatalf("[MFI(14)] Current value call broke Next value %f, expected %f", NextVal, expectedValue)
 	}
 }
-
-var mfiDummy *talive.MFI
 
 func Benchmark_Mfi_Init_Allocations(benchmark *testing.B) {
 	benchmark.Run("MFI 14", func(benchmark *testing.B) {
 		for i := 0; i < benchmark.N; i++ {
-			mfiDummy, _ = talive.NewMFI(14)
+			benchSink, _ = talive.NewMFI(14)
 		}
 	})
 	benchmark.Run("MFI 2", func(benchmark *testing.B) {
 		for i := 0; i < benchmark.N; i++ {
-			mfiDummy, _ = talive.NewMFI(2)
+			benchSink, _ = talive.NewMFI(2)
 		}
 	})
 	benchmark.Run("MFI 1000", func(benchmark *testing.B) {
 		for i := 0; i < benchmark.N; i++ {
-			mfiDummy, _ = talive.NewMFI(1000)
+			benchSink, _ = talive.NewMFI(1000)
 		}
 	})
 }

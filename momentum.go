@@ -12,26 +12,29 @@ type Momentum struct {
 }
 
 // NewMomentum creates a new Momentum indicator with the given period.
-func NewMomentum(period int, source SourceFunc) (*Momentum, error) {
+func NewMomentum(period int) (*Momentum, error) {
 	if period < 1 {
 		return nil, fmt.Errorf("period should be greater than 0")
 	}
-	if source == nil {
-		source = SourceClose
-	}
 	return &Momentum{
 		Period:     period,
-		SourceFunc: source,
+		SourceFunc: SourceClose,
 		buffer:     newRingBuffer(period),
 		out:        make([]float64, 1),
 	}, nil
+}
+
+// WithSource sets the price source used to extract values from candles.
+func (m *Momentum) WithSource(source SourceFunc) *Momentum {
+	m.SourceFunc = source
+	return m
 }
 
 func (m *Momentum) String() string {
 	return fmt.Sprintf("Momentum(%d)", m.Period)
 }
 
-func (m *Momentum) Next(candle ICandle) []float64 {
+func (m *Momentum) Next(candle OHLCV) []float64 {
 	m.valueNumber++
 
 	value := m.SourceFunc(candle)
@@ -46,7 +49,7 @@ func (m *Momentum) Next(candle ICandle) []float64 {
 	return m.out
 }
 
-func (m *Momentum) Current(candle ICandle) []float64 {
+func (m *Momentum) Current(candle OHLCV) []float64 {
 	if m.IsIdle() {
 		return m.out
 	}

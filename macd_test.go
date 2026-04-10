@@ -10,7 +10,7 @@ import (
 func TestMacdDefault(t *testing.T) {
 	candles, _ := readCandles("test_data/input_data.csv")
 	expectedParsedData, _ := readData("test_data/macd/output_default.csv", []int{1, 2, 3}, 7)
-	indicator, _ := talive.NewMACD(12, 26, 9, talive.SourceClose, talive.SourceClose)
+	indicator, _ := talive.NewMACD(12, 26, 9)
 	result := [][]float64{
 		make([]float64, len(candles)),
 		make([]float64, len(candles)),
@@ -37,7 +37,7 @@ func TestMacdDefault(t *testing.T) {
 func TestMacdMin(t *testing.T) {
 	candles, _ := readCandles("test_data/input_data.csv")
 	expectedParsedData, _ := readData("test_data/macd/output_min.csv", []int{1, 2, 3}, 7)
-	indicator, _ := talive.NewMACD(2, 3, 2, talive.SourceClose, talive.SourceClose)
+	indicator, _ := talive.NewMACD(2, 3, 2)
 	result := [][]float64{
 		make([]float64, len(candles)),
 		make([]float64, len(candles)),
@@ -62,7 +62,7 @@ func TestMacdMin(t *testing.T) {
 }
 
 func TestMacdIdle(t *testing.T) {
-	indicator, _ := talive.NewMACD(3, 4, 2, talive.SourceClose, talive.SourceClose)
+	indicator, _ := talive.NewMACD(3, 4, 2)
 	var result []string
 	for i := 0; i < 6; i++ {
 		indicator.Next(&testCandle{close: float64(i)})
@@ -86,10 +86,10 @@ func TestMacdIdle(t *testing.T) {
 	}
 }
 
-func TestMacdCurrentValue(t *testing.T) {
+func TestMacdCurrentVal(t *testing.T) {
 	candles, _ := readCandles("test_data/input_data.csv")
 	expectedParsedData, _ := readData("test_data/macd/output_default.csv", []int{1, 2, 3}, 7)
-	indicator, _ := talive.NewMACD(12, 26, 9, talive.SourceClose, talive.SourceClose)
+	indicator, _ := talive.NewMACD(12, 26, 9)
 	for i := 0; i < 34; i++ {
 		indicator.Next(candles[i])
 	}
@@ -125,22 +125,20 @@ func TestMacdCurrentValue(t *testing.T) {
 	}
 }
 
-var macdDummy *talive.MACD
-
 func Benchmark_MACD_Init_Allocations(benchmark *testing.B) {
 	benchmark.Run("MACD (12, 26, 9)", func(benchmark *testing.B) {
 		for i := 0; i < benchmark.N; i++ {
-			macdDummy, _ = talive.NewMACD(12, 26, 9, talive.SourceClose, talive.SourceClose)
+			benchSink, _ = talive.NewMACD(12, 26, 9)
 		}
 	})
 	benchmark.Run("MACD (2, 3, 2)", func(benchmark *testing.B) {
 		for i := 0; i < benchmark.N; i++ {
-			macdDummy, _ = talive.NewMACD(2, 3, 2, talive.SourceClose, talive.SourceClose)
+			benchSink, _ = talive.NewMACD(2, 3, 2)
 		}
 	})
 	benchmark.Run("MACD (100, 200, 15)", func(benchmark *testing.B) {
 		for i := 0; i < benchmark.N; i++ {
-			macdDummy, _ = talive.NewMACD(100, 200, 15, talive.SourceClose, talive.SourceClose)
+			benchSink, _ = talive.NewMACD(100, 200, 15)
 		}
 	})
 }
@@ -149,7 +147,7 @@ func Benchmark_MACD_Next_Allocations(benchmark *testing.B) {
 	candles, _ := readCandles("test_data/input_data.csv")
 	dataLen := len(candles)
 	benchmark.Run("MACD (12, 26, 9)", func(benchmark *testing.B) {
-		indicator, _ := talive.NewMACD(12, 26, 9, talive.SourceClose, talive.SourceClose)
+		indicator, _ := talive.NewMACD(12, 26, 9)
 		dataIndex := 0
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {
@@ -158,7 +156,7 @@ func Benchmark_MACD_Next_Allocations(benchmark *testing.B) {
 		}
 	})
 	benchmark.Run("MACD (2, 3, 2)", func(benchmark *testing.B) {
-		indicator, _ := talive.NewMACD(2, 3, 2, talive.SourceClose, talive.SourceClose)
+		indicator, _ := talive.NewMACD(2, 3, 2)
 		dataIndex := 0
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {
@@ -167,7 +165,7 @@ func Benchmark_MACD_Next_Allocations(benchmark *testing.B) {
 		}
 	})
 	benchmark.Run("MACD (100, 200, 15)", func(benchmark *testing.B) {
-		indicator, _ := talive.NewMACD(100, 200, 15, talive.SourceClose, talive.SourceClose)
+		indicator, _ := talive.NewMACD(100, 200, 15)
 		dataIndex := 0
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {
@@ -181,7 +179,7 @@ func Benchmark_MACD_Current_Allocations(benchmark *testing.B) {
 	candles, _ := readCandles("test_data/input_data.csv")
 	dataLen := len(candles)
 	benchmark.Run("MACD (12, 26, 9)", func(benchmark *testing.B) {
-		indicator, _ := talive.NewMACD(12, 26, 9, talive.SourceClose, talive.SourceClose)
+		indicator, _ := talive.NewMACD(12, 26, 9)
 		dataIndex := 0
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {
@@ -190,7 +188,7 @@ func Benchmark_MACD_Current_Allocations(benchmark *testing.B) {
 		}
 	})
 	benchmark.Run("MACD (2, 3, 2)", func(benchmark *testing.B) {
-		indicator, _ := talive.NewMACD(2, 3, 2, talive.SourceClose, talive.SourceClose)
+		indicator, _ := talive.NewMACD(2, 3, 2)
 		dataIndex := 0
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {
@@ -199,7 +197,7 @@ func Benchmark_MACD_Current_Allocations(benchmark *testing.B) {
 		}
 	})
 	benchmark.Run("MACD (100, 200, 15)", func(benchmark *testing.B) {
-		indicator, _ := talive.NewMACD(100, 200, 15, talive.SourceClose, talive.SourceClose)
+		indicator, _ := talive.NewMACD(100, 200, 15)
 		dataIndex := 0
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {

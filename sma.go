@@ -12,24 +12,27 @@ type SMA struct {
 }
 
 // NewSMA creates a new SMA indicator with the given period.
-func NewSMA(period int, source SourceFunc) (MA, error) {
-	if source == nil {
-		source = SourceClose
-	}
+func NewSMA(period int) (*SMA, error) {
 	return &SMA{
 		Period:      period,
-		SourceFunc:  source,
+		SourceFunc:  SourceClose,
 		valueNumber: 0,
 		buffer:      newRingBuffer(period),
 		out:         make([]float64, 1),
 	}, nil
 }
 
+// WithSource sets the price source used to extract values from candles.
+func (sma *SMA) WithSource(source SourceFunc) *SMA {
+	sma.SourceFunc = source
+	return sma
+}
+
 func (sma *SMA) String() string {
 	return fmt.Sprintf("SMA(%d)", sma.Period)
 }
 
-func (sma *SMA) next(value float64) float64 {
+func (sma *SMA) NextVal(value float64) float64 {
 	sma.buffer.Push(value)
 	sma.valueNumber++
 	if sma.IsIdle() {
@@ -38,21 +41,20 @@ func (sma *SMA) next(value float64) float64 {
 	return sma.buffer.Sum / float64(sma.Period)
 }
 
-func (sma *SMA) current(value float64) float64 {
+func (sma *SMA) CurrentVal(value float64) float64 {
 	if sma.IsIdle() {
 		return 0.0
 	}
-	result := (sma.buffer.SumExceptLast() + value) / float64(sma.Period)
-	return result
+	return (sma.buffer.SumExceptLast() + value) / float64(sma.Period)
 }
 
-func (sma *SMA) Next(candle ICandle) []float64 {
-	sma.out[0] = sma.next(sma.SourceFunc(candle))
+func (sma *SMA) Next(candle OHLCV) []float64 {
+	sma.out[0] = sma.NextVal(sma.SourceFunc(candle))
 	return sma.out
 }
 
-func (sma *SMA) Current(candle ICandle) []float64 {
-	sma.out[0] = sma.current(sma.SourceFunc(candle))
+func (sma *SMA) Current(candle OHLCV) []float64 {
+	sma.out[0] = sma.CurrentVal(sma.SourceFunc(candle))
 	return sma.out
 }
 

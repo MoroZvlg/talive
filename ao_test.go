@@ -56,30 +56,28 @@ func TestAoIdle(t *testing.T) {
 	}
 }
 
-func TestAoCurrentValue(t *testing.T) {
+func TestAoCurrentVal(t *testing.T) {
 	candles, _ := readCandles("test_data/input_data2.csv")
 	expectedParsedData, _ := readData("test_data/ao/output_default.csv", []int{1}, 8)
 	indicator, _ := talive.NewAO()
 	for i := 0; i < 34; i++ {
 		indicator.Next(candles[i])
 	}
-	currentValue := roundFloat(indicator.Current(candles[34])[0], 8)
+	CurrentVal := roundFloat(indicator.Current(candles[34])[0], 8)
 	expectedValue := roundFloat(expectedParsedData[0][34], 8)
-	if currentValue != expectedValue {
-		t.Fatalf("[AO] wrong Current value %f, expected %f", currentValue, expectedValue)
+	if CurrentVal != expectedValue {
+		t.Fatalf("[AO] wrong Current value %f, expected %f", CurrentVal, expectedValue)
 	}
-	nextValue := roundFloat(indicator.Next(candles[34])[0], 8)
-	if nextValue != currentValue {
-		t.Fatalf("[AO] Current value call broke Next value %f, expected %f", nextValue, expectedValue)
+	NextVal := roundFloat(indicator.Next(candles[34])[0], 8)
+	if NextVal != CurrentVal {
+		t.Fatalf("[AO] Current value call broke Next value %f, expected %f", NextVal, expectedValue)
 	}
 }
-
-var aoDummy *talive.AO
 
 func Benchmark_Ao_Init_Allocations(benchmark *testing.B) {
 	benchmark.Run("AO", func(benchmark *testing.B) {
 		for i := 0; i < benchmark.N; i++ {
-			aoDummy, _ = talive.NewAO()
+			benchSink, _ = talive.NewAO()
 		}
 	})
 }

@@ -9,6 +9,7 @@ import (
 
 var floatDummy float64
 var sliceDummy []float64
+var benchSink any
 
 func roundFloat(number float64, decimals int) float64 {
 	pow := math.Pow(10, float64(decimals))

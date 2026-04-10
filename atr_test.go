@@ -58,35 +58,33 @@ func TestAtrIdle(t *testing.T) {
 	}
 }
 
-func TestAtrCurrentValue(t *testing.T) {
+func TestAtrCurrentVal(t *testing.T) {
 	candles, _ := readCandles("test_data/input_data2.csv")
 	expectedParsedData, _ := readData("test_data/atr/output_default.csv", []int{1}, 8)
 	indicator, _ := talive.NewATR(14)
 	for i := 0; i < 14; i++ {
 		indicator.Next(candles[i])
 	}
-	currentValue := roundFloat(indicator.Current(candles[14])[0], 8)
+	CurrentVal := roundFloat(indicator.Current(candles[14])[0], 8)
 	expectedValue := roundFloat(expectedParsedData[0][14], 8)
-	if currentValue != expectedValue {
-		t.Fatalf("[ATR(14)] wrong Current value %f, expected %f", currentValue, expectedValue)
+	if CurrentVal != expectedValue {
+		t.Fatalf("[ATR(14)] wrong Current value %f, expected %f", CurrentVal, expectedValue)
 	}
-	nextValue := roundFloat(indicator.Next(candles[14])[0], 8)
-	if nextValue != currentValue {
-		t.Fatalf("[ATR(14)] Current value call broke Next value %f, expected %f", nextValue, expectedValue)
+	NextVal := roundFloat(indicator.Next(candles[14])[0], 8)
+	if NextVal != CurrentVal {
+		t.Fatalf("[ATR(14)] Current value call broke Next value %f, expected %f", NextVal, expectedValue)
 	}
 }
-
-var atrDummy *talive.ATR
 
 func Benchmark_ATR_Init_Allocations(b *testing.B) {
 	b.Run("ATR(2)", func(b *testing.B) {
 		for i := 0; i < b.N; i++ {
-			atrDummy, _ = talive.NewATR(2)
+			benchSink, _ = talive.NewATR(2)
 		}
 	})
 	b.Run("ATR(50)", func(b *testing.B) {
 		for i := 0; i < b.N; i++ {
-			atrDummy, _ = talive.NewATR(50)
+			benchSink, _ = talive.NewATR(50)
 		}
 	})
 }
@@ -96,21 +94,21 @@ func Benchmark_ATR_Next_Allocations(b *testing.B) {
 	dataLen := len(candles)
 
 	b.Run("ATR(2)", func(b *testing.B) {
-		atrDummy, _ = talive.NewATR(2)
+		indicator, _ := talive.NewATR(2)
 		dataIndex := 0
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)
-			sliceDummy = atrDummy.Next(candles[dataIndex])
+			sliceDummy = indicator.Next(candles[dataIndex])
 		}
 	})
 	b.Run("ATR(50)", func(b *testing.B) {
-		atrDummy, _ = talive.NewATR(50)
+		indicator, _ := talive.NewATR(50)
 		dataIndex := 0
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)
-			sliceDummy = atrDummy.Next(candles[dataIndex])
+			sliceDummy = indicator.Next(candles[dataIndex])
 		}
 	})
 }
@@ -120,21 +118,21 @@ func Benchmark_ATR_Current_Allocations(b *testing.B) {
 	dataLen := len(candles)
 
 	b.Run("ATR(2)", func(b *testing.B) {
-		atrDummy, _ = talive.NewATR(2)
+		indicator, _ := talive.NewATR(2)
 		dataIndex := 0
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)
-			sliceDummy = atrDummy.Current(candles[dataIndex])
+			sliceDummy = indicator.Current(candles[dataIndex])
 		}
 	})
 	b.Run("ATR(50)", func(b *testing.B) {
-		atrDummy, _ = talive.NewATR(50)
+		indicator, _ := talive.NewATR(50)
 		dataIndex := 0
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)
-			sliceDummy = atrDummy.Current(candles[dataIndex])
+			sliceDummy = indicator.Current(candles[dataIndex])
 		}
 	})
 }

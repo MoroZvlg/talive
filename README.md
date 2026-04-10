@@ -38,10 +38,10 @@ if rsi.IsIdle() {
 }
 ```
 
-Candles must implement the `ICandle` interface:
+Candles must implement the `OHLCV` interface:
 
 ```go
-type ICandle interface {
+type OHLCV interface {
     Open() float64
     High() float64
     Low() float64

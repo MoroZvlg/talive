@@ -58,40 +58,38 @@ func TestUoIdle(t *testing.T) {
 	}
 }
 
-func TestUoCurrentValue(t *testing.T) {
+func TestUoCurrentVal(t *testing.T) {
 	candles, _ := readCandles("test_data/input_data2.csv")
 	expectedParsedData, _ := readData("test_data/uo/output_default.csv", []int{1}, 8)
 	indicator, _ := talive.NewUO(7, 14, 28)
 	for i := 0; i < 29; i++ {
 		indicator.Next(candles[i])
 	}
-	currentValue := roundFloat(indicator.Current(candles[29])[0], 8)
+	CurrentVal := roundFloat(indicator.Current(candles[29])[0], 8)
 	expectedValue := roundFloat(expectedParsedData[0][29], 8)
-	if currentValue != expectedValue {
-		t.Fatalf("[UO(7,14,28)] wrong Current value %f, expected %f", currentValue, expectedValue)
+	if CurrentVal != expectedValue {
+		t.Fatalf("[UO(7,14,28)] wrong Current value %f, expected %f", CurrentVal, expectedValue)
 	}
-	nextValue := roundFloat(indicator.Next(candles[29])[0], 8)
-	if nextValue != currentValue {
-		t.Fatalf("[UO(7,14,28)] Current value call broke Next value %f, expected %f", nextValue, expectedValue)
+	NextVal := roundFloat(indicator.Next(candles[29])[0], 8)
+	if NextVal != CurrentVal {
+		t.Fatalf("[UO(7,14,28)] Current value call broke Next value %f, expected %f", NextVal, expectedValue)
 	}
 }
-
-var uoDummy *talive.UO
 
 func Benchmark_Uo_Init_Allocations(benchmark *testing.B) {
 	benchmark.Run("UO(2,3,4)", func(benchmark *testing.B) {
 		for i := 0; i < benchmark.N; i++ {
-			uoDummy, _ = talive.NewUO(2, 3, 4)
+			benchSink, _ = talive.NewUO(2, 3, 4)
 		}
 	})
 	benchmark.Run("UO(7,14,28)", func(benchmark *testing.B) {
 		for i := 0; i < benchmark.N; i++ {
-			uoDummy, _ = talive.NewUO(7, 14, 28)
+			benchSink, _ = talive.NewUO(7, 14, 28)
 		}
 	})
 	benchmark.Run("UO(14,28,56)", func(benchmark *testing.B) {
 		for i := 0; i < benchmark.N; i++ {
-			uoDummy, _ = talive.NewUO(14, 28, 56)
+			benchSink, _ = talive.NewUO(14, 28, 56)
 		}
 	})
 }

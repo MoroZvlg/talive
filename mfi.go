@@ -31,7 +31,7 @@ func (mfi *MFI) String() string {
 	return fmt.Sprintf("MFI(%d)", mfi.Period)
 }
 
-func (mfi *MFI) Next(candle ICandle) []float64 {
+func (mfi *MFI) Next(candle OHLCV) []float64 {
 	high, low, closeV, volume := candle.High(), candle.Low(), candle.Close(), candle.Volume()
 	mfi.valueNumber++
 	typicalPrice := (high + low + closeV) / 3.0
@@ -61,7 +61,7 @@ func (mfi *MFI) Next(candle ICandle) []float64 {
 	return mfi.out
 }
 
-func (mfi *MFI) Current(candle ICandle) []float64 {
+func (mfi *MFI) Current(candle OHLCV) []float64 {
 	high, low, closeV, volume := candle.High(), candle.Low(), candle.Close(), candle.Volume()
 	mfi.valueNumber++
 	if mfi.IsIdle() {

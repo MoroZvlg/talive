@@ -10,7 +10,7 @@ import (
 func TestHmaDefault(t *testing.T) {
 	candles, _ := readCandles("test_data/input_data2.csv")
 	expectedParsedData, _ := readData("test_data/hma/output_default.csv", []int{1}, 5)
-	indicator, _ := talive.NewHMA(9, talive.SourceClose, talive.SourceClose)
+	indicator, _ := talive.NewHMA(9)
 	result := make([]float64, len(candles))
 	for i, candle := range candles {
 		result[i] = roundFloat(indicator.Next(candle)[0], 5)
@@ -23,7 +23,7 @@ func TestHmaDefault(t *testing.T) {
 func TestHmaMin(t *testing.T) {
 	candles, _ := readCandles("test_data/input_data2.csv")
 	expectedParsedData, _ := readData("test_data/hma/output_min.csv", []int{1}, 7)
-	indicator, _ := talive.NewHMA(2, talive.SourceClose, talive.SourceClose)
+	indicator, _ := talive.NewHMA(2)
 	result := make([]float64, len(candles))
 	for i, candle := range candles {
 		result[i] = roundFloat(indicator.Next(candle)[0], 7)
@@ -34,7 +34,7 @@ func TestHmaMin(t *testing.T) {
 }
 
 func TestHmaIdle(t *testing.T) {
-	indicator, _ := talive.NewHMA(4, talive.SourceClose, talive.SourceClose)
+	indicator, _ := talive.NewHMA(4)
 	// fullWma(4) idle=3, sqrtWma(2) idle=1 -> total idle=4
 	var result []string
 	for i := 0; i < 6; i++ {
@@ -62,7 +62,7 @@ func TestHmaIdle(t *testing.T) {
 func TestHmaCurrentValue(t *testing.T) {
 	candles, _ := readCandles("test_data/input_data2.csv")
 	expectedParsedData, _ := readData("test_data/hma/output_default.csv", []int{1}, 8)
-	indicator, _ := talive.NewHMA(9, talive.SourceClose, talive.SourceClose)
+	indicator, _ := talive.NewHMA(9)
 	for i := 0; i < 11; i++ {
 		indicator.Next(candles[i])
 	}
@@ -77,17 +77,15 @@ func TestHmaCurrentValue(t *testing.T) {
 	}
 }
 
-var hmaDummy *talive.HMA
-
 func Benchmark_Hma_Init_Allocations(b *testing.B) {
 	b.Run("HMA(2)", func(b *testing.B) {
 		for i := 0; i < b.N; i++ {
-			hmaDummy, _ = talive.NewHMA(2, talive.SourceClose, talive.SourceClose)
+			benchSink, _ = talive.NewHMA(2)
 		}
 	})
 	b.Run("HMA(50)", func(b *testing.B) {
 		for i := 0; i < b.N; i++ {
-			hmaDummy, _ = talive.NewHMA(50, talive.SourceClose, talive.SourceClose)
+			benchSink, _ = talive.NewHMA(50)
 		}
 	})
 }
@@ -96,7 +94,7 @@ func Benchmark_Hma_Next_Allocations(b *testing.B) {
 	candles, _ := readCandles("test_data/input_data2.csv")
 	dataLen := len(candles)
 	b.Run("HMA(2)", func(b *testing.B) {
-		indicator, _ := talive.NewHMA(2, talive.SourceClose, talive.SourceClose)
+		indicator, _ := talive.NewHMA(2)
 		dataIndex := 0
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
@@ -105,7 +103,7 @@ func Benchmark_Hma_Next_Allocations(b *testing.B) {
 		}
 	})
 	b.Run("HMA(50)", func(b *testing.B) {
-		indicator, _ := talive.NewHMA(50, talive.SourceClose, talive.SourceClose)
+		indicator, _ := talive.NewHMA(50)
 		dataIndex := 0
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
@@ -119,7 +117,7 @@ func Benchmark_Hma_Current_Allocations(b *testing.B) {
 	candles, _ := readCandles("test_data/input_data2.csv")
 	dataLen := len(candles)
 	b.Run("HMA(2)", func(b *testing.B) {
-		indicator, _ := talive.NewHMA(2, talive.SourceClose, talive.SourceClose)
+		indicator, _ := talive.NewHMA(2)
 		dataIndex := 0
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
@@ -128,7 +126,7 @@ func Benchmark_Hma_Current_Allocations(b *testing.B) {
 		}
 	})
 	b.Run("HMA(50)", func(b *testing.B) {
-		indicator, _ := talive.NewHMA(50, talive.SourceClose, talive.SourceClose)
+		indicator, _ := talive.NewHMA(50)
 		dataIndex := 0
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {

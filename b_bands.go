@@ -6,24 +6,19 @@ import "fmt"
 type BBands struct {
 	Period         int
 	DevUp, DevDown float64
-	MaType         MaType
 	SourceFunc     SourceFunc
-	valueNumber    int
-	ma             MA
+	ma             Scalar
 	basicDeviation *StdDev
 	out            []float64
 }
 
 // NewBBands creates a new Bollinger Bands indicator with the given parameters.
-func NewBBands(period int, devUp, devDown float64, maType MaType, source SourceFunc) (*BBands, error) {
-	if source == nil {
-		source = SourceClose
-	}
-	ma, err := NewMa(period, maType, nil)
+func NewBBands(period int, devUp, devDown float64) (*BBands, error) {
+	ma, err := NewSMA(period)
 	if err != nil {
 		return nil, err
 	}
-	basicDeviation, err := NewStdDev(period, 1.0, nil)
+	basicDeviation, err := NewStdDev(period, 1.0)
 	if err != nil {
 		return nil, err
 	}
@@ -31,24 +26,33 @@ func NewBBands(period int, devUp, devDown float64, maType MaType, source SourceF
 		Period:         period,
 		DevUp:          devUp,
 		DevDown:        devDown,
-		MaType:         maType,
-		SourceFunc:     source,
-		valueNumber:    0,
+		SourceFunc:     SourceClose,
 		ma:             ma,
 		basicDeviation: basicDeviation,
 		out:            make([]float64, 3),
 	}, nil
 }
 
+// WithMA replaces the internal moving average type.
+func (bb *BBands) WithMA(ma MaType) *BBands {
+	bb.ma, _ = ma.New(bb.Period)
+	return bb
+}
+
+// WithSource sets the price source used to extract values from candles.
+func (bb *BBands) WithSource(source SourceFunc) *BBands {
+	bb.SourceFunc = source
+	return bb
+}
+
 func (bb *BBands) String() string {
 	return fmt.Sprintf("BBands(%d,%.2f,%.2f,%s)", bb.Period, bb.DevUp, bb.DevDown, bb.ma)
 }
 
-func (bb *BBands) Next(candle ICandle) []float64 {
+func (bb *BBands) Next(candle OHLCV) []float64 {
 	value := bb.SourceFunc(candle)
-	bb.valueNumber++
-	ma := bb.ma.next(value)
-	devBase := bb.basicDeviation.next(value)
+	ma := bb.ma.NextVal(value)
+	devBase := bb.basicDeviation.NextVal(value)
 
 	if bb.IsIdle() {
 		bb.out[0] = 0.0
@@ -63,24 +67,18 @@ func (bb *BBands) Next(candle ICandle) []float64 {
 	return bb.out
 }
 
-func (bb *BBands) Current(candle ICandle) []float64 {
-	value := bb.SourceFunc(candle)
-	bb.valueNumber++
-	ma := bb.ma.current(value)
-	devBase := bb.basicDeviation.current(value)
-
+func (bb *BBands) Current(candle OHLCV) []float64 {
 	if bb.IsIdle() {
-		bb.valueNumber--
-		bb.out[0] = 0.0
-		bb.out[1] = 0.0
-		bb.out[2] = 0.0
 		return bb.out
 	}
+
+	value := bb.SourceFunc(candle)
+	ma := bb.ma.CurrentVal(value)
+	devBase := bb.basicDeviation.CurrentVal(value)
 
 	bb.out[0] = ma + (devBase * bb.DevUp)
 	bb.out[1] = ma
 	bb.out[2] = ma - (devBase * bb.DevDown)
-	bb.valueNumber--
 	return bb.out
 }
 

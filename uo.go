@@ -36,7 +36,7 @@ func (uo *UO) String() string {
 	return fmt.Sprintf("UO(%d,%d,%d)", uo.PeriodMid, uo.PeriodMin, uo.PeriodMax)
 }
 
-func (uo *UO) Next(candle ICandle) []float64 {
+func (uo *UO) Next(candle OHLCV) []float64 {
 	uo.valueNumber++
 
 	if uo.valueNumber == 1 {
@@ -64,7 +64,7 @@ func (uo *UO) Next(candle ICandle) []float64 {
 	return uo.out
 }
 
-func (uo *UO) Current(candle ICandle) []float64 {
+func (uo *UO) Current(candle OHLCV) []float64 {
 	if uo.IsIdle() {
 		return uo.out
 	}

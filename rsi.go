@@ -10,67 +10,99 @@ type RSI struct {
 	SourceFunc  SourceFunc
 	valueNumber int
 	prevPrice   float64
-	gainSmma    MA
-	lossSmma    MA
+	gainMA      Scalar
+	lossMA      Scalar
 	out         []float64
 }
 
 // NewRSI creates a new RSI indicator with the given period.
-func NewRSI(period int, source SourceFunc) (*RSI, error) {
+func NewRSI(period int) (*RSI, error) {
 	if period < 2 {
 		return nil, fmt.Errorf("period should be greater than 1")
 	}
-	if source == nil {
-		source = SourceClose
-	}
-	gainSmma, _ := NewSMMA(period, nil)
-	lossSmma, _ := NewSMMA(period, nil)
+
+	gainMA, _ := NewSMMA(period)
+	lossMA, _ := NewSMMA(period)
 	return &RSI{
 		Period:     period,
-		SourceFunc: source,
-		gainSmma:   gainSmma,
-		lossSmma:   lossSmma,
+		SourceFunc: SourceClose,
+		gainMA:     gainMA,
+		lossMA:     lossMA,
 		out:        make([]float64, 1),
 	}, nil
+}
+
+// WithMA replaces the internal smoothing method used for both gain and loss averages.
+func (rsi *RSI) WithMA(ma MaType) *RSI {
+	gainMA, _ := ma.New(rsi.Period)
+	lossMA, _ := ma.New(rsi.Period)
+	rsi.gainMA = gainMA
+	rsi.lossMA = lossMA
+	return rsi
+}
+
+// WithGain replaces the smoothing indicator used for gain averaging.
+func (rsi *RSI) WithGain(gain Scalar) *RSI {
+	rsi.gainMA = gain
+	return rsi
+}
+
+// WithLoss replaces the smoothing indicator used for loss averaging.
+func (rsi *RSI) WithLoss(loss Scalar) *RSI {
+	rsi.lossMA = loss
+	return rsi
+}
+
+// WithSource sets the price source used to extract values from candles.
+func (rsi *RSI) WithSource(source SourceFunc) *RSI {
+	rsi.SourceFunc = source
+	return rsi
 }
 
 func (rsi *RSI) String() string {
 	return fmt.Sprintf("RSI(%d)", rsi.Period)
 }
 
-func (rsi *RSI) Next(candle ICandle) []float64 {
+func (rsi *RSI) NextVal(value float64) float64 {
 	rsi.valueNumber++
 
-	price := rsi.SourceFunc(candle)
 	if rsi.valueNumber == 1 {
-		rsi.prevPrice = price
-		return rsi.out
+		rsi.prevPrice = value
+		return 0
 	}
 
-	gain, loss := rsi.gainLoss(price)
-	rsi.prevPrice = price
+	gain, loss := rsi.gainLoss(value)
+	rsi.prevPrice = value
 
-	avgGain := rsi.gainSmma.next(gain)
-	avgLoss := rsi.lossSmma.next(loss)
+	avgGain := rsi.gainMA.NextVal(gain)
+	avgLoss := rsi.lossMA.NextVal(loss)
 
 	if rsi.IsIdle() {
-		return rsi.out
+		return 0
 	}
 
-	rsi.out[0] = 100.0 * avgGain / (avgGain + avgLoss)
+	return 100.0 * avgGain / (avgGain + avgLoss)
+}
+
+func (rsi *RSI) CurrentVal(value float64) float64 {
+	if rsi.IsIdle() {
+		return 0
+	}
+
+	gain, loss := rsi.gainLoss(value)
+	avgGain := rsi.gainMA.CurrentVal(gain)
+	avgLoss := rsi.lossMA.CurrentVal(loss)
+
+	return 100.0 * avgGain / (avgGain + avgLoss)
+}
+
+func (rsi *RSI) Next(candle OHLCV) []float64 {
+	rsi.out[0] = rsi.NextVal(rsi.SourceFunc(candle))
 	return rsi.out
 }
 
-func (rsi *RSI) Current(candle ICandle) []float64 {
-	if rsi.IsIdle() {
-		return rsi.out
-	}
-
-	gain, loss := rsi.gainLoss(rsi.SourceFunc(candle))
-	avgGain := rsi.gainSmma.current(gain)
-	avgLoss := rsi.lossSmma.current(loss)
-
-	rsi.out[0] = 100.0 * avgGain / (avgGain + avgLoss)
+func (rsi *RSI) Current(candle OHLCV) []float64 {
+	rsi.out[0] = rsi.CurrentVal(rsi.SourceFunc(candle))
 	return rsi.out
 }
 
@@ -87,7 +119,7 @@ func (rsi *RSI) IdlePeriod() int {
 }
 
 func (rsi *RSI) WarmUpPeriod() int {
-	return rsi.IdlePeriod() + rsi.Period*6
+	return max(rsi.gainMA.IdlePeriod(), rsi.lossMA.IdlePeriod()) + 1
 }
 
 func (rsi *RSI) gainLoss(price float64) (gain, loss float64) {

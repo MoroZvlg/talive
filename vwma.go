@@ -15,16 +15,13 @@ type VWMA struct {
 }
 
 // NewVWMA creates a new VWMA indicator with the given period.
-func NewVWMA(period int, source SourceFunc) (*VWMA, error) {
+func NewVWMA(period int) (*VWMA, error) {
 	if period < 2 {
 		return nil, fmt.Errorf("period should be greater than 1")
 	}
-	if source == nil {
-		source = SourceClose
-	}
 	return &VWMA{
 		Period:         period,
-		SourceFunc:     source,
+		SourceFunc:     SourceClose,
 		valueNumber:    0,
 		closeVolBuffer: newRingBuffer(period),
 		volBuffer:      newRingBuffer(period),
@@ -32,11 +29,17 @@ func NewVWMA(period int, source SourceFunc) (*VWMA, error) {
 	}, nil
 }
 
+// WithSource sets the price source used to extract values from candles.
+func (vwma *VWMA) WithSource(source SourceFunc) *VWMA {
+	vwma.SourceFunc = source
+	return vwma
+}
+
 func (vwma *VWMA) String() string {
 	return fmt.Sprintf("VWMA(%d)", vwma.Period)
 }
 
-func (vwma *VWMA) Next(candle ICandle) []float64 {
+func (vwma *VWMA) Next(candle OHLCV) []float64 {
 	vwma.valueNumber++
 
 	cv := vwma.SourceFunc(candle) * candle.Volume()
@@ -53,7 +56,7 @@ func (vwma *VWMA) Next(candle ICandle) []float64 {
 	return vwma.out
 }
 
-func (vwma *VWMA) Current(candle ICandle) []float64 {
+func (vwma *VWMA) Current(candle OHLCV) []float64 {
 	if vwma.IsIdle() {
 		vwma.out[0] = 0.0
 		return vwma.out
