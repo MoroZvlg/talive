@@ -10,7 +10,6 @@ import (
 	"log/slog"
 	"net/http"
 	"net/url"
-	"screener/domain/entity"
 	"slices"
 	"strconv"
 	"strings"
@@ -42,9 +41,7 @@ func NewHTTPClient(log *slog.Logger) *HTTPClient {
 	}
 }
 
-const TopSymbolsNumber = 100
-
-func (hc *HTTPClient) TopVolumeSymbols(ctx context.Context) ([]string, error) {
+func (hc *HTTPClient) TopVolumeSymbols(ctx context.Context, topNumber int) ([]string, error) {
 	g, ctx := errgroup.WithContext(ctx)
 	var exchangeInfo *ExchangeInfoResp
 	var dayTickerData DayTickerResp
@@ -84,11 +81,11 @@ func (hc *HTTPClient) TopVolumeSymbols(ctx context.Context) ([]string, error) {
 		return cmp.Compare(bVol, aVol) // desc
 	})
 
-	symbols := make([]string, 0, TopSymbolsNumber)
+	symbols := make([]string, 0, topNumber)
 	for _, dayTicker := range dayTickerData {
 		if _, ok := activeSymbols[dayTicker.Symbol]; ok {
 			symbols = append(symbols, dayTicker.Symbol)
-			if len(symbols) >= TopSymbolsNumber {
+			if len(symbols) >= topNumber {
 				break
 			}
 		}
@@ -122,7 +119,7 @@ func (hc *HTTPClient) ExchangeInfo(ctx context.Context) (*ExchangeInfoResp, erro
 	return &parsedResponse, nil
 }
 
-func (hc *HTTPClient) LastKlines(ctx context.Context, symbol string, limit int) ([]entity.Kline, error) {
+func (hc *HTTPClient) LastKlines(ctx context.Context, symbol string, limit int) ([]Kline, error) {
 	params := RequestParams{
 		Method: http.MethodGet,
 		Path:   "/fapi/v1/klines",
@@ -139,7 +136,7 @@ func (hc *HTTPClient) LastKlines(ctx context.Context, symbol string, limit int) 
 	}
 	receivedAt := time.Now()
 
-	result := make([]entity.Kline, 0, len(parsedResponse))
+	result := make([]Kline, 0, len(parsedResponse))
 	if len(parsedResponse) == 0 {
 		return result, nil
 	}
@@ -189,7 +186,7 @@ func (hc *HTTPClient) LastKlines(ctx context.Context, symbol string, limit int) 
 		}
 		volumeF, _ := strconv.ParseFloat(volumeStr, 64)
 
-		result = append(result, entity.Kline{
+		result = append(result, Kline{
 			O:            openF,
 			H:            highF,
 			L:            lowF,

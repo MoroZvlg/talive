@@ -1,18 +1,40 @@
-package logger
+package internal
 
 import (
 	"log/slog"
 	"os"
-	"screener/config"
+	"path"
+	"strings"
+
+	"github.com/joho/godotenv"
 )
 
-type CtxKeyType string
+func init() {
+	pwd, err := os.Getwd()
+	if err != nil {
+		panic(err)
+	}
+	_ = godotenv.Load(path.Join(pwd, ".env"))
+}
 
-const CtxKey CtxKeyType = "logger"
+func LogLevel() string {
+	return strings.ToLower(env("LOG_LEVEL", "INFO"))
+}
 
-func New() *slog.Logger {
+func LogFormat() string {
+	return strings.ToLower(env("LOG_FORMAT", "text"))
+}
+
+func env(key, defaultValue string) string {
+	if value := os.Getenv(key); value != "" {
+		return value
+	}
+	return defaultValue
+}
+
+func NewLogger() *slog.Logger {
 	options := &slog.HandlerOptions{
-		Level: parseLogLevel(config.LogLevel()),
+		Level: parseLogLevel(LogLevel()),
 		ReplaceAttr: func(_ []string, a slog.Attr) slog.Attr {
 			if a.Key == slog.TimeKey {
 				a.Value = slog.StringValue(a.Value.Time().UTC().Format("2006-01-02T15:04:05.000000Z"))
@@ -22,7 +44,7 @@ func New() *slog.Logger {
 	}
 
 	var handler slog.Handler
-	if config.LogFormat() == "json" {
+	if LogFormat() == "json" {
 		handler = slog.NewJSONHandler(os.Stdout, options)
 	} else {
 		handler = slog.NewTextHandler(os.Stdout, options)

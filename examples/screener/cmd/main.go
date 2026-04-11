@@ -4,27 +4,24 @@ import (
 	"context"
 	"os"
 	"os/signal"
-	"screener/binance"
-	"screener/domain/entity"
-	"screener/logger"
-	"screener/worker"
+	"screener/internal"
+	"screener/internal/binance"
 	"sync"
 	"syscall"
 	"time"
 )
 
 func main() {
-	log := logger.New()
+	log := internal.NewLogger()
 	symbolsCtx, symbolsCancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer symbolsCancel()
 	httpClient := binance.NewHTTPClient(log)
-	symbols, err := httpClient.TopVolumeSymbols(symbolsCtx)
+	symbols, err := httpClient.TopVolumeSymbols(symbolsCtx, 1)
 	if err != nil {
 		log.Error("Error calling TopVolumeSymbols", "error", err)
 		return
 	}
 	log.Info("Top Volume Symbols", "symbols", symbols)
-	symbols = symbols[:1]
 
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
@@ -37,17 +34,17 @@ func main() {
 		log.Error("Error connection to WS", "error", err)
 		return
 	}
-	workerMap := make(map[string]chan<- entity.Kline)
+	workerMap := make(map[string]chan<- binance.Kline)
 	var workerWg sync.WaitGroup
-	for i, symbol := range symbols {
-		klineCh := make(chan entity.Kline, 10)
-		w := worker.NewScreenerWorker(workerCtx, log, uint(i), symbol, httpClient)
+	for _, symbol := range symbols {
+		klineCh := make(chan binance.Kline, 10)
+		w := internal.NewScreenerWorker(workerCtx, log, symbol, httpClient)
 		workerWg.Add(1)
 		w.Start(klineCh, &workerWg)
 		workerMap[symbol] = klineCh
 	}
 
-	ws.SetKlineHandler(func(kline entity.Kline) {
+	ws.SetKlineHandler(func(kline binance.Kline) {
 		klineCh, ok := workerMap[kline.Symbol]
 		if !ok {
 			log.Warn("Worker not found in workerMap", "symbol", kline.Symbol)

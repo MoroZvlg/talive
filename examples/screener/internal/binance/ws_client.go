@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"log/slog"
 	"net"
-	"screener/domain/entity"
 	"strconv"
 	"strings"
 	"sync"
@@ -64,9 +63,9 @@ func (wc *WsClient) Close() error {
 	return wc.conn.Close()
 }
 
-func (wc *WsClient) SetKlineHandler(handler func(kline entity.Kline)) {
+func (wc *WsClient) SetKlineHandler(handler func(kline Kline)) {
 	wrappedFunc := func(data any) {
-		kline, ok := data.(entity.Kline)
+		kline, ok := data.(Kline)
 		if !ok {
 			wc.log.Error("Kline cast error")
 			return
@@ -152,7 +151,7 @@ func (wc *WsClient) processMessage(msg []byte) error {
 		fLow, _ := strconv.ParseFloat(klineMsg.KlineData.Low, 64)
 		fClose, _ := strconv.ParseFloat(klineMsg.KlineData.Close, 64)
 		fVolume, _ := strconv.ParseFloat(klineMsg.KlineData.QuoteVolume, 64)
-		kline := entity.Kline{
+		kline := Kline{
 			O:            fOpen,
 			H:            fHigh,
 			L:            fLow,
