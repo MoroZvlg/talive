@@ -1,13 +1,17 @@
 package talive
 
-import "math"
+import (
+	"fmt"
+	"math"
+)
 
 // StdDev is a Standard Deviation indicator.
 type StdDev struct {
-	period    int
-	deviation float64
-	variance  *Variance
-	out       []float64
+	Period     int
+	Deviation  float64
+	SourceFunc SourceFunc
+	variance   *Variance
+	out        []float64
 }
 
 // NewStdDev creates a new Standard Deviation indicator.
@@ -18,30 +22,42 @@ func NewStdDev(period int, deviation float64) (*StdDev, error) {
 		return nil, err
 	}
 	return &StdDev{
-		period:    period,
-		deviation: deviation,
-		variance:  variance,
-		out:       make([]float64, 1),
+		Period:     period,
+		Deviation:  deviation,
+		SourceFunc: SourceClose,
+		variance:   variance,
+		out:        make([]float64, 1),
 	}, nil
 }
 
-func (stdDev *StdDev) next(value float64) float64 {
-	variance := stdDev.variance.next(value)
-	return math.Sqrt(variance) * stdDev.deviation
+// WithSource sets the price source used to extract values from candles.
+func (stdDev *StdDev) WithSource(source SourceFunc) *StdDev {
+	stdDev.SourceFunc = source
+	stdDev.variance.SourceFunc = source
+	return stdDev
 }
 
-func (stdDev *StdDev) current(value float64) float64 {
-	variance := stdDev.variance.current(value)
-	return math.Sqrt(variance) * stdDev.deviation
+func (stdDev *StdDev) String() string {
+	return fmt.Sprintf("StdDev(%d,%.2f)", stdDev.Period, stdDev.Deviation)
 }
 
-func (stdDev *StdDev) Next(candle ICandle) []float64 {
-	stdDev.out[0] = stdDev.next(candle.Close())
+func (stdDev *StdDev) NextVal(value float64) float64 {
+	variance := stdDev.variance.NextVal(value)
+	return math.Sqrt(variance) * stdDev.Deviation
+}
+
+func (stdDev *StdDev) CurrentVal(value float64) float64 {
+	variance := stdDev.variance.CurrentVal(value)
+	return math.Sqrt(variance) * stdDev.Deviation
+}
+
+func (stdDev *StdDev) Next(candle OHLCV) []float64 {
+	stdDev.out[0] = stdDev.NextVal(stdDev.SourceFunc(candle))
 	return stdDev.out
 }
 
-func (stdDev *StdDev) Current(candle ICandle) []float64 {
-	stdDev.out[0] = stdDev.current(candle.Close())
+func (stdDev *StdDev) Current(candle OHLCV) []float64 {
+	stdDev.out[0] = stdDev.CurrentVal(stdDev.SourceFunc(candle))
 	return stdDev.out
 }
 
@@ -63,8 +79,9 @@ func (stdDev *StdDev) WarmUpPeriod() int {
 
 // Variance is a Variance indicator.
 type Variance struct {
+	Period          int
+	SourceFunc      SourceFunc
 	valueNumber     int
-	period          int
 	buffer          *ringBuffer
 	quadraticBuffer *ringBuffer
 	out             []float64
@@ -74,55 +91,66 @@ type Variance struct {
 func NewVariance(period int) (*Variance, error) {
 	// TODO: add validations
 	return &Variance{
+		Period:          period,
+		SourceFunc:      SourceClose,
 		valueNumber:     0,
-		period:          period,
 		buffer:          newRingBuffer(period),
 		quadraticBuffer: newRingBuffer(period),
 		out:             make([]float64, 1),
 	}, nil
 }
 
-func (variance *Variance) next(value float64) float64 {
+// WithSource sets the price source used to extract values from candles.
+func (variance *Variance) WithSource(source SourceFunc) *Variance {
+	variance.SourceFunc = source
+	return variance
+}
+
+func (variance *Variance) String() string {
+	return fmt.Sprintf("Variance(%d)", variance.Period)
+}
+
+func (variance *Variance) NextVal(value float64) float64 {
 	variance.valueNumber++
 	variance.buffer.Push(value)
 	variance.quadraticBuffer.Push(value * value)
 	if variance.IsIdle() {
 		return 0.0
 	}
-	meanValue := variance.buffer.Sum / float64(variance.period)
-	meanQuadroValue := variance.quadraticBuffer.Sum / float64(variance.period)
+	meanValue := variance.buffer.Sum / float64(variance.Period)
+	meanQuadroValue := variance.quadraticBuffer.Sum / float64(variance.Period)
 	return meanQuadroValue - meanValue*meanValue
 }
 
-func (variance *Variance) current(value float64) float64 {
+func (variance *Variance) CurrentVal(value float64) float64 {
 	variance.valueNumber++
 	if variance.IsIdle() {
 		variance.valueNumber--
 		return 0.0
 	}
-	meanValue := (variance.buffer.SumExceptLast() + value) / float64(variance.period)
-	meanQuadroValue := (variance.quadraticBuffer.SumExceptLast() + value*value) / float64(variance.period)
+	meanValue := (variance.buffer.SumExceptLast() + value) / float64(variance.Period)
+	meanQuadroValue := (variance.quadraticBuffer.SumExceptLast() + value*value) / float64(variance.Period)
 	result := meanQuadroValue - meanValue*meanValue
 	variance.valueNumber--
 	return result
 }
 
-func (variance *Variance) Next(candle ICandle) []float64 {
-	variance.out[0] = variance.next(candle.Close())
+func (variance *Variance) Next(candle OHLCV) []float64 {
+	variance.out[0] = variance.NextVal(variance.SourceFunc(candle))
 	return variance.out
 }
 
-func (variance *Variance) Current(candle ICandle) []float64 {
-	variance.out[0] = variance.current(candle.Close())
+func (variance *Variance) Current(candle OHLCV) []float64 {
+	variance.out[0] = variance.CurrentVal(variance.SourceFunc(candle))
 	return variance.out
 }
 
 func (variance *Variance) IsIdle() bool {
-	return variance.valueNumber < variance.period
+	return variance.valueNumber < variance.Period
 }
 
 func (variance *Variance) IdlePeriod() int {
-	return variance.period - 1
+	return variance.Period - 1
 }
 
 func (variance *Variance) IsWarmedUp() bool {

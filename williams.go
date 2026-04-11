@@ -1,8 +1,11 @@
 package talive
 
+import "fmt"
+
 // Williams is a Williams %R indicator.
 type Williams struct {
 	Period      int
+	SourceFunc  SourceFunc
 	valueNumber int
 	lowest      *ringBuffer
 	highest     *ringBuffer
@@ -13,6 +16,7 @@ type Williams struct {
 func NewWilliams(period int) (*Williams, error) {
 	return &Williams{
 		Period:      period,
+		SourceFunc:  SourceClose,
 		valueNumber: 0,
 		lowest:      newRingBuffer(period),
 		highest:     newRingBuffer(period),
@@ -20,47 +24,57 @@ func NewWilliams(period int) (*Williams, error) {
 	}, nil
 }
 
-func (w *Williams) Next(candle ICandle) []float64 {
-	w.valueNumber++
+// WithSource sets the price source used to extract values from candles.
+func (will *Williams) WithSource(source SourceFunc) *Williams {
+	will.SourceFunc = source
+	return will
+}
 
-	w.lowest.Push(candle.Low())
-	w.highest.Push(candle.High())
+func (will *Williams) String() string {
+	return fmt.Sprintf("Williams(%d)", will.Period)
+}
 
-	if w.valueNumber < w.Period {
-		return w.out
+func (will *Williams) Next(candle OHLCV) []float64 {
+	will.valueNumber++
+
+	will.lowest.Push(candle.Low())
+	will.highest.Push(candle.High())
+
+	if will.valueNumber < will.Period {
+		return will.out
 	}
 
-	highestV := w.highest.Max()
-	w.out[0] = (highestV - candle.Close()) / (highestV - w.lowest.Min()) * -100.0
+	highestV := will.highest.Max()
+	will.out[0] = (highestV - will.SourceFunc(candle)) / (highestV - will.lowest.Min()) * -100.0
 
-	return w.out
+	return will.out
 }
 
-func (w *Williams) Current(candle ICandle) []float64 {
-	if w.valueNumber < w.Period {
-		return w.out
+func (will *Williams) Current(candle OHLCV) []float64 {
+	if will.valueNumber < will.Period {
+		return will.out
 	}
 
-	lowestV := min(w.lowest.MinExceptLast(), candle.Low())
-	highestV := max(w.highest.MaxExceptLast(), candle.High())
+	lowestV := min(will.lowest.MinExceptLast(), candle.Low())
+	highestV := max(will.highest.MaxExceptLast(), candle.High())
 
-	w.out[0] = (highestV - candle.Close()) / (highestV - lowestV) * -100.0
+	will.out[0] = (highestV - will.SourceFunc(candle)) / (highestV - lowestV) * -100.0
 
-	return w.out
+	return will.out
 }
 
-func (w *Williams) IsIdle() bool {
-	return w.valueNumber < w.Period
+func (will *Williams) IsIdle() bool {
+	return will.valueNumber < will.Period
 }
 
-func (w *Williams) IsWarmedUp() bool {
-	return w.valueNumber > w.WarmUpPeriod()
+func (will *Williams) IsWarmedUp() bool {
+	return will.valueNumber > will.WarmUpPeriod()
 }
 
-func (w *Williams) IdlePeriod() int {
-	return w.Period - 1
+func (will *Williams) IdlePeriod() int {
+	return will.Period - 1
 }
 
-func (w *Williams) WarmUpPeriod() int {
-	return w.IdlePeriod()
+func (will *Williams) WarmUpPeriod() int {
+	return will.IdlePeriod()
 }

@@ -10,7 +10,7 @@ import (
 func TestAoDefault(t *testing.T) {
 	candles, _ := readCandles("test_data/input_data2.csv")
 	expectedParsedData, _ := readData("test_data/ao/output_default.csv", []int{1}, 7)
-	indicator := talive.NewAO()
+	indicator, _ := talive.NewAO()
 	result := make([]float64, len(candles))
 	for i, candle := range candles {
 		result[i] = roundFloat(indicator.Next(candle)[0], 7)
@@ -21,7 +21,7 @@ func TestAoDefault(t *testing.T) {
 }
 
 func TestAoIdle(t *testing.T) {
-	indicator := talive.NewAO()
+	indicator, _ := talive.NewAO()
 	var result []string
 	for i := 0; i < 35; i++ {
 		indicator.Next(&testCandle{
@@ -56,30 +56,28 @@ func TestAoIdle(t *testing.T) {
 	}
 }
 
-func TestAoCurrentValue(t *testing.T) {
+func TestAoCurrentVal(t *testing.T) {
 	candles, _ := readCandles("test_data/input_data2.csv")
 	expectedParsedData, _ := readData("test_data/ao/output_default.csv", []int{1}, 8)
-	indicator := talive.NewAO()
+	indicator, _ := talive.NewAO()
 	for i := 0; i < 34; i++ {
 		indicator.Next(candles[i])
 	}
-	currentValue := roundFloat(indicator.Current(candles[34])[0], 8)
+	CurrentVal := roundFloat(indicator.Current(candles[34])[0], 8)
 	expectedValue := roundFloat(expectedParsedData[0][34], 8)
-	if currentValue != expectedValue {
-		t.Fatalf("[AO] wrong Current value %f, expected %f", currentValue, expectedValue)
+	if CurrentVal != expectedValue {
+		t.Fatalf("[AO] wrong Current value %f, expected %f", CurrentVal, expectedValue)
 	}
-	nextValue := roundFloat(indicator.Next(candles[34])[0], 8)
-	if nextValue != currentValue {
-		t.Fatalf("[AO] Current value call broke Next value %f, expected %f", nextValue, expectedValue)
+	NextVal := roundFloat(indicator.Next(candles[34])[0], 8)
+	if NextVal != CurrentVal {
+		t.Fatalf("[AO] Current value call broke Next value %f, expected %f", NextVal, expectedValue)
 	}
 }
-
-var aoDummy *talive.AO
 
 func Benchmark_Ao_Init_Allocations(benchmark *testing.B) {
 	benchmark.Run("AO", func(benchmark *testing.B) {
 		for i := 0; i < benchmark.N; i++ {
-			aoDummy = talive.NewAO()
+			benchSink, _ = talive.NewAO()
 		}
 	})
 }
@@ -88,7 +86,7 @@ func Benchmark_Ao_Next_Allocations(benchmark *testing.B) {
 	candles, _ := readCandles("test_data/input_data2.csv")
 	dataLen := len(candles)
 	benchmark.Run("AO", func(benchmark *testing.B) {
-		indicator := talive.NewAO()
+		indicator, _ := talive.NewAO()
 		dataIndex := 0
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {
@@ -102,7 +100,7 @@ func Benchmark_Ao_Current_Allocations(benchmark *testing.B) {
 	candles, _ := readCandles("test_data/input_data2.csv")
 	dataLen := len(candles)
 	benchmark.Run("AO", func(benchmark *testing.B) {
-		indicator := talive.NewAO()
+		indicator, _ := talive.NewAO()
 		dataIndex := 0
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {

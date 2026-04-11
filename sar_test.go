@@ -10,7 +10,7 @@ import (
 func TestSarDefault(t *testing.T) {
 	candles, _ := readCandles("test_data/input_data2.csv")
 	expectedParsedData, _ := readData("test_data/sar/output_default.csv", []int{1}, 7)
-	indicator := talive.NewSAR(0.02, 0.02, 0.2)
+	indicator, _ := talive.NewSAR(0.02, 0.02, 0.2)
 	result := make([]float64, len(candles))
 	for i, candle := range candles {
 		result[i] = roundFloat(indicator.Next(candle)[0], 7)
@@ -23,7 +23,7 @@ func TestSarDefault(t *testing.T) {
 func TestSarMin(t *testing.T) {
 	candles, _ := readCandles("test_data/input_data2.csv")
 	expectedParsedData, _ := readData("test_data/sar/output_min.csv", []int{1}, 7)
-	indicator := talive.NewSAR(0.01, 0.01, 0.01)
+	indicator, _ := talive.NewSAR(0.01, 0.01, 0.01)
 	result := make([]float64, len(candles))
 	for i, candle := range candles {
 		result[i] = roundFloat(indicator.Next(candle)[0], 7)
@@ -34,7 +34,7 @@ func TestSarMin(t *testing.T) {
 }
 
 func TestSarIdle(t *testing.T) {
-	indicator := talive.NewSAR(0.02, 0.02, 0.2)
+	indicator, _ := talive.NewSAR(0.02, 0.02, 0.2)
 	var result []string
 	for i := 0; i < 3; i++ {
 		indicator.Next(&testCandle{high: float64(i + 2), low: float64(i), close: float64(i + 1)})
@@ -58,40 +58,38 @@ func TestSarIdle(t *testing.T) {
 	}
 }
 
-func TestSarCurrentValue(t *testing.T) {
+func TestSarCurrentVal(t *testing.T) {
 	candles, _ := readCandles("test_data/input_data2.csv")
 	expectedParsedData, _ := readData("test_data/sar/output_default.csv", []int{1}, 8)
-	indicator := talive.NewSAR(0.02, 0.02, 0.2)
+	indicator, _ := talive.NewSAR(0.02, 0.02, 0.2)
 	for i := 0; i < 5; i++ {
 		indicator.Next(candles[i])
 	}
-	currentValue := roundFloat(indicator.Current(candles[5])[0], 8)
+	CurrentVal := roundFloat(indicator.Current(candles[5])[0], 8)
 	expectedValue := roundFloat(expectedParsedData[0][5], 8)
-	if currentValue != expectedValue {
-		t.Fatalf("[SAR] wrong Current value %f, expected %f", currentValue, expectedValue)
+	if CurrentVal != expectedValue {
+		t.Fatalf("[SAR] wrong Current value %f, expected %f", CurrentVal, expectedValue)
 	}
-	nextValue := roundFloat(indicator.Next(candles[5])[0], 8)
-	if nextValue != currentValue {
-		t.Fatalf("[SAR] Current value call broke Next value %f, expected %f", nextValue, expectedValue)
+	NextVal := roundFloat(indicator.Next(candles[5])[0], 8)
+	if NextVal != CurrentVal {
+		t.Fatalf("[SAR] Current value call broke Next value %f, expected %f", NextVal, expectedValue)
 	}
 }
-
-var sarDummy *talive.SAR
 
 func Benchmark_Sar_Init_Allocations(benchmark *testing.B) {
 	benchmark.Run("SAR(0.01,0.01,0.01)", func(benchmark *testing.B) {
 		for i := 0; i < benchmark.N; i++ {
-			sarDummy = talive.NewSAR(0.01, 0.01, 0.01)
+			benchSink, _ = talive.NewSAR(0.01, 0.01, 0.01)
 		}
 	})
 	benchmark.Run("SAR(0.02,0.02,0.2)", func(benchmark *testing.B) {
 		for i := 0; i < benchmark.N; i++ {
-			sarDummy = talive.NewSAR(0.02, 0.02, 0.2)
+			benchSink, _ = talive.NewSAR(0.02, 0.02, 0.2)
 		}
 	})
 	benchmark.Run("SAR(0.05,0.05,0.5)", func(benchmark *testing.B) {
 		for i := 0; i < benchmark.N; i++ {
-			sarDummy = talive.NewSAR(0.05, 0.05, 0.5)
+			benchSink, _ = talive.NewSAR(0.05, 0.05, 0.5)
 		}
 	})
 }
@@ -101,7 +99,7 @@ func Benchmark_Sar_Next_Allocations(benchmark *testing.B) {
 	dataLen := len(candles)
 
 	benchmark.Run("SAR(0.01,0.01,0.01)", func(benchmark *testing.B) {
-		indicator := talive.NewSAR(0.01, 0.01, 0.01)
+		indicator, _ := talive.NewSAR(0.01, 0.01, 0.01)
 		dataIndex := 0
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {
@@ -110,7 +108,7 @@ func Benchmark_Sar_Next_Allocations(benchmark *testing.B) {
 		}
 	})
 	benchmark.Run("SAR(0.02,0.02,0.2)", func(benchmark *testing.B) {
-		indicator := talive.NewSAR(0.02, 0.02, 0.2)
+		indicator, _ := talive.NewSAR(0.02, 0.02, 0.2)
 		dataIndex := 0
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {
@@ -119,7 +117,7 @@ func Benchmark_Sar_Next_Allocations(benchmark *testing.B) {
 		}
 	})
 	benchmark.Run("SAR(0.05,0.05,0.5)", func(benchmark *testing.B) {
-		indicator := talive.NewSAR(0.05, 0.05, 0.5)
+		indicator, _ := talive.NewSAR(0.05, 0.05, 0.5)
 		dataIndex := 0
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {
@@ -134,7 +132,7 @@ func Benchmark_Sar_Current_Allocations(benchmark *testing.B) {
 	dataLen := len(candles)
 
 	benchmark.Run("SAR(0.01,0.01,0.01)", func(benchmark *testing.B) {
-		indicator := talive.NewSAR(0.01, 0.01, 0.01)
+		indicator, _ := talive.NewSAR(0.01, 0.01, 0.01)
 		dataIndex := 0
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {
@@ -143,7 +141,7 @@ func Benchmark_Sar_Current_Allocations(benchmark *testing.B) {
 		}
 	})
 	benchmark.Run("SAR(0.02,0.02,0.2)", func(benchmark *testing.B) {
-		indicator := talive.NewSAR(0.02, 0.02, 0.2)
+		indicator, _ := talive.NewSAR(0.02, 0.02, 0.2)
 		dataIndex := 0
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {
@@ -152,7 +150,7 @@ func Benchmark_Sar_Current_Allocations(benchmark *testing.B) {
 		}
 	})
 	benchmark.Run("SAR(0.05,0.05,0.5)", func(benchmark *testing.B) {
-		indicator := talive.NewSAR(0.05, 0.05, 0.5)
+		indicator, _ := talive.NewSAR(0.05, 0.05, 0.5)
 		dataIndex := 0
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {

@@ -5,6 +5,7 @@ import "fmt"
 // Momentum is a Momentum indicator.
 type Momentum struct {
 	Period      int
+	SourceFunc  SourceFunc
 	valueNumber int
 	buffer      *ringBuffer
 	out         []float64
@@ -16,33 +17,44 @@ func NewMomentum(period int) (*Momentum, error) {
 		return nil, fmt.Errorf("period should be greater than 0")
 	}
 	return &Momentum{
-		Period: period,
-		buffer: newRingBuffer(period),
-		out:    make([]float64, 1),
+		Period:     period,
+		SourceFunc: SourceClose,
+		buffer:     newRingBuffer(period),
+		out:        make([]float64, 1),
 	}, nil
 }
 
-func (m *Momentum) Next(candle ICandle) []float64 {
+// WithSource sets the price source used to extract values from candles.
+func (m *Momentum) WithSource(source SourceFunc) *Momentum {
+	m.SourceFunc = source
+	return m
+}
+
+func (m *Momentum) String() string {
+	return fmt.Sprintf("Momentum(%d)", m.Period)
+}
+
+func (m *Momentum) Next(candle OHLCV) []float64 {
 	m.valueNumber++
 
+	value := m.SourceFunc(candle)
 	oldest := m.buffer.Last()
-	m.buffer.Push(candle.Close())
+	m.buffer.Push(value)
 
 	if m.IsIdle() {
 		return m.out
 	}
 
-	m.out[0] = candle.Close() - oldest
+	m.out[0] = value - oldest
 	return m.out
 }
 
-func (m *Momentum) Current(candle ICandle) []float64 {
+func (m *Momentum) Current(candle OHLCV) []float64 {
 	if m.IsIdle() {
 		return m.out
 	}
 
-	oldest := m.buffer.Last()
-	m.out[0] = candle.Close() - oldest
+	m.out[0] = m.SourceFunc(candle) - m.buffer.Last()
 	return m.out
 }
 

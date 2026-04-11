@@ -58,45 +58,43 @@ func TestEmaIdle(t *testing.T) {
 	}
 }
 
-func TestEmaCurrentValue(t *testing.T) {
+func TestEmaCurrentVal(t *testing.T) {
 	candles, _ := readCandles("test_data/input_data.csv")
 	expectedParsedData, _ := readData("test_data/ema/output_default.csv", []int{1}, 8)
 	indicator, _ := talive.NewEMA(9)
 	for i := 0; i < 9; i++ {
 		indicator.Next(candles[i])
 	}
-	currentValue := roundFloat(indicator.Current(candles[9])[0], 8)
+	CurrentVal := roundFloat(indicator.Current(candles[9])[0], 8)
 	expectedValue := roundFloat(expectedParsedData[0][9], 8)
-	if currentValue != expectedValue {
-		t.Fatalf("[EMA(9)] wrong Current value %f, expected %f", currentValue, expectedValue)
+	if CurrentVal != expectedValue {
+		t.Fatalf("[EMA(9)] wrong Current value %f, expected %f", CurrentVal, expectedValue)
 	}
-	nextValue := roundFloat(indicator.Next(candles[9])[0], 8)
-	if nextValue != currentValue {
-		t.Fatalf("[EMA(9)] Current value call broke Next value %f, expected %f", nextValue, expectedValue)
+	NextVal := roundFloat(indicator.Next(candles[9])[0], 8)
+	if NextVal != CurrentVal {
+		t.Fatalf("[EMA(9)] Current value call broke Next value %f, expected %f", NextVal, expectedValue)
 	}
 }
-
-var emaDummy talive.MA
 
 func Benchmark_Ema_Init_Allocations(benchmark *testing.B) {
 	benchmark.Run("EMA 2", func(benchmark *testing.B) {
 		for i := 0; i < benchmark.N; i++ {
-			emaDummy, _ = talive.NewEMA(2)
+			benchSink, _ = talive.NewEMA(2)
 		}
 	})
 	benchmark.Run("EMA 50", func(benchmark *testing.B) {
 		for i := 0; i < benchmark.N; i++ {
-			emaDummy, _ = talive.NewEMA(50)
+			benchSink, _ = talive.NewEMA(50)
 		}
 	})
 	benchmark.Run("EMA 100", func(benchmark *testing.B) {
 		for i := 0; i < benchmark.N; i++ {
-			emaDummy, _ = talive.NewEMA(100)
+			benchSink, _ = talive.NewEMA(100)
 		}
 	})
 	benchmark.Run("EMA 1000", func(benchmark *testing.B) {
 		for i := 0; i < benchmark.N; i++ {
-			emaDummy, _ = talive.NewEMA(1000)
+			benchSink, _ = talive.NewEMA(1000)
 		}
 	})
 }

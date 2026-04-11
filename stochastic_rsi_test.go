@@ -70,7 +70,7 @@ func TestStochasticRsiIdle(t *testing.T) {
 	}
 }
 
-func TestStochasticRsiCurrentValue(t *testing.T) {
+func TestStochasticRsiCurrentVal(t *testing.T) {
 	candles, _ := readCandles("test_data/input_data2.csv")
 	expectedParsedData, _ := readData("test_data/stochastic_rsi/output_default.csv", []int{1, 2}, 8)
 	indicator, _ := talive.NewStochasticRSI(14, 14, 3, 3)
@@ -99,12 +99,15 @@ func TestStochasticRsiCurrentValue(t *testing.T) {
 	}
 }
 
-var stochRsiDummy *talive.StochasticRSI
-
 func Benchmark_StochRsi_Init_Allocations(benchmark *testing.B) {
-	benchmark.Run("StochRSI 14,14,3,3", func(benchmark *testing.B) {
+	benchmark.Run("StochRSI(14,14,3,3)", func(benchmark *testing.B) {
 		for i := 0; i < benchmark.N; i++ {
-			stochRsiDummy, _ = talive.NewStochasticRSI(14, 14, 3, 3)
+			benchSink, _ = talive.NewStochasticRSI(14, 14, 3, 3)
+		}
+	})
+	benchmark.Run("StochRSI(50,50,10,10)", func(benchmark *testing.B) {
+		for i := 0; i < benchmark.N; i++ {
+			benchSink, _ = talive.NewStochasticRSI(50, 50, 10, 10)
 		}
 	})
 }
@@ -112,8 +115,17 @@ func Benchmark_StochRsi_Init_Allocations(benchmark *testing.B) {
 func Benchmark_StochRsi_Next_Allocations(benchmark *testing.B) {
 	candles, _ := readCandles("test_data/input_data2.csv")
 	dataLen := len(candles)
-	benchmark.Run("StochRSI 14,14,3,3", func(benchmark *testing.B) {
+	benchmark.Run("StochRSI(14,14,3,3)", func(benchmark *testing.B) {
 		indicator, _ := talive.NewStochasticRSI(14, 14, 3, 3)
+		dataIndex := 0
+		benchmark.ResetTimer()
+		for i := 0; i < benchmark.N; i++ {
+			dataIndex = limitedDataIndex(dataIndex, dataLen)
+			sliceDummy = indicator.Next(candles[dataIndex])
+		}
+	})
+	benchmark.Run("StochRSI(50,50,10,10)", func(benchmark *testing.B) {
+		indicator, _ := talive.NewStochasticRSI(50, 50, 10, 10)
 		dataIndex := 0
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {
@@ -126,8 +138,17 @@ func Benchmark_StochRsi_Next_Allocations(benchmark *testing.B) {
 func Benchmark_StochRsi_Current_Allocations(benchmark *testing.B) {
 	candles, _ := readCandles("test_data/input_data2.csv")
 	dataLen := len(candles)
-	benchmark.Run("StochRSI 14,14,3,3", func(benchmark *testing.B) {
+	benchmark.Run("StochRSI(14,14,3,3)", func(benchmark *testing.B) {
 		indicator, _ := talive.NewStochasticRSI(14, 14, 3, 3)
+		dataIndex := 0
+		benchmark.ResetTimer()
+		for i := 0; i < benchmark.N; i++ {
+			dataIndex = limitedDataIndex(dataIndex, dataLen)
+			sliceDummy = indicator.Current(candles[dataIndex])
+		}
+	})
+	benchmark.Run("StochRSI(50,50,10,10)", func(benchmark *testing.B) {
+		indicator, _ := talive.NewStochasticRSI(50, 50, 10, 10)
 		dataIndex := 0
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {

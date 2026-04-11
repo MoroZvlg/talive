@@ -58,35 +58,33 @@ func TestMomentumIdle(t *testing.T) {
 	}
 }
 
-func TestMomentumCurrentValue(t *testing.T) {
+func TestMomentumCurrentVal(t *testing.T) {
 	candles, _ := readCandles("test_data/input_data2.csv")
 	expectedParsedData, _ := readData("test_data/momentum/output_default.csv", []int{1}, 8)
 	indicator, _ := talive.NewMomentum(10)
 	for i := 0; i < 11; i++ {
 		indicator.Next(candles[i])
 	}
-	currentValue := roundFloat(indicator.Current(candles[11])[0], 8)
+	CurrentVal := roundFloat(indicator.Current(candles[11])[0], 8)
 	expectedValue := roundFloat(expectedParsedData[0][11], 8)
-	if currentValue != expectedValue {
-		t.Fatalf("[Momentum(10)] wrong Current value %f, expected %f", currentValue, expectedValue)
+	if CurrentVal != expectedValue {
+		t.Fatalf("[Momentum(10)] wrong Current value %f, expected %f", CurrentVal, expectedValue)
 	}
-	nextValue := roundFloat(indicator.Next(candles[11])[0], 8)
-	if nextValue != currentValue {
-		t.Fatalf("[Momentum(10)] Current value call broke Next value %f, expected %f", nextValue, expectedValue)
+	NextVal := roundFloat(indicator.Next(candles[11])[0], 8)
+	if NextVal != CurrentVal {
+		t.Fatalf("[Momentum(10)] Current value call broke Next value %f, expected %f", NextVal, expectedValue)
 	}
 }
-
-var momentumDummy *talive.Momentum
 
 func Benchmark_Momentum_Init_Allocations(benchmark *testing.B) {
 	benchmark.Run("Momentum 2", func(benchmark *testing.B) {
 		for i := 0; i < benchmark.N; i++ {
-			momentumDummy, _ = talive.NewMomentum(2)
+			benchSink, _ = talive.NewMomentum(2)
 		}
 	})
 	benchmark.Run("Momentum 50", func(benchmark *testing.B) {
 		for i := 0; i < benchmark.N; i++ {
-			momentumDummy, _ = talive.NewMomentum(50)
+			benchSink, _ = talive.NewMomentum(50)
 		}
 	})
 }

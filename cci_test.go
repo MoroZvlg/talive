@@ -58,40 +58,38 @@ func TestCciIdle(t *testing.T) {
 	}
 }
 
-func TestCciCurrentValue(t *testing.T) {
+func TestCciCurrentVal(t *testing.T) {
 	candles, _ := readCandles("test_data/input_data2.csv")
 	expectedParsedData, _ := readData("test_data/cci/output_default.csv", []int{1}, 8)
 	indicator, _ := talive.NewCCI(20)
 	for i := 0; i < 20; i++ {
 		indicator.Next(candles[i])
 	}
-	currentValue := roundFloat(indicator.Current(candles[20])[0], 8)
+	CurrentVal := roundFloat(indicator.Current(candles[20])[0], 8)
 	expectedValue := roundFloat(expectedParsedData[0][20], 8)
-	if currentValue != expectedValue {
-		t.Fatalf("[CCI(20)] wrong Current value %f, expected %f", currentValue, expectedValue)
+	if CurrentVal != expectedValue {
+		t.Fatalf("[CCI(20)] wrong Current value %f, expected %f", CurrentVal, expectedValue)
 	}
-	nextValue := roundFloat(indicator.Next(candles[20])[0], 8)
-	if nextValue != currentValue {
-		t.Fatalf("[CCI(20)] Current value call broke Next value %f, expected %f", nextValue, expectedValue)
+	NextVal := roundFloat(indicator.Next(candles[20])[0], 8)
+	if NextVal != CurrentVal {
+		t.Fatalf("[CCI(20)] Current value call broke Next value %f, expected %f", NextVal, expectedValue)
 	}
 }
-
-var cciDummy *talive.CCI
 
 func Benchmark_CCI_Init_Allocations(b *testing.B) {
 	b.Run("CCI(2)", func(b *testing.B) {
 		for i := 0; i < b.N; i++ {
-			cciDummy, _ = talive.NewCCI(2)
+			benchSink, _ = talive.NewCCI(2)
 		}
 	})
 	b.Run("CCI(20)", func(b *testing.B) {
 		for i := 0; i < b.N; i++ {
-			cciDummy, _ = talive.NewCCI(20)
+			benchSink, _ = talive.NewCCI(20)
 		}
 	})
 	b.Run("CCI(50)", func(b *testing.B) {
 		for i := 0; i < b.N; i++ {
-			cciDummy, _ = talive.NewCCI(50)
+			benchSink, _ = talive.NewCCI(50)
 		}
 	})
 }
@@ -101,30 +99,30 @@ func Benchmark_CCI_Next_Allocations(b *testing.B) {
 	dataLen := len(candles)
 
 	b.Run("CCI(2)", func(b *testing.B) {
-		cciDummy, _ = talive.NewCCI(2)
+		indicator, _ := talive.NewCCI(2)
 		dataIndex := 0
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)
-			sliceDummy = cciDummy.Next(candles[dataIndex])
+			sliceDummy = indicator.Next(candles[dataIndex])
 		}
 	})
 	b.Run("CCI(20)", func(b *testing.B) {
-		cciDummy, _ = talive.NewCCI(20)
+		indicator, _ := talive.NewCCI(20)
 		dataIndex := 0
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)
-			sliceDummy = cciDummy.Next(candles[dataIndex])
+			sliceDummy = indicator.Next(candles[dataIndex])
 		}
 	})
 	b.Run("CCI(50)", func(b *testing.B) {
-		cciDummy, _ = talive.NewCCI(50)
+		indicator, _ := talive.NewCCI(50)
 		dataIndex := 0
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)
-			sliceDummy = cciDummy.Next(candles[dataIndex])
+			sliceDummy = indicator.Next(candles[dataIndex])
 		}
 	})
 }
@@ -134,30 +132,30 @@ func Benchmark_CCI_Current_Allocations(b *testing.B) {
 	dataLen := len(candles)
 
 	b.Run("CCI(2)", func(b *testing.B) {
-		cciDummy, _ = talive.NewCCI(2)
+		indicator, _ := talive.NewCCI(2)
 		dataIndex := 0
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)
-			sliceDummy = cciDummy.Current(candles[dataIndex])
+			sliceDummy = indicator.Current(candles[dataIndex])
 		}
 	})
 	b.Run("CCI(20)", func(b *testing.B) {
-		cciDummy, _ = talive.NewCCI(20)
+		indicator, _ := talive.NewCCI(20)
 		dataIndex := 0
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)
-			sliceDummy = cciDummy.Current(candles[dataIndex])
+			sliceDummy = indicator.Current(candles[dataIndex])
 		}
 	})
 	b.Run("CCI(50)", func(b *testing.B) {
-		cciDummy, _ = talive.NewCCI(50)
+		indicator, _ := talive.NewCCI(50)
 		dataIndex := 0
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)
-			sliceDummy = cciDummy.Current(candles[dataIndex])
+			sliceDummy = indicator.Current(candles[dataIndex])
 		}
 	})
 }

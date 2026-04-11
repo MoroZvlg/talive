@@ -77,17 +77,15 @@ func TestHmaCurrentValue(t *testing.T) {
 	}
 }
 
-var hmaDummy *talive.HMA
-
 func Benchmark_Hma_Init_Allocations(b *testing.B) {
 	b.Run("HMA(2)", func(b *testing.B) {
 		for i := 0; i < b.N; i++ {
-			hmaDummy, _ = talive.NewHMA(2)
+			benchSink, _ = talive.NewHMA(2)
 		}
 	})
 	b.Run("HMA(50)", func(b *testing.B) {
 		for i := 0; i < b.N; i++ {
-			hmaDummy, _ = talive.NewHMA(50)
+			benchSink, _ = talive.NewHMA(50)
 		}
 	})
 }

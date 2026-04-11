@@ -11,7 +11,7 @@ type ATR struct {
 	valueNumber int
 
 	prevClose float64
-	smma      MA
+	ma        Scalar
 
 	out []float64
 }
@@ -21,15 +21,25 @@ func NewATR(period int) (*ATR, error) {
 	if period < 2 {
 		return nil, fmt.Errorf("period should be greater than 1")
 	}
-	smma, _ := NewSMMA(period)
+	ma, _ := NewSMMA(period)
 	return &ATR{
 		Period: period,
-		smma:   smma,
+		ma:     ma,
 		out:    make([]float64, 1),
 	}, nil
 }
 
-func (atr *ATR) Next(candle ICandle) []float64 {
+// WithMA replaces the internal smoothing method.
+func (atr *ATR) WithMA(ma MaType) *ATR {
+	atr.ma, _ = ma.New(atr.Period)
+	return atr
+}
+
+func (atr *ATR) String() string {
+	return fmt.Sprintf("ATR(%d)", atr.Period)
+}
+
+func (atr *ATR) Next(candle OHLCV) []float64 {
 	atr.valueNumber++
 
 	var trueRange float64
@@ -44,9 +54,9 @@ func (atr *ATR) Next(candle ICandle) []float64 {
 
 	atr.prevClose = candle.Close()
 
-	atrV := atr.smma.next(trueRange)
+	atrV := atr.ma.NextVal(trueRange)
 
-	if atr.smma.IsIdle() {
+	if atr.ma.IsIdle() {
 		return atr.out
 	}
 
@@ -54,7 +64,7 @@ func (atr *ATR) Next(candle ICandle) []float64 {
 	return atr.out
 }
 
-func (atr *ATR) Current(candle ICandle) []float64 {
+func (atr *ATR) Current(candle OHLCV) []float64 {
 	if atr.IsIdle() {
 		return atr.out
 	}
@@ -64,22 +74,22 @@ func (atr *ATR) Current(candle ICandle) []float64 {
 	lowPrevClose := math.Abs(candle.Low() - atr.prevClose)
 	trueRange := max(highLow, max(highPrevClose, lowPrevClose))
 
-	atr.out[0] = atr.smma.current(trueRange)
+	atr.out[0] = atr.ma.CurrentVal(trueRange)
 	return atr.out
 }
 
 func (atr *ATR) IsIdle() bool {
-	return atr.smma.IsIdle()
+	return atr.ma.IsIdle()
 }
 
 func (atr *ATR) IdlePeriod() int {
-	return atr.smma.IdlePeriod()
+	return atr.ma.IdlePeriod()
 }
 
 func (atr *ATR) IsWarmedUp() bool {
-	return atr.smma.IsWarmedUp()
+	return atr.ma.IsWarmedUp()
 }
 
 func (atr *ATR) WarmUpPeriod() int {
-	return atr.smma.WarmUpPeriod()
+	return atr.ma.WarmUpPeriod()
 }

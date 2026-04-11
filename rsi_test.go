@@ -11,6 +11,7 @@ func TestRsiDefault(t *testing.T) {
 	candles, _ := readCandles("test_data/input_data.csv")
 	expectedParsedData, _ := readData("test_data/rsi/output_default.csv", []int{1}, 8)
 	indicator, _ := talive.NewRSI(14)
+	indicator.WithMA(talive.UseSMMA)
 	result := make([]float64, len(candles))
 	for i, candle := range candles {
 		result[i] = roundFloat(indicator.Next(candle)[0], 8)
@@ -58,40 +59,38 @@ func TestRsiIdle(t *testing.T) {
 	}
 }
 
-func TestRsiCurrentValue(t *testing.T) {
+func TestRsiCurrentVal(t *testing.T) {
 	candles, _ := readCandles("test_data/input_data.csv")
 	expectedParsedData, _ := readData("test_data/rsi/output_default.csv", []int{1}, 8)
 	indicator, _ := talive.NewRSI(14)
 	for i := 0; i < 15; i++ {
 		indicator.Next(candles[i])
 	}
-	currentValue := roundFloat(indicator.Current(candles[15])[0], 8)
+	CurrentVal := roundFloat(indicator.Current(candles[15])[0], 8)
 	expectedValue := roundFloat(expectedParsedData[0][15], 8)
-	if currentValue != expectedValue {
-		t.Fatalf("[RSI(14)] wrong Current value %f, expected %f", currentValue, expectedValue)
+	if CurrentVal != expectedValue {
+		t.Fatalf("[RSI(14)] wrong Current value %f, expected %f", CurrentVal, expectedValue)
 	}
-	nextValue := roundFloat(indicator.Next(candles[15])[0], 8)
-	if nextValue != currentValue {
-		t.Fatalf("[RSI(14)] Current value call broke Next value %f, expected %f", nextValue, expectedValue)
+	NextVal := roundFloat(indicator.Next(candles[15])[0], 8)
+	if NextVal != CurrentVal {
+		t.Fatalf("[RSI(14)] Current value call broke Next value %f, expected %f", NextVal, expectedValue)
 	}
 }
-
-var rsiDummy *talive.RSI
 
 func Benchmark_Rsi_Init_Allocations(benchmark *testing.B) {
 	benchmark.Run("RSI 2", func(benchmark *testing.B) {
 		for i := 0; i < benchmark.N; i++ {
-			rsiDummy, _ = talive.NewRSI(2)
+			benchSink, _ = talive.NewRSI(2)
 		}
 	})
 	benchmark.Run("RSI 14", func(benchmark *testing.B) {
 		for i := 0; i < benchmark.N; i++ {
-			rsiDummy, _ = talive.NewRSI(14)
+			benchSink, _ = talive.NewRSI(14)
 		}
 	})
 	benchmark.Run("RSI 100", func(benchmark *testing.B) {
 		for i := 0; i < benchmark.N; i++ {
-			rsiDummy, _ = talive.NewRSI(100)
+			benchSink, _ = talive.NewRSI(100)
 		}
 	})
 }

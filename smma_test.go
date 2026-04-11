@@ -58,45 +58,43 @@ func TestSmmaIdle(t *testing.T) {
 	}
 }
 
-func TestSmmaCurrentValue(t *testing.T) {
+func TestSmmaCurrentVal(t *testing.T) {
 	candles, _ := readCandles("test_data/input_data2.csv")
 	expectedParsedData, _ := readData("test_data/smma/output_default.csv", []int{1}, 8)
 	indicator, _ := talive.NewSMMA(7)
 	for i := 0; i < 7; i++ {
 		indicator.Next(candles[i])
 	}
-	currentValue := roundFloat(indicator.Current(candles[7])[0], 8)
+	CurrentVal := roundFloat(indicator.Current(candles[7])[0], 8)
 	expectedValue := roundFloat(expectedParsedData[0][7], 8)
-	if currentValue != expectedValue {
-		t.Fatalf("[SMMA(7)] wrong Current value %f, expected %f", currentValue, expectedValue)
+	if CurrentVal != expectedValue {
+		t.Fatalf("[SMMA(7)] wrong Current value %f, expected %f", CurrentVal, expectedValue)
 	}
-	nextValue := roundFloat(indicator.Next(candles[7])[0], 8)
-	if nextValue != currentValue {
-		t.Fatalf("[SMMA(7)] Current value call broke Next value %f, expected %f", nextValue, expectedValue)
+	NextVal := roundFloat(indicator.Next(candles[7])[0], 8)
+	if NextVal != CurrentVal {
+		t.Fatalf("[SMMA(7)] Current value call broke Next value %f, expected %f", NextVal, expectedValue)
 	}
 }
-
-var smmaDummy talive.MA
 
 func Benchmark_Smma_Init_Allocations(benchmark *testing.B) {
 	benchmark.Run("SMMA 2", func(benchmark *testing.B) {
 		for i := 0; i < benchmark.N; i++ {
-			smmaDummy, _ = talive.NewSMMA(2)
+			benchSink, _ = talive.NewSMMA(2)
 		}
 	})
 	benchmark.Run("SMMA 50", func(benchmark *testing.B) {
 		for i := 0; i < benchmark.N; i++ {
-			smmaDummy, _ = talive.NewSMMA(50)
+			benchSink, _ = talive.NewSMMA(50)
 		}
 	})
 	benchmark.Run("SMMA 100", func(benchmark *testing.B) {
 		for i := 0; i < benchmark.N; i++ {
-			smmaDummy, _ = talive.NewSMMA(100)
+			benchSink, _ = talive.NewSMMA(100)
 		}
 	})
 	benchmark.Run("SMMA 1000", func(benchmark *testing.B) {
 		for i := 0; i < benchmark.N; i++ {
-			smmaDummy, _ = talive.NewSMMA(1000)
+			benchSink, _ = talive.NewSMMA(1000)
 		}
 	})
 }

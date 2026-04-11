@@ -65,13 +65,13 @@ func TestVarianceCurrent(t *testing.T) {
 	for i := 0; i < 5; i++ {
 		indicator.Next(&testCandle{close: inputParsedData[i]})
 	}
-	currentValue := roundFloat(indicator.Current(&testCandle{close: inputParsedData[5]})[0], 8)
+	CurrentVal := roundFloat(indicator.Current(&testCandle{close: inputParsedData[5]})[0], 8)
 	expectedValue := roundFloat(expectedParsedData[5], 8)
-	if currentValue != expectedValue {
-		t.Fatalf("[Variance(5)] wrong Current value %f, expected %f", currentValue, expectedValue)
+	if CurrentVal != expectedValue {
+		t.Fatalf("[Variance(5)] wrong Current value %f, expected %f", CurrentVal, expectedValue)
 	}
-	nextValue := roundFloat(indicator.Next(&testCandle{close: inputParsedData[5]})[0], 8)
-	if nextValue != currentValue {
-		t.Fatalf("[Variance(5)] Current value call broke Next value %f, expected %f", nextValue, expectedValue)
+	NextVal := roundFloat(indicator.Next(&testCandle{close: inputParsedData[5]})[0], 8)
+	if NextVal != CurrentVal {
+		t.Fatalf("[Variance(5)] Current value call broke Next value %f, expected %f", NextVal, expectedValue)
 	}
 }

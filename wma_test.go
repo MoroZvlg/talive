@@ -58,35 +58,33 @@ func TestWmaIdle(t *testing.T) {
 	}
 }
 
-func TestWmaCurrentValue(t *testing.T) {
+func TestWmaCurrentVal(t *testing.T) {
 	candles, _ := readCandles("test_data/input_data2.csv")
 	expectedParsedData, _ := readData("test_data/wma/output_default.csv", []int{1}, 8)
 	indicator, _ := talive.NewWMA(9)
 	for i := 0; i < 10; i++ {
 		indicator.Next(candles[i])
 	}
-	currentValue := roundFloat(indicator.Current(candles[10])[0], 8)
+	CurrentVal := roundFloat(indicator.Current(candles[10])[0], 8)
 	expectedValue := roundFloat(expectedParsedData[0][10], 8)
-	if currentValue != expectedValue {
-		t.Fatalf("[WMA(9)] wrong Current value %f, expected %f", currentValue, expectedValue)
+	if CurrentVal != expectedValue {
+		t.Fatalf("[WMA(9)] wrong Current value %f, expected %f", CurrentVal, expectedValue)
 	}
-	nextValue := roundFloat(indicator.Next(candles[10])[0], 8)
-	if nextValue != currentValue {
-		t.Fatalf("[WMA(9)] Current value call broke Next value %f, expected %f", nextValue, expectedValue)
+	NextVal := roundFloat(indicator.Next(candles[10])[0], 8)
+	if NextVal != CurrentVal {
+		t.Fatalf("[WMA(9)] Current value call broke Next value %f, expected %f", NextVal, expectedValue)
 	}
 }
-
-var wmaDummy talive.MA
 
 func Benchmark_Wma_Init_Allocations(b *testing.B) {
 	b.Run("WMA(2)", func(b *testing.B) {
 		for i := 0; i < b.N; i++ {
-			wmaDummy, _ = talive.NewWMA(2)
+			benchSink, _ = talive.NewWMA(2)
 		}
 	})
 	b.Run("WMA(50)", func(b *testing.B) {
 		for i := 0; i < b.N; i++ {
-			wmaDummy, _ = talive.NewWMA(50)
+			benchSink, _ = talive.NewWMA(50)
 		}
 	})
 }

@@ -1,10 +1,14 @@
 package talive
 
-import "math"
+import (
+	"fmt"
+	"math"
+)
 
 // CCI is a Commodity Channel Index indicator.
 type CCI struct {
 	Period      int
+	SourceFunc  SourceFunc
 	valueNumber int
 	buffer      *ringBuffer
 	out         []float64
@@ -13,17 +17,27 @@ type CCI struct {
 // NewCCI creates a new CCI indicator with the given period.
 func NewCCI(period int) (*CCI, error) {
 	return &CCI{
-		Period:      period,
-		valueNumber: 0,
-		buffer:      newRingBuffer(period),
-		out:         make([]float64, 1),
+		Period:     period,
+		SourceFunc: SourceHLC3,
+		buffer:     newRingBuffer(period),
+		out:        make([]float64, 1),
 	}, nil
 }
 
-func (cci *CCI) Next(candle ICandle) []float64 {
+// WithSource sets the price source used to extract values from candles.
+func (cci *CCI) WithSource(source SourceFunc) *CCI {
+	cci.SourceFunc = source
+	return cci
+}
+
+func (cci *CCI) String() string {
+	return fmt.Sprintf("CCI(%d)", cci.Period)
+}
+
+func (cci *CCI) Next(candle OHLCV) []float64 {
 	cci.valueNumber++
 
-	typicalPrice := (candle.High() + candle.Low() + candle.Close()) / 3.0
+	typicalPrice := cci.SourceFunc(candle)
 	cci.buffer.Push(typicalPrice)
 
 	if cci.IsIdle() {
@@ -45,12 +59,12 @@ func (cci *CCI) Next(candle ICandle) []float64 {
 	return cci.out
 }
 
-func (cci *CCI) Current(candle ICandle) []float64 {
+func (cci *CCI) Current(candle OHLCV) []float64 {
 	if cci.IsIdle() {
 		return cci.out
 	}
 
-	typicalPrice := (candle.High() + candle.Low() + candle.Close()) / 3.0
+	typicalPrice := cci.SourceFunc(candle)
 
 	// SMA replacement for optimisation
 	// TODO: can be moved to RingBuffer??

@@ -230,7 +230,8 @@ func Test_WarmUpAnalyze_Stochastic(t *testing.T) {
 
 func Test_WarmUpAnalyze_BBands_EMA(t *testing.T) {
 	factory := func(period int) (func(c *testCandle) []float64, int, int) {
-		ind, _ := talive.NewBBands(period, 2.0, 2.0, talive.EMAtype)
+		ind, _ := talive.NewBBands(period, 2.0, 2.0)
+		ind.WithMA(talive.UseEMA)
 		return func(c *testCandle) []float64 { return ind.Next(c) }, 3, ind.IdlePeriod()
 	}
 	runWarmUpAnalysis(t, "BBands(EMA)", factory, periods2to99(), []int{2, 3, 4, 5, 6})

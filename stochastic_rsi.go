@@ -4,16 +4,17 @@ import "fmt"
 
 // StochasticRSI is a Stochastic RSI indicator.
 type StochasticRSI struct {
-	RSIPeriod int
-	StochLen  int
-	KSmooth   int
-	DSmooth   int
+	RSIPeriod  int
+	StochLen   int
+	KSmooth    int
+	DSmooth    int
+	SourceFunc SourceFunc
 
 	valueNumber int
 	rsi         *RSI
 	buffer      *ringBuffer
-	kSMA        MA
-	dSMA        MA
+	kMA         Scalar
+	dMA         Scalar
 	out         []float64
 }
 
@@ -23,24 +24,35 @@ func NewStochasticRSI(rsiPeriod, stochLen, kSmooth, dSmooth int) (*StochasticRSI
 		return nil, fmt.Errorf("invalid parameters")
 	}
 	rsi, _ := NewRSI(rsiPeriod)
-	kSMA, _ := NewSMA(kSmooth)
-	dSMA, _ := NewSMA(dSmooth)
+	kMA, _ := NewSMA(kSmooth)
+	dMA, _ := NewSMA(dSmooth)
 	return &StochasticRSI{
-		RSIPeriod: rsiPeriod,
-		StochLen:  stochLen,
-		KSmooth:   kSmooth,
-		DSmooth:   dSmooth,
-		rsi:       rsi,
-		buffer:    newRingBuffer(stochLen),
-		kSMA:      kSMA,
-		dSMA:      dSMA,
-		out:       make([]float64, 2),
+		RSIPeriod:  rsiPeriod,
+		StochLen:   stochLen,
+		KSmooth:    kSmooth,
+		DSmooth:    dSmooth,
+		SourceFunc: SourceClose,
+		rsi:        rsi,
+		buffer:     newRingBuffer(stochLen),
+		kMA:        kMA,
+		dMA:        dMA,
+		out:        make([]float64, 2),
 	}, nil
 }
 
-func (sr *StochasticRSI) Next(candle ICandle) []float64 {
+// WithSource sets the price source used to extract values from candles.
+func (sr *StochasticRSI) WithSource(source SourceFunc) *StochasticRSI {
+	sr.SourceFunc = source
+	return sr
+}
+
+func (sr *StochasticRSI) String() string {
+	return fmt.Sprintf("StochasticRSI(%d,%d,%d,%d)", sr.RSIPeriod, sr.StochLen, sr.KSmooth, sr.DSmooth)
+}
+
+func (sr *StochasticRSI) Next(candle OHLCV) []float64 {
 	sr.valueNumber++
-	rsiValue := sr.rsi.Next(candle)[0]
+	rsiValue := sr.rsi.NextVal(sr.SourceFunc(candle))
 	if sr.rsi.IsIdle() {
 		return sr.out
 	}
@@ -55,34 +67,34 @@ func (sr *StochasticRSI) Next(candle ICandle) []float64 {
 	minV, maxV := sr.buffer.MinMax()
 	raw := sr.stochValue(rsiValue, minV, maxV)
 
-	k := sr.kSMA.next(raw)
-	if sr.kSMA.IsIdle() {
+	k := sr.kMA.NextVal(raw)
+	if sr.kMA.IsIdle() {
 		return sr.out
 	}
 	sr.out[0] = k
 
-	d := sr.dSMA.next(k)
-	if !sr.dSMA.IsIdle() {
+	d := sr.dMA.NextVal(k)
+	if !sr.dMA.IsIdle() {
 		sr.out[1] = d
 	}
 
 	return sr.out
 }
 
-func (sr *StochasticRSI) Current(candle ICandle) []float64 {
+func (sr *StochasticRSI) Current(candle OHLCV) []float64 {
 	if sr.IsIdle() {
 		return sr.out
 	}
 
-	rsiValue := sr.rsi.Current(candle)[0]
+	rsiValue := sr.rsi.CurrentVal(sr.SourceFunc(candle))
 
 	minV, maxV := sr.buffer.MinMaxExceptLast()
 	minV = min(minV, rsiValue)
 	maxV = max(maxV, rsiValue)
 
 	raw := sr.stochValue(rsiValue, minV, maxV)
-	k := sr.kSMA.current(raw)
-	d := sr.dSMA.current(k)
+	k := sr.kMA.CurrentVal(raw)
+	d := sr.dMA.CurrentVal(k)
 	sr.out[0] = k
 	sr.out[1] = d
 
@@ -97,11 +109,11 @@ func (sr *StochasticRSI) stochValue(value, minV, maxV float64) float64 {
 }
 
 func (sr *StochasticRSI) IsIdle() bool {
-	return sr.dSMA.IsIdle()
+	return sr.dMA.IsIdle()
 }
 
 func (sr *StochasticRSI) IdlePeriod() int {
-	return sr.rsi.IdlePeriod() + 1 + sr.kSMA.IdlePeriod() + sr.dSMA.IdlePeriod()
+	return sr.rsi.IdlePeriod() + 1 + sr.kMA.IdlePeriod() + sr.dMA.IdlePeriod()
 }
 
 func (sr *StochasticRSI) IsWarmedUp() bool {
@@ -110,5 +122,5 @@ func (sr *StochasticRSI) IsWarmedUp() bool {
 
 func (sr *StochasticRSI) WarmUpPeriod() int {
 	// StochLen*2 because Min/Max is sensitive to small RSI errorsr. Subject to further clarification.
-	return sr.rsi.WarmUpPeriod() + sr.StochLen*2 + sr.kSMA.WarmUpPeriod() + sr.dSMA.WarmUpPeriod()
+	return sr.rsi.WarmUpPeriod() + sr.StochLen*2 + sr.kMA.WarmUpPeriod() + sr.dMA.WarmUpPeriod()
 }

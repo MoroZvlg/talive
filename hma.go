@@ -8,10 +8,11 @@ import (
 // HMA is a Hull Moving Average indicator.
 type HMA struct {
 	Period      int
+	SourceFunc  SourceFunc
 	valueNumber int
-	halfWma     MA
-	fullWma     MA
-	sqrtWma     MA
+	halfMA      Scalar
+	fullMA      Scalar
+	sqrtMA      Scalar
 	out         []float64
 }
 
@@ -20,70 +21,77 @@ func NewHMA(period int) (*HMA, error) {
 	if period < 2 {
 		return nil, fmt.Errorf("period should be greater than 1")
 	}
-	halfPeriod := period / 2
-	if halfPeriod < 1 {
-		halfPeriod = 1
-	}
-	sqrtPeriod := int(math.Floor(math.Sqrt(float64(period))))
-	if sqrtPeriod < 1 {
-		sqrtPeriod = 1
-	}
-	halfWma, _ := NewWMA(halfPeriod)
-	fullWma, _ := NewWMA(period)
-	sqrtWma, _ := NewWMA(sqrtPeriod)
+	halfPeriod := max(period/2, 1)
+	sqrtPeriod := max(int(math.Floor(math.Sqrt(float64(period)))), 1)
+	halfMA, _ := NewWMA(halfPeriod)
+	fullMA, _ := NewWMA(period)
+	sqrtMA, _ := NewWMA(sqrtPeriod)
 	return &HMA{
-		Period:  period,
-		halfWma: halfWma,
-		fullWma: fullWma,
-		sqrtWma: sqrtWma,
-		out:     make([]float64, 1),
+		Period:     period,
+		SourceFunc: SourceClose,
+		halfMA:     halfMA,
+		fullMA:     fullMA,
+		sqrtMA:     sqrtMA,
+		out:        make([]float64, 1),
 	}, nil
 }
 
-func (h *HMA) Next(candle ICandle) []float64 {
-	h.valueNumber++
-	halfVal := h.halfWma.next(candle.Close())
-	fullVal := h.fullWma.next(candle.Close())
+// WithSource sets the price source used to extract values from candles.
+func (hma *HMA) WithSource(source SourceFunc) *HMA {
+	hma.SourceFunc = source
+	return hma
+}
 
-	if h.fullWma.IsIdle() {
-		return h.out
+func (hma *HMA) String() string {
+	return fmt.Sprintf("HullMA(%d)", hma.Period)
+}
+
+func (hma *HMA) Next(candle OHLCV) []float64 {
+	hma.valueNumber++
+	value := hma.SourceFunc(candle)
+	halfVal := hma.halfMA.NextVal(value)
+	fullVal := hma.fullMA.NextVal(value)
+
+	if hma.fullMA.IsIdle() {
+		return hma.out
 	}
 
 	diff := 2*halfVal - fullVal
-	hma := h.sqrtWma.next(diff)
+	hmaV := hma.sqrtMA.NextVal(diff)
 
-	if h.sqrtWma.IsIdle() {
-		return h.out
+	if hma.sqrtMA.IsIdle() {
+		return hma.out
 	}
 
-	h.out[0] = hma
-	return h.out
+	hma.out[0] = hmaV
+	return hma.out
 }
 
-func (h *HMA) Current(candle ICandle) []float64 {
-	if h.IsIdle() {
-		return h.out
+func (hma *HMA) Current(candle OHLCV) []float64 {
+	if hma.IsIdle() {
+		return hma.out
 	}
 
-	halfVal := h.halfWma.current(candle.Close())
-	fullVal := h.fullWma.current(candle.Close())
+	value := hma.SourceFunc(candle)
+	halfVal := hma.halfMA.CurrentVal(value)
+	fullVal := hma.fullMA.CurrentVal(value)
 	diff := 2*halfVal - fullVal
-	h.out[0] = h.sqrtWma.current(diff)
-	return h.out
+	hma.out[0] = hma.sqrtMA.CurrentVal(diff)
+	return hma.out
 }
 
-func (h *HMA) IsIdle() bool {
-	return h.sqrtWma.IsIdle()
+func (hma *HMA) IsIdle() bool {
+	return hma.sqrtMA.IsIdle()
 }
 
-func (h *HMA) IdlePeriod() int {
-	return h.fullWma.IdlePeriod() + h.sqrtWma.IdlePeriod()
+func (hma *HMA) IdlePeriod() int {
+	return hma.fullMA.IdlePeriod() + hma.sqrtMA.IdlePeriod()
 }
 
-func (h *HMA) IsWarmedUp() bool {
-	return !h.IsIdle()
+func (hma *HMA) IsWarmedUp() bool {
+	return !hma.IsIdle()
 }
 
-func (h *HMA) WarmUpPeriod() int {
-	return h.IdlePeriod()
+func (hma *HMA) WarmUpPeriod() int {
+	return hma.IdlePeriod()
 }
