@@ -13,11 +13,11 @@ import (
 //	buy  = close < ema50 (downtrend) AND kStochRsi < 20 AND dStochRsi < 20 AND k > d
 //	sell = close > ema50 (uptrend)   AND kStochRsi > 80 AND dStochRsi > 80 AND k < d
 type StochRSISignal struct {
-	stochRSI talive.IIndicator
-	trendMA  talive.MA
+	stochRSI talive.Indicator
+	trendMA  talive.Scalar
 }
 
-func NewStochRSISignal(stochRSI talive.IIndicator, trendMA talive.MA) *StochRSISignal {
+func NewStochRSISignal(stochRSI talive.Indicator, trendMA talive.Scalar) *StochRSISignal {
 	return &StochRSISignal{
 		stochRSI: stochRSI,
 		trendMA:  trendMA,

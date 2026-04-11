@@ -12,14 +12,14 @@ import (
 // RSI: buy if rsi < 30 AND rsi rising, sell if rsi > 70 AND rsi falling.
 // CCI: buy if cci < -100 AND cci rising, sell if cci > 100 AND cci falling.
 type ThresholdTrendSignal struct {
-	indicator  talive.IIndicator
+	indicator  talive.Indicator
 	buyTh      float64
 	sellTh     float64
 	lastResult float64
 	hasLast    bool
 }
 
-func NewThresholdTrendSignal(indicator talive.IIndicator, buyTh, sellTh float64) *ThresholdTrendSignal {
+func NewThresholdTrendSignal(indicator talive.Indicator, buyTh, sellTh float64) *ThresholdTrendSignal {
 	return &ThresholdTrendSignal{
 		indicator: indicator,
 		buyTh:     buyTh,

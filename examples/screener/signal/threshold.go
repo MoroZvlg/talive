@@ -8,13 +8,13 @@ import (
 )
 
 type ThresholdSignal struct {
-	indicator     talive.IIndicator
+	indicator     talive.Indicator
 	buyThreshold  float64
 	sellThreshold float64
 	reverse       int
 }
 
-func NewThresholdSignal(indicator talive.IIndicator, buyTh, sellTh float64, reverse bool) *ThresholdSignal {
+func NewThresholdSignal(indicator talive.Indicator, buyTh, sellTh float64, reverse bool) *ThresholdSignal {
 	var r int
 	if reverse {
 		r = -1

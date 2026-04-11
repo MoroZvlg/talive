@@ -144,6 +144,7 @@ func NewScreener() *Screener {
 
 	// CCI(20): buy if cci < -100 AND rising, sell if cci > 100 AND falling
 	cci, _ := talive.NewCCI(20)
+	cci.WithSource(talive.SourceClose)
 	oscSignals = append(oscSignals, signal.NewThresholdTrendSignal(cci, -100, 100))
 
 	// DMI/ADX(14): buy if adx>20 & adx rising & +DI>-DI, sell opposite

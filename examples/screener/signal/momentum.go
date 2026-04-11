@@ -10,12 +10,12 @@ import (
 // MomentumSignal generates buy/sell based on momentum direction.
 // Pine Script: buy if mom > mom[1], sell if mom < mom[1].
 type MomentumSignal struct {
-	indicator  talive.IIndicator
+	indicator  talive.Indicator
 	lastResult float64
 	hasLast    bool
 }
 
-func NewMomentumSignal(indicator talive.IIndicator) *MomentumSignal {
+func NewMomentumSignal(indicator talive.Indicator) *MomentumSignal {
 	return &MomentumSignal{
 		indicator: indicator,
 	}

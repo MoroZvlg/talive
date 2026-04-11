@@ -15,14 +15,14 @@ import (
 //	buy  = close > ema50 (uptrend)   AND bearPower < 0 AND bearPower > bearPower[1]
 //	sell = close < ema50 (downtrend) AND bullPower > 0 AND bullPower < bullPower[1]
 type BullBearPowerSignal struct {
-	ema      talive.MA
-	trendMA  talive.MA
+	ema      talive.Scalar
+	trendMA  talive.Scalar
 	lastBull float64
 	lastBear float64
 	hasLast  bool
 }
 
-func NewBullBearPowerSignal(ema talive.MA, trendMA talive.MA) *BullBearPowerSignal {
+func NewBullBearPowerSignal(ema talive.Scalar, trendMA talive.Scalar) *BullBearPowerSignal {
 	return &BullBearPowerSignal{
 		ema:     ema,
 		trendMA: trendMA,

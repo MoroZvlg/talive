@@ -12,10 +12,10 @@ import (
 // ----------------
 
 type MASignal struct {
-	ma talive.IIndicator
+	ma talive.Indicator
 }
 
-func NewMASignal(ma talive.IIndicator) *MASignal {
+func NewMASignal(ma talive.Indicator) *MASignal {
 	return &MASignal{ma: ma}
 }
 
@@ -42,11 +42,11 @@ func (s *MASignal) MaxWarmUp() int {
 // ----------------
 
 type MACrossSignal struct {
-	fast talive.MA
-	slow talive.MA
+	fast talive.Scalar
+	slow talive.Scalar
 }
 
-func NewMACrossSignal(fast, slow talive.MA) *MACrossSignal {
+func NewMACrossSignal(fast, slow talive.Scalar) *MACrossSignal {
 	return &MACrossSignal{fast: fast, slow: slow}
 }
 

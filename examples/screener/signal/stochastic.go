@@ -8,10 +8,10 @@ import (
 )
 
 type StochasticSignal struct {
-	stoch talive.IIndicator
+	stoch talive.Indicator
 }
 
-func NewStochasticSignal(stoch talive.IIndicator) *StochasticSignal {
+func NewStochasticSignal(stoch talive.Indicator) *StochasticSignal {
 	return &StochasticSignal{
 		stoch: stoch,
 	}
