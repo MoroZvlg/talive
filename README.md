@@ -120,6 +120,10 @@ StochasticRSI   ~68.5 ns/op    0 B/op    0 allocs/op
 
 Zero allocations in the hot path — output slices are pre-allocated in constructors and reused on every call.
 
+### vs go-talib (batch mode)
+
+In batch mode (full history from scratch) you can expect **2-5x less memory** but **1.5-3x slower** wall time — some indicators are actually might be faster. Full results in [examples/bench](examples/bench).
+
 ## Why talive
 
 - **Streaming-first** — designed for live feeds, not batch recalculation
