@@ -63,6 +63,39 @@ func TestOBVCurrentVal(t *testing.T) {
 	}
 }
 
+func TestOBVReset(t *testing.T) {
+	indicator, _ := talive.NewOBV()
+	indicator.Next(&testCandle{close: 10, volume: 1.0})
+	indicator.Next(&testCandle{close: 11, volume: 2.0})       // OBV = +2
+	out := indicator.Next(&testCandle{close: 9, volume: 3.0}) // OBV = +2 - 3 = -1
+	if out[0] != -1.0 {
+		t.Fatalf("[OBV] pre-Reset value = %f, want -1.0", out[0])
+	}
+	indicator.Reset()
+	if !indicator.IsIdle() {
+		t.Fatal("[OBV] should be idle after Reset")
+	}
+	out = indicator.Next(&testCandle{close: 100, volume: 5.0})
+	if out[0] != 0.0 {
+		t.Fatalf("[OBV] first post-Reset value = %f, want 0.0 (no prevClose yet)", out[0])
+	}
+	out = indicator.Next(&testCandle{close: 101, volume: 7.0})
+	if out[0] != 7.0 {
+		t.Fatalf("[OBV] second post-Reset value = %f, want 7.0 (close up by 1, +volume)", out[0])
+	}
+}
+
+func TestOBVString(t *testing.T) {
+	indicator, _ := talive.NewOBV()
+	if got := indicator.String(); got != "OBV" {
+		t.Fatalf("OBV.String() default = %q, want %q", got, "OBV")
+	}
+	indicator.WithAnchor(talive.AnchorWeekly)
+	if got := indicator.String(); got != "OBV(anchor=Weekly)" {
+		t.Fatalf("OBV.String() weekly = %q, want %q", got, "OBV(anchor=Weekly)")
+	}
+}
+
 func Benchmark_OBV_Init_Allocations(benchmark *testing.B) {
 	for i := 0; i < benchmark.N; i++ {
 		benchSink, _ = talive.NewOBV()

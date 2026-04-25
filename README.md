@@ -47,6 +47,7 @@ type OHLCV interface {
     Low() float64
     Close() float64
     Volume() float64
+    Timestamp() time.Time // used by Anchored indicators (e.g. VWAP) for boundary detection
 }
 ```
 
@@ -76,7 +77,6 @@ type OHLCV interface {
 | Stochastic | `NewStochastic(kLen, kSmooth, dSmooth)` | `[k, d]` |
 | Stochastic RSI | `NewStochasticRSI(rsiPeriod, stochLen, kSmooth, dSmooth)` | `[k, d]` |
 | CCI | `NewCCI(period)` | `[cci]` |
-| MFI | `NewMFI(period)` | `[mfi]` |
 | Williams %R | `NewWilliams(period)` | `[williams]` |
 | Ultimate Oscillator | `NewUO(periodMin, periodMid, periodMax)` | `[uo]` |
 | Awesome Oscillator | `NewAO()` | `[ao]` |
@@ -90,6 +90,44 @@ type OHLCV interface {
 | ATR | `NewATR(period)` | `[atr]` |
 | StdDev | `NewStdDev(period, ddof)` | `[stddev]` |
 | Variance | `NewVariance(period)` | `[variance]` |
+
+### Volume
+
+| Indicator | Constructor | Output |
+|-----------|-------------|--------|
+| OBV | `NewOBV()` | `[obv]` |
+| VWAP | `NewVWAP()` | `[vwap, upper1, lower1, ...]` |
+| MFI | `NewMFI(period)` | `[mfi]` |
+
+### Anchored indicators
+
+Some indicators (currently `OBV` and `VWAP`) accumulate state from an anchor point and need
+to be reset at session/period boundaries. They implement the `Anchored` interface:
+
+```go
+type Anchored interface {
+    Indicator
+    Reset()  // clear accumulated state
+}
+```
+
+Two ways to use them:
+
+```go
+// 1) Auto-reset on time-based boundaries (Daily/Weekly/Monthly/Quarterly/Yearly).
+//    Boundary detection uses candle.Timestamp() in its embedded location.
+vwap, _ := talive.NewVWAP()
+vwap.WithAnchor(talive.AnchorDaily)
+
+// 2) Manual reset for custom anchors (sessions, earnings, splits).
+vwap, _ := talive.NewVWAP()
+for _, c := range candles {
+    if myCustomBoundary(c) {
+        vwap.Reset()
+    }
+    vwap.Next(c)
+}
+```
 
 ## Benchmarks
 
@@ -105,9 +143,11 @@ BullBearPower    ~4.8 ns/op    0 B/op    0 allocs/op
 VWMA             ~5.7 ns/op    0 B/op    0 allocs/op
 ATR              ~6.9 ns/op    0 B/op    0 allocs/op
 MACD             ~7.0 ns/op    0 B/op    0 allocs/op
+VWAP             ~8.3 ns/op    0 B/op    0 allocs/op
 AO               ~8.6 ns/op    0 B/op    0 allocs/op
 BBands          ~10.4 ns/op    0 B/op    0 allocs/op
 RSI             ~10.5 ns/op    0 B/op    0 allocs/op
+OBV             ~11.6 ns/op    0 B/op    0 allocs/op
 MFI             ~12.5 ns/op    0 B/op    0 allocs/op
 HMA             ~12.7 ns/op    0 B/op    0 allocs/op
 Williams        ~15.1 ns/op    0 B/op    0 allocs/op

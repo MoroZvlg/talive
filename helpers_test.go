@@ -5,6 +5,7 @@ import (
 	"math"
 	"os"
 	"strconv"
+	"time"
 )
 
 var floatDummy float64
@@ -54,12 +55,16 @@ func readCandles(filePath string) ([]*testCandle, error) {
 		if i == 0 {
 			continue
 		}
+		ts, _ := strconv.ParseInt(record[0], 10, 64)
 		open, _ := strconv.ParseFloat(record[1], 64)
 		high, _ := strconv.ParseFloat(record[2], 64)
 		low, _ := strconv.ParseFloat(record[3], 64)
 		closeV, _ := strconv.ParseFloat(record[4], 64)
 		volume, _ := strconv.ParseFloat(record[5], 64)
-		result = append(result, &testCandle{open: open, high: high, low: low, close: closeV, volume: volume})
+		result = append(result, &testCandle{
+			open: open, high: high, low: low, close: closeV, volume: volume,
+			timestamp: time.Unix(ts, 0).UTC(),
+		})
 	}
 	return result, nil
 }
