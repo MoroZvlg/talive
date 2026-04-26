@@ -68,6 +68,7 @@ type OHLCV interface {
 | Parabolic SAR | `NewSAR(start, increment, maxAF)` | `[sar]` |
 | Ichimoku Cloud | `NewIchimoku(conv, base, spanB, shift)` | `[tenkan, kijun, spanA, spanB]` |
 | ADX | `NewADX(period)` | `[adx]` |
+| Supertrend | `NewSupertrend(period, multiplier)` | `[supertrend, direction]` |
 
 ### Momentum
 
@@ -90,6 +91,7 @@ type OHLCV interface {
 | ATR | `NewATR(period)` | `[atr]` |
 | StdDev | `NewStdDev(period, ddof)` | `[stddev]` |
 | Variance | `NewVariance(period)` | `[variance]` |
+| Keltner Channels | `NewKeltnerChannels(period, atrPeriod, multiplier)` | `[upper, basis, lower]` |
 
 ### Volume
 
@@ -150,9 +152,11 @@ RSI             ~10.5 ns/op    0 B/op    0 allocs/op
 OBV             ~11.6 ns/op    0 B/op    0 allocs/op
 MFI             ~12.5 ns/op    0 B/op    0 allocs/op
 HMA             ~12.7 ns/op    0 B/op    0 allocs/op
+KeltnerChannels ~12.8 ns/op    0 B/op    0 allocs/op
 Williams        ~15.1 ns/op    0 B/op    0 allocs/op
 SAR             ~15.8 ns/op    0 B/op    0 allocs/op
 UO              ~16.0 ns/op    0 B/op    0 allocs/op
+Supertrend      ~17.2 ns/op    0 B/op    0 allocs/op
 ADX             ~21.3 ns/op    0 B/op    0 allocs/op
 Ichimoku        ~50.1 ns/op    0 B/op    0 allocs/op
 StochasticRSI   ~68.5 ns/op    0 B/op    0 allocs/op

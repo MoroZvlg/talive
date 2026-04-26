@@ -29,6 +29,8 @@
 | 23 | Bull Bear Power | Momentum | 5/10 |
 | 24 | OBV (On Balance Volume) | Volume | 9/10 |
 | 25 | VWAP | Volume | 9/10 |
+| 26 | Supertrend | Trend | 9/10 |
+| 27 | Keltner Channel | Volatility | 8/10 |
 
 ## To Build
 
@@ -36,8 +38,6 @@ Sorted by priority. Usage is approximate popularity among retail/algo traders.
 
 | Priority | Indicator | Category | Usage | Comment |
 |----------|-----------|----------|-------|---------|
-| 1 | Supertrend | Trend | 9/10 | ATR-based trend follower. Huge in crypto/forex. Simple buy/sell signals |
-| 2 | Keltner Channel | Volatility | 8/10 | EMA + ATR channel. The "TTM Squeeze" (Keltner inside BBands) is a famous setup |
 | 3 | DEMA | Moving Average | 7/10 | Double EMA, reduces lag. Popular in crossover strategies |
 | 4 | TEMA | Moving Average | 7/10 | Triple EMA, even less lag. Often paired with DEMA |
 | 5 | Aroon | Trend | 7/10 | Measures time since highest high / lowest low. Good for detecting new trends |
