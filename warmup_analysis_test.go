@@ -187,6 +187,30 @@ func Test_WarmUpAnalyze_EMA(t *testing.T) {
 }
 
 // ============================================================
+// DEMA
+// ============================================================
+
+func Test_WarmUpAnalyze_DEMA(t *testing.T) {
+	factory := func(period int) (func(c *testCandle) []float64, int, int) {
+		ind, _ := talive.NewDEMA(period)
+		return func(c *testCandle) []float64 { return ind.Next(c) }, 1, ind.IdlePeriod()
+	}
+	runWarmUpAnalysis(t, "DEMA", factory, periods2to99(), []int{1, 2, 3, 4})
+}
+
+// ============================================================
+// TEMA
+// ============================================================
+
+func Test_WarmUpAnalyze_TEMA(t *testing.T) {
+	factory := func(period int) (func(c *testCandle) []float64, int, int) {
+		ind, _ := talive.NewTEMA(period)
+		return func(c *testCandle) []float64 { return ind.Next(c) }, 1, ind.IdlePeriod()
+	}
+	runWarmUpAnalysis(t, "TEMA", factory, periods2to99(), []int{1, 2, 3, 4})
+}
+
+// ============================================================
 // MACD (vary slowPeriod, fast=slowPeriod/2, signal=9)
 // ============================================================
 

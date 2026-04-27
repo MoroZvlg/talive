@@ -167,6 +167,10 @@ func (mt MaType) String() string {
 		return "SMMA"
 	case UseWMA:
 		return "WMA"
+	case UseDEMA:
+		return "DEMA"
+	case UseTEMA:
+		return "TEMA"
 	}
 	return "UnknownMA"
 }
@@ -182,6 +186,10 @@ func (mt MaType) New(period int) (Scalar, error) {
 		return NewSMMA(period)
 	case UseWMA:
 		return NewWMA(period)
+	case UseDEMA:
+		return NewDEMA(period)
+	case UseTEMA:
+		return NewTEMA(period)
 	}
 	return nil, fmt.Errorf("unknown MA type: %s", mt)
 }
@@ -192,4 +200,6 @@ const (
 	UseEMA
 	UseSMMA
 	UseWMA
+	UseDEMA
+	UseTEMA
 )
