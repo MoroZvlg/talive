@@ -5,6 +5,7 @@ import (
 	"os"
 	"strconv"
 	"testing"
+	"time"
 
 	"github.com/MoroZvlg/talive"
 	"github.com/markcheno/go-talib"
@@ -19,13 +20,15 @@ var (
 
 type candle struct {
 	open, high, low, close, volume float64
+	timestamp                      time.Time
 }
 
-func (c *candle) Open() float64   { return c.open }
-func (c *candle) High() float64   { return c.high }
-func (c *candle) Low() float64    { return c.low }
-func (c *candle) Close() float64  { return c.close }
-func (c *candle) Volume() float64 { return c.volume }
+func (c *candle) Open() float64        { return c.open }
+func (c *candle) High() float64        { return c.high }
+func (c *candle) Low() float64         { return c.low }
+func (c *candle) Close() float64       { return c.close }
+func (c *candle) Volume() float64      { return c.volume }
+func (c *candle) Timestamp() time.Time { return c.timestamp }
 
 var testCandles []candle
 
@@ -48,12 +51,13 @@ func loadCandles(path string) []candle {
 
 	candles := make([]candle, 0, len(records)-1)
 	for _, row := range records[1:] {
+		ts, _ := strconv.ParseInt(row[0], 10, 64)
 		o, _ := strconv.ParseFloat(row[1], 64)
 		h, _ := strconv.ParseFloat(row[2], 64)
 		l, _ := strconv.ParseFloat(row[3], 64)
 		c, _ := strconv.ParseFloat(row[4], 64)
 		v, _ := strconv.ParseFloat(row[5], 64)
-		candles = append(candles, candle{o, h, l, c, v})
+		candles = append(candles, candle{open: o, high: h, low: l, close: c, volume: v, timestamp: time.Unix(ts, 0).UTC()})
 	}
 	return candles
 }

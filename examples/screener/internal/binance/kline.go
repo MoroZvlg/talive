@@ -33,3 +33,7 @@ func (kline *Kline) Low() float64 {
 func (kline *Kline) Volume() float64 {
 	return kline.V
 }
+
+func (kline *Kline) Timestamp() time.Time {
+	return kline.TimeStart
+}

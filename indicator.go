@@ -1,7 +1,10 @@
 // Package talive provides streaming technical analysis indicators with zero allocations.
 package talive
 
-import "fmt"
+import (
+	"fmt"
+	"time"
+)
 
 // OHLCV represents a single candlestick data point.
 type OHLCV interface {
@@ -10,6 +13,8 @@ type OHLCV interface {
 	Low() float64
 	Close() float64
 	Volume() float64
+	// Timestamp returns candle open time. Used by some Anchored indicators
+	Timestamp() time.Time
 }
 
 // Indicator is the common interface for all technical indicators.
@@ -58,6 +63,75 @@ type Scalar interface {
 	CurrentVal(float64) float64
 }
 
+// Anchored extends Indicator for indicators whose accumulated state can be cleared
+// and started fresh at a chosen point (e.g. VWAP, Pivot Points, ADR).
+type Anchored interface {
+	Indicator
+
+	// Reset clears accumulated state and returns the indicator to its initial idle state.
+	Reset()
+}
+
+// Anchor selects an auto-reset period for Anchored indicators. Boundaries are detected
+// from candle.Timestamp() using the timestamp's own location — convert your timestamps
+// to the desired timezone before feeding them in if needed. Use AnchorNone (default) to
+// disable auto-detection and rely on manual Reset calls (e.g. for venue session boundaries
+// or corporate-action anchors that can't be derived from time alone).
+type Anchor int
+
+// Supported anchor periods.
+const (
+	AnchorNone Anchor = iota
+	AnchorDaily
+	AnchorWeekly // ISO week (Monday-start)
+	AnchorMonthly
+	AnchorQuarterly
+	AnchorYearly
+)
+
+func (a Anchor) String() string {
+	switch a {
+	case AnchorNone:
+		return "None"
+	case AnchorDaily:
+		return "Daily"
+	case AnchorWeekly:
+		return "Weekly"
+	case AnchorMonthly:
+		return "Monthly"
+	case AnchorQuarterly:
+		return "Quarterly"
+	case AnchorYearly:
+		return "Yearly"
+	}
+	return "UnknownAnchor"
+}
+
+// anchorChanged reports whether prev and curr fall in different anchor periods.
+// Shared internal helper for Anchored indicators that support auto-anchor modes.
+func anchorChanged(prev, curr time.Time, mode Anchor) bool {
+	switch mode {
+	case AnchorDaily:
+		return prev.Year() != curr.Year() || prev.YearDay() != curr.YearDay()
+	case AnchorWeekly:
+		py, pw := prev.ISOWeek()
+		cy, cw := curr.ISOWeek()
+		return py != cy || pw != cw
+	case AnchorMonthly:
+		return prev.Year() != curr.Year() || prev.Month() != curr.Month()
+	case AnchorQuarterly:
+		pq := (int(prev.Month()) - 1) / 3
+		cq := (int(curr.Month()) - 1) / 3
+		return prev.Year() != curr.Year() || pq != cq
+	case AnchorYearly:
+		return prev.Year() != curr.Year()
+	case AnchorNone:
+		return false
+	default:
+		return false
+	}
+}
+
 // SourceFunc selects which price value an indicator reads from a candle.
 // Pass one of the predefined sources or a custom function to derive the price series.
 type SourceFunc func(OHLCV) float64
@@ -93,6 +167,10 @@ func (mt MaType) String() string {
 		return "SMMA"
 	case UseWMA:
 		return "WMA"
+	case UseDEMA:
+		return "DEMA"
+	case UseTEMA:
+		return "TEMA"
 	}
 	return "UnknownMA"
 }
@@ -108,6 +186,10 @@ func (mt MaType) New(period int) (Scalar, error) {
 		return NewSMMA(period)
 	case UseWMA:
 		return NewWMA(period)
+	case UseDEMA:
+		return NewDEMA(period)
+	case UseTEMA:
+		return NewTEMA(period)
 	}
 	return nil, fmt.Errorf("unknown MA type: %s", mt)
 }
@@ -118,4 +200,6 @@ const (
 	UseEMA
 	UseSMMA
 	UseWMA
+	UseDEMA
+	UseTEMA
 )
