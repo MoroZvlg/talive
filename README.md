@@ -92,6 +92,7 @@ type OHLCV interface {
 | StdDev | `NewStdDev(period, ddof)` | `[stddev]` |
 | Variance | `NewVariance(period)` | `[variance]` |
 | Keltner Channels | `NewKeltnerChannels(period, atrPeriod, multiplier)` | `[upper, basis, lower]` |
+| Donchian Channel | `NewDonchianChannel(period)` | `[upper, mid, lower]` |
 
 ### Volume
 
