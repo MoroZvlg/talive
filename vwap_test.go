@@ -210,7 +210,7 @@ func Benchmark_VWAP_Current_Allocations(benchmark *testing.B) {
 	benchmark.Run("VWAP NoBands", func(benchmark *testing.B) {
 		indicator, _ := talive.NewVWAP()
 		indicator.WithBands()
-		dataIndex := 0
+		dataIndex := primeForCurrentBench(indicator, candles)
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)
@@ -219,7 +219,7 @@ func Benchmark_VWAP_Current_Allocations(benchmark *testing.B) {
 	})
 	benchmark.Run("VWAP 1Band", func(benchmark *testing.B) {
 		indicator, _ := talive.NewVWAP()
-		dataIndex := 0
+		dataIndex := primeForCurrentBench(indicator, candles)
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)
@@ -229,7 +229,7 @@ func Benchmark_VWAP_Current_Allocations(benchmark *testing.B) {
 	benchmark.Run("VWAP 3Bands", func(benchmark *testing.B) {
 		indicator, _ := talive.NewVWAP()
 		indicator.WithBands(1.0, 2.0, 3.0)
-		dataIndex := 0
+		dataIndex := primeForCurrentBench(indicator, candles)
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)

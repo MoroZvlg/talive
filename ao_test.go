@@ -101,7 +101,7 @@ func Benchmark_Ao_Current_Allocations(benchmark *testing.B) {
 	dataLen := len(candles)
 	benchmark.Run("AO", func(benchmark *testing.B) {
 		indicator, _ := talive.NewAO()
-		dataIndex := 0
+		dataIndex := primeForCurrentBench(indicator, candles)
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)

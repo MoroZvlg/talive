@@ -161,7 +161,7 @@ func Benchmark_Stochastic_Current_Allocations(b *testing.B) {
 
 	b.Run("Stochastic(2, 1, 2)", func(b *testing.B) {
 		indicator, _ := talive.NewStochastic(2, 1, 2)
-		dataIndex := 0
+		dataIndex := primeForCurrentBench(indicator, candles)
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)
@@ -170,7 +170,7 @@ func Benchmark_Stochastic_Current_Allocations(b *testing.B) {
 	})
 	b.Run("Stochastic(14, 1, 3)", func(b *testing.B) {
 		indicator, _ := talive.NewStochastic(14, 1, 3)
-		dataIndex := 0
+		dataIndex := primeForCurrentBench(indicator, candles)
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)
@@ -179,7 +179,7 @@ func Benchmark_Stochastic_Current_Allocations(b *testing.B) {
 	})
 	b.Run("Stochastic(50, 10, 20)", func(b *testing.B) {
 		indicator, _ := talive.NewStochastic(50, 10, 20)
-		dataIndex := 0
+		dataIndex := primeForCurrentBench(indicator, candles)
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)

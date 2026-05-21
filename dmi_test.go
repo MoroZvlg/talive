@@ -175,7 +175,7 @@ func Benchmark_DMI_Current_Allocations(b *testing.B) {
 
 	b.Run("DMI(2)", func(b *testing.B) {
 		indicator, _ := talive.NewDMI(2)
-		dataIndex := 0
+		dataIndex := primeForCurrentBench(indicator, candles)
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)
@@ -184,7 +184,7 @@ func Benchmark_DMI_Current_Allocations(b *testing.B) {
 	})
 	b.Run("DMI(14)", func(b *testing.B) {
 		indicator, _ := talive.NewDMI(14)
-		dataIndex := 0
+		dataIndex := primeForCurrentBench(indicator, candles)
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)
@@ -193,7 +193,7 @@ func Benchmark_DMI_Current_Allocations(b *testing.B) {
 	})
 	b.Run("DMI(50)", func(b *testing.B) {
 		indicator, _ := talive.NewDMI(50)
-		dataIndex := 0
+		dataIndex := primeForCurrentBench(indicator, candles)
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)

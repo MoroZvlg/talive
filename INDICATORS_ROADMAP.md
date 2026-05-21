@@ -72,5 +72,4 @@ Sorted by priority. Usage is approximate popularity among retail/algo traders.
 | 34 | ZigZag | Pattern | 5/10 | Connects swing highs/lows filtering noise by %. Not predictive but useful for pattern detection |
 | 35 | Fibonacci Retracement | Support/Resistance | 8/10 | Not a traditional indicator, but worth having as a utility. Every trader knows Fib levels |
 | 36 | Linear Regression Channel | Statistical | 5/10 | Regression line + stddev bands. Used for mean-reversion and trend channels |
-| 37 | Standard Deviation | Statistical | 6/10 | Building block for BBands and other indicators. Useful standalone for volatility screening |
 | 38 | ADR (Average Daily Range) | Volatility | 6/10 | Average of daily high-low range. Day traders use it to gauge how much room a move has left. Anchored |

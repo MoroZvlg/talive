@@ -133,7 +133,7 @@ func Benchmark_Uo_Current_Allocations(benchmark *testing.B) {
 
 	benchmark.Run("UO(2,3,4)", func(benchmark *testing.B) {
 		indicator, _ := talive.NewUO(2, 3, 4)
-		dataIndex := 0
+		dataIndex := primeForCurrentBench(indicator, candles)
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)
@@ -142,7 +142,7 @@ func Benchmark_Uo_Current_Allocations(benchmark *testing.B) {
 	})
 	benchmark.Run("UO(7,14,28)", func(benchmark *testing.B) {
 		indicator, _ := talive.NewUO(7, 14, 28)
-		dataIndex := 0
+		dataIndex := primeForCurrentBench(indicator, candles)
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)
@@ -151,7 +151,7 @@ func Benchmark_Uo_Current_Allocations(benchmark *testing.B) {
 	})
 	benchmark.Run("UO(14,28,56)", func(benchmark *testing.B) {
 		indicator, _ := talive.NewUO(14, 28, 56)
-		dataIndex := 0
+		dataIndex := primeForCurrentBench(indicator, candles)
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)

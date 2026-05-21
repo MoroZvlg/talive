@@ -7,10 +7,10 @@ import (
 	"github.com/MoroZvlg/talive"
 )
 
-func TestDonchianChannelDefault(t *testing.T) {
+func TestDonchianChannelsDefault(t *testing.T) {
 	candles, _ := readCandles("test_data/input_data2.csv")
-	expectedParsedData, _ := readData("test_data/donchian/output_default.csv", []int{1, 2, 3}, 4)
-	indicator, _ := talive.NewDonchianChannel(20)
+	expectedParsedData, _ := readData("test_data/donchian_channels/output_default.csv", []int{1, 2, 3}, 4)
+	indicator, _ := talive.NewDonchianChannels(20)
 	result := [][]float64{
 		make([]float64, len(candles)),
 		make([]float64, len(candles)),
@@ -24,20 +24,20 @@ func TestDonchianChannelDefault(t *testing.T) {
 	}
 
 	if !reflect.DeepEqual(result[0], expectedParsedData[0]) {
-		t.Fatal(`[DonchianChannel(20)] Mid values didn't match `, difference(result[0], expectedParsedData[0]))
+		t.Fatal(`[DonchianChannels(20)] Mid values didn't match `, difference(result[0], expectedParsedData[0]))
 	}
 	if !reflect.DeepEqual(result[1], expectedParsedData[1]) {
-		t.Fatal(`[DonchianChannel(20)] Upper values didn't match `, difference(result[1], expectedParsedData[1]))
+		t.Fatal(`[DonchianChannels(20)] Upper values didn't match `, difference(result[1], expectedParsedData[1]))
 	}
 	if !reflect.DeepEqual(result[2], expectedParsedData[2]) {
-		t.Fatal(`[DonchianChannel(20)] Lower values didn't match `, difference(result[2], expectedParsedData[2]))
+		t.Fatal(`[DonchianChannels(20)] Lower values didn't match `, difference(result[2], expectedParsedData[2]))
 	}
 }
 
-func TestDonchianChannelMin(t *testing.T) {
+func TestDonchianChannelsMin(t *testing.T) {
 	candles, _ := readCandles("test_data/input_data2.csv")
-	expectedParsedData, _ := readData("test_data/donchian/output_min.csv", []int{1, 2, 3}, 5)
-	indicator, _ := talive.NewDonchianChannel(2)
+	expectedParsedData, _ := readData("test_data/donchian_channels/output_min.csv", []int{1, 2, 3}, 5)
+	indicator, _ := talive.NewDonchianChannels(2)
 	result := [][]float64{
 		make([]float64, len(candles)),
 		make([]float64, len(candles)),
@@ -51,18 +51,18 @@ func TestDonchianChannelMin(t *testing.T) {
 	}
 
 	if !reflect.DeepEqual(result[0], expectedParsedData[0]) {
-		t.Fatal(`[DonchianChannel(2)] Mid values didn't match `, difference(result[0], expectedParsedData[0]))
+		t.Fatal(`[DonchianChannels(2)] Mid values didn't match `, difference(result[0], expectedParsedData[0]))
 	}
 	if !reflect.DeepEqual(result[1], expectedParsedData[1]) {
-		t.Fatal(`[DonchianChannel(2)] Upper values didn't match `, difference(result[1], expectedParsedData[1]))
+		t.Fatal(`[DonchianChannels(2)] Upper values didn't match `, difference(result[1], expectedParsedData[1]))
 	}
 	if !reflect.DeepEqual(result[2], expectedParsedData[2]) {
-		t.Fatal(`[DonchianChannel(2)] Lower values didn't match `, difference(result[2], expectedParsedData[2]))
+		t.Fatal(`[DonchianChannels(2)] Lower values didn't match `, difference(result[2], expectedParsedData[2]))
 	}
 }
 
-func TestDonchianChannelIdle(t *testing.T) {
-	indicator, _ := talive.NewDonchianChannel(5)
+func TestDonchianChannelsIdle(t *testing.T) {
+	indicator, _ := talive.NewDonchianChannels(5)
 	var result []string
 	for i := 0; i < 6; i++ {
 		indicator.Next(&testCandle{high: float64(i + 2), low: float64(i)})
@@ -73,7 +73,7 @@ func TestDonchianChannelIdle(t *testing.T) {
 		}
 	}
 	if !reflect.DeepEqual(result, []string{"true", "true", "true", "true", "false", "false"}) {
-		t.Fatal(`[DonchianChannel(5)] wrong idle value `, result)
+		t.Fatal(`[DonchianChannels(5)] wrong idle value `, result)
 	}
 	trueCount := 0
 	for _, v := range result {
@@ -82,14 +82,14 @@ func TestDonchianChannelIdle(t *testing.T) {
 		}
 	}
 	if trueCount != indicator.IdlePeriod() {
-		t.Fatalf("[DonchianChannel(5)] IdlePeriod() = %d, but IsIdle() was true %d times", indicator.IdlePeriod(), trueCount)
+		t.Fatalf("[DonchianChannels(5)] IdlePeriod() = %d, but IsIdle() was true %d times", indicator.IdlePeriod(), trueCount)
 	}
 }
 
-func TestDonchianChannelCurrentVal(t *testing.T) {
+func TestDonchianChannelsCurrentVal(t *testing.T) {
 	candles, _ := readCandles("test_data/input_data2.csv")
-	expectedParsedData, _ := readData("test_data/donchian/output_default.csv", []int{1, 2, 3}, 8)
-	indicator, _ := talive.NewDonchianChannel(20)
+	expectedParsedData, _ := readData("test_data/donchian_channels/output_default.csv", []int{1, 2, 3}, 8)
+	indicator, _ := talive.NewDonchianChannels(20)
 	for i := 0; i < 22; i++ {
 		indicator.Next(candles[i])
 	}
@@ -101,47 +101,47 @@ func TestDonchianChannelCurrentVal(t *testing.T) {
 	expectedUpper := expectedParsedData[1][22]
 	expectedLower := expectedParsedData[2][22]
 	if roundFloat(currUpper, 8) != roundFloat(expectedUpper, 8) {
-		t.Fatalf("[DonchianChannel(20)] wrong Current Upper value %f, expected %f", currUpper, expectedUpper)
+		t.Fatalf("[DonchianChannels(20)] wrong Current Upper value %f, expected %f", currUpper, expectedUpper)
 	}
 	if roundFloat(currMid, 8) != roundFloat(expectedMid, 8) {
-		t.Fatalf("[DonchianChannel(20)] wrong Current Mid value %f, expected %f", currMid, expectedMid)
+		t.Fatalf("[DonchianChannels(20)] wrong Current Mid value %f, expected %f", currMid, expectedMid)
 	}
 	if roundFloat(currLower, 8) != roundFloat(expectedLower, 8) {
-		t.Fatalf("[DonchianChannel(20)] wrong Current Lower value %f, expected %f", currLower, expectedLower)
+		t.Fatalf("[DonchianChannels(20)] wrong Current Lower value %f, expected %f", currLower, expectedLower)
 	}
 	nextResult := indicator.Next(candles[22])
 	nextUpper := nextResult[0]
 	nextMid := nextResult[1]
 	nextLower := nextResult[2]
 	if roundFloat(nextUpper, 8) != roundFloat(expectedUpper, 8) {
-		t.Fatalf("[DonchianChannel(20)] Current Upper value call broke Next Upper value %f, expected %f", nextUpper, expectedUpper)
+		t.Fatalf("[DonchianChannels(20)] Current Upper value call broke Next Upper value %f, expected %f", nextUpper, expectedUpper)
 	}
 	if roundFloat(nextMid, 8) != roundFloat(expectedMid, 8) {
-		t.Fatalf("[DonchianChannel(20)] Current Mid value call broke Next Mid value %f, expected %f", nextMid, expectedMid)
+		t.Fatalf("[DonchianChannels(20)] Current Mid value call broke Next Mid value %f, expected %f", nextMid, expectedMid)
 	}
 	if roundFloat(nextLower, 8) != roundFloat(expectedLower, 8) {
-		t.Fatalf("[DonchianChannel(20)] Current Lower value call broke Next Lower value %f, expected %f", nextLower, expectedLower)
+		t.Fatalf("[DonchianChannels(20)] Current Lower value call broke Next Lower value %f, expected %f", nextLower, expectedLower)
 	}
 }
 
-func Benchmark_DonchianChannel_Init_Allocations(b *testing.B) {
-	b.Run("DonchianChannel(20)", func(b *testing.B) {
+func Benchmark_DonchianChannels_Init_Allocations(b *testing.B) {
+	b.Run("DonchianChannels(20)", func(b *testing.B) {
 		for i := 0; i < b.N; i++ {
-			benchSink, _ = talive.NewDonchianChannel(20)
+			benchSink, _ = talive.NewDonchianChannels(20)
 		}
 	})
-	b.Run("DonchianChannel(2)", func(b *testing.B) {
+	b.Run("DonchianChannels(2)", func(b *testing.B) {
 		for i := 0; i < b.N; i++ {
-			benchSink, _ = talive.NewDonchianChannel(2)
+			benchSink, _ = talive.NewDonchianChannels(2)
 		}
 	})
 }
 
-func Benchmark_DonchianChannel_Next_Allocations(b *testing.B) {
+func Benchmark_DonchianChannels_Next_Allocations(b *testing.B) {
 	candles, _ := readCandles("test_data/input_data2.csv")
 	dataLen := len(candles)
-	b.Run("DonchianChannel(20)", func(b *testing.B) {
-		indicator, _ := talive.NewDonchianChannel(20)
+	b.Run("DonchianChannels(20)", func(b *testing.B) {
+		indicator, _ := talive.NewDonchianChannels(20)
 		dataIndex := 0
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
@@ -149,8 +149,8 @@ func Benchmark_DonchianChannel_Next_Allocations(b *testing.B) {
 			sliceDummy = indicator.Next(candles[dataIndex])
 		}
 	})
-	b.Run("DonchianChannel(2)", func(b *testing.B) {
-		indicator, _ := talive.NewDonchianChannel(2)
+	b.Run("DonchianChannels(2)", func(b *testing.B) {
+		indicator, _ := talive.NewDonchianChannels(2)
 		dataIndex := 0
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
@@ -160,21 +160,21 @@ func Benchmark_DonchianChannel_Next_Allocations(b *testing.B) {
 	})
 }
 
-func Benchmark_DonchianChannel_Current_Allocations(b *testing.B) {
+func Benchmark_DonchianChannels_Current_Allocations(b *testing.B) {
 	candles, _ := readCandles("test_data/input_data2.csv")
 	dataLen := len(candles)
-	b.Run("DonchianChannel(20)", func(b *testing.B) {
-		indicator, _ := talive.NewDonchianChannel(20)
-		dataIndex := 0
+	b.Run("DonchianChannels(20)", func(b *testing.B) {
+		indicator, _ := talive.NewDonchianChannels(20)
+		dataIndex := primeForCurrentBench(indicator, candles)
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)
 			sliceDummy = indicator.Current(candles[dataIndex])
 		}
 	})
-	b.Run("DonchianChannel(2)", func(b *testing.B) {
-		indicator, _ := talive.NewDonchianChannel(2)
-		dataIndex := 0
+	b.Run("DonchianChannels(2)", func(b *testing.B) {
+		indicator, _ := talive.NewDonchianChannels(2)
+		dataIndex := primeForCurrentBench(indicator, candles)
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)

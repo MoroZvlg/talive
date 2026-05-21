@@ -119,7 +119,7 @@ func Benchmark_Vwma_Current_Allocations(b *testing.B) {
 
 	b.Run("VWMA(2)", func(b *testing.B) {
 		indicator, _ := talive.NewVWMA(2)
-		dataIndex := 0
+		dataIndex := primeForCurrentBench(indicator, candles)
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)
@@ -128,7 +128,7 @@ func Benchmark_Vwma_Current_Allocations(b *testing.B) {
 	})
 	b.Run("VWMA(50)", func(b *testing.B) {
 		indicator, _ := talive.NewVWMA(50)
-		dataIndex := 0
+		dataIndex := primeForCurrentBench(indicator, candles)
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)

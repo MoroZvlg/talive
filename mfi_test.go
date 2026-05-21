@@ -142,7 +142,7 @@ func Benchmark_Mfi_Current_Allocations(benchmark *testing.B) {
 	dataLen := len(candles)
 	benchmark.Run("MFI 2", func(benchmark *testing.B) {
 		indicator, _ := talive.NewMFI(2)
-		dataIndex := 0
+		dataIndex := primeForCurrentBench(indicator, candles)
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)
@@ -151,7 +151,7 @@ func Benchmark_Mfi_Current_Allocations(benchmark *testing.B) {
 	})
 	benchmark.Run("MFI 14", func(benchmark *testing.B) {
 		indicator, _ := talive.NewMFI(14)
-		dataIndex := 0
+		dataIndex := primeForCurrentBench(indicator, candles)
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)
@@ -160,7 +160,7 @@ func Benchmark_Mfi_Current_Allocations(benchmark *testing.B) {
 	})
 	benchmark.Run("MFI 1000", func(benchmark *testing.B) {
 		indicator, _ := talive.NewMFI(1000)
-		dataIndex := 0
+		dataIndex := primeForCurrentBench(indicator, candles)
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)

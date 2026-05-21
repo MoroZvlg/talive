@@ -145,7 +145,7 @@ func Benchmark_Sma_Current_Allocations(benchmark *testing.B) {
 	dataLen := len(candles)
 	benchmark.Run("SMA 2", func(benchmark *testing.B) {
 		indicator, _ := talive.NewSMA(2)
-		dataIndex := 0
+		dataIndex := primeForCurrentBench(indicator, candles)
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)
@@ -154,7 +154,7 @@ func Benchmark_Sma_Current_Allocations(benchmark *testing.B) {
 	})
 	benchmark.Run("SMA 50", func(benchmark *testing.B) {
 		indicator, _ := talive.NewSMA(50)
-		dataIndex := 0
+		dataIndex := primeForCurrentBench(indicator, candles)
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)
@@ -163,7 +163,7 @@ func Benchmark_Sma_Current_Allocations(benchmark *testing.B) {
 	})
 	benchmark.Run("SMA 100", func(benchmark *testing.B) {
 		indicator, _ := talive.NewSMA(100)
-		dataIndex := 0
+		dataIndex := primeForCurrentBench(indicator, candles)
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)
@@ -172,7 +172,7 @@ func Benchmark_Sma_Current_Allocations(benchmark *testing.B) {
 	})
 	benchmark.Run("SMA 1000", func(benchmark *testing.B) {
 		indicator, _ := talive.NewSMA(1000)
-		dataIndex := 0
+		dataIndex := primeForCurrentBench(indicator, candles)
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)

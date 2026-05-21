@@ -140,7 +140,7 @@ func Benchmark_StochRsi_Current_Allocations(benchmark *testing.B) {
 	dataLen := len(candles)
 	benchmark.Run("StochRSI(14,14,3,3)", func(benchmark *testing.B) {
 		indicator, _ := talive.NewStochasticRSI(14, 14, 3, 3)
-		dataIndex := 0
+		dataIndex := primeForCurrentBench(indicator, candles)
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)
@@ -149,7 +149,7 @@ func Benchmark_StochRsi_Current_Allocations(benchmark *testing.B) {
 	})
 	benchmark.Run("StochRSI(50,50,10,10)", func(benchmark *testing.B) {
 		indicator, _ := talive.NewStochasticRSI(50, 50, 10, 10)
-		dataIndex := 0
+		dataIndex := primeForCurrentBench(indicator, candles)
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)

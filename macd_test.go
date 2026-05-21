@@ -180,7 +180,7 @@ func Benchmark_MACD_Current_Allocations(benchmark *testing.B) {
 	dataLen := len(candles)
 	benchmark.Run("MACD (12, 26, 9)", func(benchmark *testing.B) {
 		indicator, _ := talive.NewMACD(12, 26, 9)
-		dataIndex := 0
+		dataIndex := primeForCurrentBench(indicator, candles)
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)
@@ -189,7 +189,7 @@ func Benchmark_MACD_Current_Allocations(benchmark *testing.B) {
 	})
 	benchmark.Run("MACD (2, 3, 2)", func(benchmark *testing.B) {
 		indicator, _ := talive.NewMACD(2, 3, 2)
-		dataIndex := 0
+		dataIndex := primeForCurrentBench(indicator, candles)
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)
@@ -198,7 +198,7 @@ func Benchmark_MACD_Current_Allocations(benchmark *testing.B) {
 	})
 	benchmark.Run("MACD (100, 200, 15)", func(benchmark *testing.B) {
 		indicator, _ := talive.NewMACD(100, 200, 15)
-		dataIndex := 0
+		dataIndex := primeForCurrentBench(indicator, candles)
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)

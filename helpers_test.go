@@ -6,6 +6,8 @@ import (
 	"os"
 	"strconv"
 	"time"
+
+	"github.com/MoroZvlg/talive"
 )
 
 var floatDummy float64
@@ -15,6 +17,17 @@ var benchSink any
 func roundFloat(number float64, decimals int) float64 {
 	pow := math.Pow(10, float64(decimals))
 	return math.Round(number*pow) / pow
+}
+
+// primeForCurrentBench feeds IdlePeriod()+1 candles via Next so the indicator
+// exits the idle short-circuit before benchmarking Current. Returns the index
+// of the last fed candle so limitedDataIndex advances to the next fresh one.
+func primeForCurrentBench(ind talive.Indicator, candles []*testCandle) int {
+	idle := ind.IdlePeriod()
+	for i := 0; i <= idle; i++ {
+		ind.Next(candles[i])
+	}
+	return idle
 }
 
 func limitedDataIndex(dataIndex int, dataLen int) int {

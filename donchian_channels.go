@@ -2,10 +2,10 @@ package talive
 
 import "fmt"
 
-// DonchianChannel is a Donchian Channel indicator.
+// DonchianChannels is a Donchian Channel indicator.
 //
 // Output layout: [Upper, Mid, Lower].
-type DonchianChannel struct {
+type DonchianChannels struct {
 	Period      int
 	valueNumber int
 	highest     *ringBuffer
@@ -13,12 +13,12 @@ type DonchianChannel struct {
 	out         []float64
 }
 
-// NewDonchianChannel creates a new Donchian Channel indicator with the given period.
-func NewDonchianChannel(period int) (*DonchianChannel, error) {
+// NewDonchianChannels creates a new Donchian Channel indicator with the given period.
+func NewDonchianChannels(period int) (*DonchianChannels, error) {
 	if period < 1 {
 		return nil, fmt.Errorf("period should be positive")
 	}
-	return &DonchianChannel{
+	return &DonchianChannels{
 		Period:  period,
 		highest: newRingBuffer(period),
 		lowest:  newRingBuffer(period),
@@ -26,11 +26,11 @@ func NewDonchianChannel(period int) (*DonchianChannel, error) {
 	}, nil
 }
 
-func (dc *DonchianChannel) String() string {
-	return fmt.Sprintf("DonchianChannel(%d)", dc.Period)
+func (dc *DonchianChannels) String() string {
+	return fmt.Sprintf("DonchianChannels(%d)", dc.Period)
 }
 
-func (dc *DonchianChannel) Next(candle OHLCV) []float64 {
+func (dc *DonchianChannels) Next(candle OHLCV) []float64 {
 	dc.valueNumber++
 	dc.highest.Push(candle.High())
 	dc.lowest.Push(candle.Low())
@@ -46,7 +46,7 @@ func (dc *DonchianChannel) Next(candle OHLCV) []float64 {
 	return dc.out
 }
 
-func (dc *DonchianChannel) Current(candle OHLCV) []float64 {
+func (dc *DonchianChannels) Current(candle OHLCV) []float64 {
 	if dc.IsIdle() {
 		return dc.out
 	}
@@ -59,18 +59,18 @@ func (dc *DonchianChannel) Current(candle OHLCV) []float64 {
 	return dc.out
 }
 
-func (dc *DonchianChannel) IsIdle() bool {
+func (dc *DonchianChannels) IsIdle() bool {
 	return dc.valueNumber < dc.Period
 }
 
-func (dc *DonchianChannel) IdlePeriod() int {
+func (dc *DonchianChannels) IdlePeriod() int {
 	return dc.Period - 1
 }
 
-func (dc *DonchianChannel) IsWarmedUp() bool {
+func (dc *DonchianChannels) IsWarmedUp() bool {
 	return !dc.IsIdle()
 }
 
-func (dc *DonchianChannel) WarmUpPeriod() int {
+func (dc *DonchianChannels) WarmUpPeriod() int {
 	return dc.IdlePeriod()
 }
