@@ -69,6 +69,7 @@ type OHLCV interface {
 | Ichimoku Cloud | `NewIchimoku(conv, base, spanB, shift)` | `[tenkan, kijun, spanA, spanB]` |
 | ADX | `NewADX(period)` | `[adx]` |
 | Supertrend | `NewSupertrend(period, multiplier)` | `[supertrend, direction]` |
+| ZigZag | `NewZigZag(deviation, minTrendLength)` | `[lastHigh, lastLow, event]` |
 
 ### Momentum
 
@@ -145,6 +146,7 @@ WMA              ~4.5 ns/op    0 B/op    0 allocs/op
 Momentum         ~4.3 ns/op    0 B/op    0 allocs/op
 BullBearPower    ~4.8 ns/op    0 B/op    0 allocs/op
 VWMA             ~5.7 ns/op    0 B/op    0 allocs/op
+ZigZag           ~6.6 ns/op    0 B/op    0 allocs/op
 ATR              ~6.9 ns/op    0 B/op    0 allocs/op
 MACD             ~7.0 ns/op    0 B/op    0 allocs/op
 VWAP             ~8.3 ns/op    0 B/op    0 allocs/op

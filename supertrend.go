@@ -4,7 +4,7 @@ import "fmt"
 
 // Supertrend is an ATR-based trailing-stop trend indicator.
 //
-// Output layout: [supertrend, direction], where direction is +1 in uptrend
+// Output layout: [Supertrend, Direction], where direction is +1 in uptrend
 // (line below price, acting as support) and -1 in downtrend (line above price,
 // acting as resistance).
 type Supertrend struct {

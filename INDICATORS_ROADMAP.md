@@ -35,6 +35,7 @@
 | 29 | TEMA | Moving Average | 7/10 |
 | 30 | Donchian Channel | Volatility | 7/10 |
 | 31 | Pivot Points | Support/Resistance | 8/10 |
+| 32 | ZigZag | Pattern | 5/10 |
 
 ## To Build
 
@@ -69,7 +70,6 @@ Sorted by priority. Usage is approximate popularity among retail/algo traders.
 | 31 | RVI (Relative Vigor Index) | Momentum | 4/10 | Compares close-open to high-low range. Measures conviction of moves |
 | 32 | Elder Ray (Bull/Bear Power) | Momentum | 4/10 | You have Bull Bear Power already; this is the full Elder Ray system with EMA |
 | 33 | Chop Index (CHOP) | Volatility | 5/10 | Measures if market is choppy (ranging) or trending. Good as a filter |
-| 34 | ZigZag | Pattern | 5/10 | Connects swing highs/lows filtering noise by %. Not predictive but useful for pattern detection |
 | 35 | Fibonacci Retracement | Support/Resistance | 8/10 | Not a traditional indicator, but worth having as a utility. Every trader knows Fib levels |
 | 36 | Linear Regression Channel | Statistical | 5/10 | Regression line + stddev bands. Used for mean-reversion and trend channels |
 | 38 | ADR (Average Daily Range) | Volatility | 6/10 | Average of daily high-low range. Day traders use it to gauge how much room a move has left. Anchored |
