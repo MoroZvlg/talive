@@ -93,6 +93,7 @@ type OHLCV interface {
 | Variance | `NewVariance(period)` | `[variance]` |
 | Keltner Channels | `NewKeltnerChannels(period, atrPeriod, multiplier)` | `[upper, basis, lower]` |
 | Donchian Channel | `NewDonchianChannels(period)` | `[upper, mid, lower]` |
+| Pivot Points | `NewPivotPoints()` | `[pp, r1, r2, r3, s1, s2, s3]` |
 
 ### Volume
 
@@ -159,6 +160,7 @@ SAR             ~15.8 ns/op    0 B/op    0 allocs/op
 UO              ~16.0 ns/op    0 B/op    0 allocs/op
 Supertrend      ~17.2 ns/op    0 B/op    0 allocs/op
 ADX             ~21.3 ns/op    0 B/op    0 allocs/op
+PivotPoints     ~22.8 ns/op    0 B/op    0 allocs/op
 Ichimoku        ~50.1 ns/op    0 B/op    0 allocs/op
 DonchianChannels ~54.5 ns/op   0 B/op    0 allocs/op
 StochasticRSI   ~68.5 ns/op    0 B/op    0 allocs/op
