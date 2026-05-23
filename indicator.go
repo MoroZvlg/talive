@@ -64,11 +64,17 @@ type Scalar interface {
 }
 
 // Anchored extends Indicator for indicators whose accumulated state can be cleared
-// and started fresh at a chosen point (e.g. VWAP, Pivot Points, ADR).
+// and started fresh at a chosen point (e.g. VWAP, Pivot Points).
+//
+// IdlePeriod and WarmUpPeriod are not meaningful for Anchored indicators — when
+// they exit idle depends on the anchor mode and candle frequency, not a fixed
+// candle count.
 type Anchored interface {
 	Indicator
 
-	// Reset clears accumulated state and returns the indicator to its initial idle state.
+	// Reset triggers a manual anchor flip — the same operation auto-anchor
+	// performs on a calendar boundary. Use for boundaries that can't be derived
+	// from timestamps (session opens, ex-dividend dates, corporate actions).
 	Reset()
 }
 

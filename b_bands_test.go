@@ -182,7 +182,7 @@ func Benchmark_BBands_Current_Allocations(benchmark *testing.B) {
 	dataLen := len(candles)
 	benchmark.Run("BBands (20, 2.0, 2.0, SMA)", func(benchmark *testing.B) {
 		indicator, _ := talive.NewBBands(20, 2.0, 2.0)
-		dataIndex := 0
+		dataIndex := primeForCurrentBench(indicator, candles)
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)
@@ -191,7 +191,7 @@ func Benchmark_BBands_Current_Allocations(benchmark *testing.B) {
 	})
 	benchmark.Run("BBands (2, 0.1, 0.1, SMA)", func(benchmark *testing.B) {
 		indicator, _ := talive.NewBBands(2, 0.1, 0.1)
-		dataIndex := 0
+		dataIndex := primeForCurrentBench(indicator, candles)
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)
@@ -201,7 +201,7 @@ func Benchmark_BBands_Current_Allocations(benchmark *testing.B) {
 	benchmark.Run("BBands (30, 3.0, 3.0, EMA)", func(benchmark *testing.B) {
 		indicator, _ := talive.NewBBands(30, 3.0, 3.0)
 		indicator.WithMA(talive.UseEMA)
-		dataIndex := 0
+		dataIndex := primeForCurrentBench(indicator, candles)
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)

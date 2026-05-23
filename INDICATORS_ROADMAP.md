@@ -33,6 +33,13 @@
 | 27 | Keltner Channel | Volatility | 8/10 |
 | 28 | DEMA | Moving Average | 7/10 |
 | 29 | TEMA | Moving Average | 7/10 |
+| 30 | Donchian Channel | Volatility | 7/10 |
+| 31 | Pivot Points | Support/Resistance | 8/10 |
+| 32 | ZigZag | Pattern | 5/10 |
+| 33 | ADR (Average Daily Range) | Volatility | 6/10 |
+| 34 | ADL (Accumulation/Distribution) | Volume | 7/10 |
+| 35 | KAMA (Kaufman Adaptive MA) | Moving Average | 6/10 |
+| 36 | Pivot High Low | Pattern | 6/10 |
 
 ## To Build
 
@@ -42,17 +49,13 @@ Sorted by priority. Usage is approximate popularity among retail/algo traders.
 |----------|-----------|----------|-------|---------|
 | 5 | Aroon | Trend | 7/10 | Measures time since highest high / lowest low. Good for detecting new trends |
 | 6 | ROC (Rate of Change) | Momentum | 7/10 | Percentage price change over N periods. Simple, widely used in screening |
-| 7 | Pivot Points | Support/Resistance | 8/10 | Standard, Fibonacci, Camarilla, Woodie. Floor traders' tool, still very relevant. Anchored |
-| 8 | Donchian Channel | Volatility | 7/10 | Highest high / lowest low channel. Turtle Traders made it famous. Basis for Supertrend-like strategies |
-| 9 | CMF (Chaikin Money Flow) | Volume | 7/10 | Money flow over N periods. Shows buying/selling pressure. Common screener filter |
-| 10 | ADL (Accumulation/Distribution) | Volume | 7/10 | Cumulative volume-price indicator. Foundation for CMF. Divergence with price = strong signal |
+| 8 | CMF (Chaikin Money Flow) | Volume | 7/10 | Money flow over N periods. Shows buying/selling pressure. Common screener filter |
 | 11 | TRIX | Momentum | 6/10 | Triple-smoothed EMA rate of change. Good noise filter, used for signal line crossovers |
 | 12 | EOM (Ease of Movement) | Volume | 5/10 | Relates price change to volume. Useful for detecting low-volume breakouts |
 | 13 | PPO (Percentage Price Osc) | Momentum | 6/10 | Normalized MACD (percentage). Allows comparison across different price levels |
 | 14 | DPO (Detrended Price Osc) | Momentum | 5/10 | Removes trend to isolate cycles. Niche but used in cycle analysis |
 | 15 | Chande Momentum Osc (CMO) | Momentum | 5/10 | Like RSI but unsmoothed. Used in adaptive MA systems (Chande's VIDYA) |
 | 16 | VIDYA | Moving Average | 5/10 | Volatility-adaptive MA using CMO. Adjusts speed based on market conditions |
-| 17 | KAMA (Kaufman Adaptive MA) | Moving Average | 6/10 | Adapts to noise level. Less whipsaw than EMA in ranging markets |
 | 18 | Coppock Curve | Momentum | 4/10 | Long-term momentum for monthly charts. Originally for S&P 500 bottom detection |
 | 19 | KST (Know Sure Thing) | Momentum | 5/10 | Weighted sum of 4 ROC smoothed values. Martin Pring's trend confirmation tool |
 | 20 | Mass Index | Volatility | 4/10 | Detects trend reversals via range narrowing/widening ("reversal bulge") |
@@ -69,8 +72,5 @@ Sorted by priority. Usage is approximate popularity among retail/algo traders.
 | 31 | RVI (Relative Vigor Index) | Momentum | 4/10 | Compares close-open to high-low range. Measures conviction of moves |
 | 32 | Elder Ray (Bull/Bear Power) | Momentum | 4/10 | You have Bull Bear Power already; this is the full Elder Ray system with EMA |
 | 33 | Chop Index (CHOP) | Volatility | 5/10 | Measures if market is choppy (ranging) or trending. Good as a filter |
-| 34 | ZigZag | Pattern | 5/10 | Connects swing highs/lows filtering noise by %. Not predictive but useful for pattern detection |
 | 35 | Fibonacci Retracement | Support/Resistance | 8/10 | Not a traditional indicator, but worth having as a utility. Every trader knows Fib levels |
 | 36 | Linear Regression Channel | Statistical | 5/10 | Regression line + stddev bands. Used for mean-reversion and trend channels |
-| 37 | Standard Deviation | Statistical | 6/10 | Building block for BBands and other indicators. Useful standalone for volatility screening |
-| 38 | ADR (Average Daily Range) | Volatility | 6/10 | Average of daily high-low range. Day traders use it to gauge how much room a move has left. Anchored |

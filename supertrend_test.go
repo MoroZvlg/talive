@@ -142,7 +142,7 @@ func Benchmark_Supertrend_Current_Allocations(b *testing.B) {
 
 	b.Run("Supertrend(2,1)", func(b *testing.B) {
 		indicator, _ := talive.NewSupertrend(2, 1)
-		dataIndex := 0
+		dataIndex := primeForCurrentBench(indicator, candles)
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)
@@ -151,7 +151,7 @@ func Benchmark_Supertrend_Current_Allocations(b *testing.B) {
 	})
 	b.Run("Supertrend(10,3)", func(b *testing.B) {
 		indicator, _ := talive.NewSupertrend(10, 3)
-		dataIndex := 0
+		dataIndex := primeForCurrentBench(indicator, candles)
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)

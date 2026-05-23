@@ -133,7 +133,7 @@ func Benchmark_Sar_Current_Allocations(benchmark *testing.B) {
 
 	benchmark.Run("SAR(0.01,0.01,0.01)", func(benchmark *testing.B) {
 		indicator, _ := talive.NewSAR(0.01, 0.01, 0.01)
-		dataIndex := 0
+		dataIndex := primeForCurrentBench(indicator, candles)
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)
@@ -142,7 +142,7 @@ func Benchmark_Sar_Current_Allocations(benchmark *testing.B) {
 	})
 	benchmark.Run("SAR(0.02,0.02,0.2)", func(benchmark *testing.B) {
 		indicator, _ := talive.NewSAR(0.02, 0.02, 0.2)
-		dataIndex := 0
+		dataIndex := primeForCurrentBench(indicator, candles)
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)
@@ -151,7 +151,7 @@ func Benchmark_Sar_Current_Allocations(benchmark *testing.B) {
 	})
 	benchmark.Run("SAR(0.05,0.05,0.5)", func(benchmark *testing.B) {
 		indicator, _ := talive.NewSAR(0.05, 0.05, 0.5)
-		dataIndex := 0
+		dataIndex := primeForCurrentBench(indicator, candles)
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)

@@ -62,7 +62,7 @@ func (stoch *Stochastic) Current(candle OHLCV) []float64 {
 	}
 
 	lowestV := min(stoch.lowest.MinExceptLast(), candle.Low())
-	highestV := max(stoch.highest.MinExceptLast(), candle.High())
+	highestV := max(stoch.highest.MaxExceptLast(), candle.High())
 
 	value := (candle.Close() - lowestV) / (highestV - lowestV) * 100.0
 	kSmooth := stoch.kMA.CurrentVal(value)

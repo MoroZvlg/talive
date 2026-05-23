@@ -119,7 +119,7 @@ func Benchmark_ATR_Current_Allocations(b *testing.B) {
 
 	b.Run("ATR(2)", func(b *testing.B) {
 		indicator, _ := talive.NewATR(2)
-		dataIndex := 0
+		dataIndex := primeForCurrentBench(indicator, candles)
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)
@@ -128,7 +128,7 @@ func Benchmark_ATR_Current_Allocations(b *testing.B) {
 	})
 	b.Run("ATR(50)", func(b *testing.B) {
 		indicator, _ := talive.NewATR(50)
-		dataIndex := 0
+		dataIndex := primeForCurrentBench(indicator, candles)
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)

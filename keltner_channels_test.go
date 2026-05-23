@@ -182,7 +182,7 @@ func Benchmark_KeltnerChannels_Current_Allocations(b *testing.B) {
 	dataLen := len(candles)
 	b.Run("KeltnerChannels(20,10,2.0)", func(b *testing.B) {
 		indicator, _ := talive.NewKeltnerChannels(20, 10, 2.0)
-		dataIndex := 0
+		dataIndex := primeForCurrentBench(indicator, candles)
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)
@@ -191,7 +191,7 @@ func Benchmark_KeltnerChannels_Current_Allocations(b *testing.B) {
 	})
 	b.Run("KeltnerChannels(2,2,1.0)", func(b *testing.B) {
 		indicator, _ := talive.NewKeltnerChannels(2, 2, 1.0)
-		dataIndex := 0
+		dataIndex := primeForCurrentBench(indicator, candles)
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)

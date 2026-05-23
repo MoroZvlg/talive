@@ -119,7 +119,7 @@ func Benchmark_Tema_Current_Allocations(b *testing.B) {
 	dataLen := len(candles)
 	b.Run("TEMA(2)", func(b *testing.B) {
 		indicator, _ := talive.NewTEMA(2)
-		dataIndex := 0
+		dataIndex := primeForCurrentBench(indicator, candles)
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)
@@ -128,7 +128,7 @@ func Benchmark_Tema_Current_Allocations(b *testing.B) {
 	})
 	b.Run("TEMA(50)", func(b *testing.B) {
 		indicator, _ := talive.NewTEMA(50)
-		dataIndex := 0
+		dataIndex := primeForCurrentBench(indicator, candles)
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)

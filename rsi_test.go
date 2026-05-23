@@ -132,7 +132,7 @@ func Benchmark_Rsi_Current_Allocations(benchmark *testing.B) {
 	dataLen := len(candles)
 	benchmark.Run("RSI 2", func(benchmark *testing.B) {
 		indicator, _ := talive.NewRSI(2)
-		dataIndex := 0
+		dataIndex := primeForCurrentBench(indicator, candles)
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)
@@ -141,7 +141,7 @@ func Benchmark_Rsi_Current_Allocations(benchmark *testing.B) {
 	})
 	benchmark.Run("RSI 14", func(benchmark *testing.B) {
 		indicator, _ := talive.NewRSI(14)
-		dataIndex := 0
+		dataIndex := primeForCurrentBench(indicator, candles)
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)
@@ -150,7 +150,7 @@ func Benchmark_Rsi_Current_Allocations(benchmark *testing.B) {
 	})
 	benchmark.Run("RSI 100", func(benchmark *testing.B) {
 		indicator, _ := talive.NewRSI(100)
-		dataIndex := 0
+		dataIndex := primeForCurrentBench(indicator, candles)
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)

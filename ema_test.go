@@ -145,7 +145,7 @@ func Benchmark_Ema_Current_Allocations(benchmark *testing.B) {
 	dataLen := len(candles)
 	benchmark.Run("EMA 2", func(benchmark *testing.B) {
 		indicator, _ := talive.NewEMA(2)
-		dataIndex := 0
+		dataIndex := primeForCurrentBench(indicator, candles)
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)
@@ -154,7 +154,7 @@ func Benchmark_Ema_Current_Allocations(benchmark *testing.B) {
 	})
 	benchmark.Run("EMA 50", func(benchmark *testing.B) {
 		indicator, _ := talive.NewEMA(50)
-		dataIndex := 0
+		dataIndex := primeForCurrentBench(indicator, candles)
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)
@@ -163,7 +163,7 @@ func Benchmark_Ema_Current_Allocations(benchmark *testing.B) {
 	})
 	benchmark.Run("EMA 100", func(benchmark *testing.B) {
 		indicator, _ := talive.NewEMA(100)
-		dataIndex := 0
+		dataIndex := primeForCurrentBench(indicator, candles)
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)
@@ -172,7 +172,7 @@ func Benchmark_Ema_Current_Allocations(benchmark *testing.B) {
 	})
 	benchmark.Run("EMA 1000", func(benchmark *testing.B) {
 		indicator, _ := talive.NewEMA(1000)
-		dataIndex := 0
+		dataIndex := primeForCurrentBench(indicator, candles)
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)

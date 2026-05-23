@@ -117,7 +117,7 @@ func Benchmark_Momentum_Current_Allocations(benchmark *testing.B) {
 	dataLen := len(candles)
 	benchmark.Run("Momentum 2", func(benchmark *testing.B) {
 		indicator, _ := talive.NewMomentum(2)
-		dataIndex := 0
+		dataIndex := primeForCurrentBench(indicator, candles)
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)
@@ -126,7 +126,7 @@ func Benchmark_Momentum_Current_Allocations(benchmark *testing.B) {
 	})
 	benchmark.Run("Momentum 50", func(benchmark *testing.B) {
 		indicator, _ := talive.NewMomentum(50)
-		dataIndex := 0
+		dataIndex := primeForCurrentBench(indicator, candles)
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)

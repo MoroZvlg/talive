@@ -119,7 +119,7 @@ func Benchmark_Dema_Current_Allocations(b *testing.B) {
 	dataLen := len(candles)
 	b.Run("DEMA(2)", func(b *testing.B) {
 		indicator, _ := talive.NewDEMA(2)
-		dataIndex := 0
+		dataIndex := primeForCurrentBench(indicator, candles)
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)
@@ -128,7 +128,7 @@ func Benchmark_Dema_Current_Allocations(b *testing.B) {
 	})
 	b.Run("DEMA(50)", func(b *testing.B) {
 		indicator, _ := talive.NewDEMA(50)
-		dataIndex := 0
+		dataIndex := primeForCurrentBench(indicator, candles)
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)

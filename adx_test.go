@@ -134,7 +134,7 @@ func Benchmark_ADX_Current_Allocations(b *testing.B) {
 
 	b.Run("ADX(2)", func(b *testing.B) {
 		indicator, _ := talive.NewADX(2)
-		dataIndex := 0
+		dataIndex := primeForCurrentBench(indicator, candles)
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)
@@ -143,7 +143,7 @@ func Benchmark_ADX_Current_Allocations(b *testing.B) {
 	})
 	b.Run("ADX(14)", func(b *testing.B) {
 		indicator, _ := talive.NewADX(14)
-		dataIndex := 0
+		dataIndex := primeForCurrentBench(indicator, candles)
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)
@@ -152,7 +152,7 @@ func Benchmark_ADX_Current_Allocations(b *testing.B) {
 	})
 	b.Run("ADX(50)", func(b *testing.B) {
 		indicator, _ := talive.NewADX(50)
-		dataIndex := 0
+		dataIndex := primeForCurrentBench(indicator, candles)
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)

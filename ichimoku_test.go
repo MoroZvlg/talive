@@ -146,7 +146,7 @@ func Benchmark_Ichimoku_Current_Allocations(benchmark *testing.B) {
 	dataLen := len(candles)
 	benchmark.Run("Ichimoku 9,26,52,26", func(benchmark *testing.B) {
 		indicator, _ := talive.NewIchimoku(9, 26, 52, 26)
-		dataIndex := 0
+		dataIndex := primeForCurrentBench(indicator, candles)
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)
@@ -155,7 +155,7 @@ func Benchmark_Ichimoku_Current_Allocations(benchmark *testing.B) {
 	})
 	benchmark.Run("Ichimoku 2,3,4,5", func(benchmark *testing.B) {
 		indicator, _ := talive.NewIchimoku(2, 3, 4, 5)
-		dataIndex := 0
+		dataIndex := primeForCurrentBench(indicator, candles)
 		benchmark.ResetTimer()
 		for i := 0; i < benchmark.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)

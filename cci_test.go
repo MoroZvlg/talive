@@ -133,7 +133,7 @@ func Benchmark_CCI_Current_Allocations(b *testing.B) {
 
 	b.Run("CCI(2)", func(b *testing.B) {
 		indicator, _ := talive.NewCCI(2)
-		dataIndex := 0
+		dataIndex := primeForCurrentBench(indicator, candles)
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)
@@ -142,7 +142,7 @@ func Benchmark_CCI_Current_Allocations(b *testing.B) {
 	})
 	b.Run("CCI(20)", func(b *testing.B) {
 		indicator, _ := talive.NewCCI(20)
-		dataIndex := 0
+		dataIndex := primeForCurrentBench(indicator, candles)
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)
@@ -151,7 +151,7 @@ func Benchmark_CCI_Current_Allocations(b *testing.B) {
 	})
 	b.Run("CCI(50)", func(b *testing.B) {
 		indicator, _ := talive.NewCCI(50)
-		dataIndex := 0
+		dataIndex := primeForCurrentBench(indicator, candles)
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
 			dataIndex = limitedDataIndex(dataIndex, dataLen)

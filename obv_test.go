@@ -118,7 +118,7 @@ func Benchmark_OBV_Current_Allocations(benchmark *testing.B) {
 	candles, _ := readCandles("test_data/input_data2.csv")
 	dataLen := len(candles)
 	indicator, _ := talive.NewOBV()
-	dataIndex := 0
+	dataIndex := primeForCurrentBench(indicator, candles)
 	benchmark.ResetTimer()
 	for i := 0; i < benchmark.N; i++ {
 		dataIndex = limitedDataIndex(dataIndex, dataLen)

@@ -133,6 +133,23 @@ func (buf *ringBuffer) Len() int {
 	return len(buf.buffer)
 }
 
+// Cap returns the buffer's fixed capacity.
+func (buf *ringBuffer) Cap() int {
+	return buf.capacity
+}
+
+// At returns the element at logical position i, where 0 is the oldest and
+// Len()-1 is the newest. Out-of-range access panics like a slice.
+func (buf *ringBuffer) At(i int) float64 {
+	if i < 0 || i >= len(buf.buffer) {
+		panic("ringBuffer: At index out of range")
+	}
+	if len(buf.buffer) < buf.capacity {
+		return buf.buffer[i]
+	}
+	return buf.buffer[(buf.writeIdx+i)%buf.capacity]
+}
+
 func (buf *ringBuffer) incrWriteIdx() {
 	if buf.writeIdx == (buf.capacity - 1) {
 		buf.writeIdx = 0
