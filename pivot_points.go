@@ -8,6 +8,7 @@ import (
 // PivotType defines the formula variant used by Pivot Points.
 type PivotType int
 
+// Supported pivot formulas.
 const (
 	PivotStandard PivotType = iota
 	PivotFibonacci
