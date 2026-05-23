@@ -296,3 +296,24 @@ func Test_WarmUpAnalyze_ADX(t *testing.T) {
 	}
 	runWarmUpAnalysis(t, "ADX", factory, periods2to99(), []int{8})
 }
+
+// ============================================================
+// KAMA (vary slowPeriod, fix period=10, fastPeriod=2)
+//
+// SlowPeriod drives worst-case memory: in choppy markets ER->0 so the
+// smoothing constant collapses to slowAlpha^2, giving an effective half-life
+// of ~slowPeriod^2/4 candles. Multipliers on Period (the ER lookback) would
+// understate this. We vary slowPeriod and report warmup as slowPeriod*M.
+// ============================================================
+
+func Test_WarmUpAnalyze_KAMA(t *testing.T) {
+	factory := func(slowPeriod int) (func(c *testCandle) []float64, int, int) {
+		ind, _ := talive.NewKAMA(10, 2, slowPeriod)
+		return func(c *testCandle) []float64 { return ind.Next(c) }, 1, ind.IdlePeriod()
+	}
+	params := make([]int, 0, 51)
+	for i := 10; i <= 60; i++ {
+		params = append(params, i)
+	}
+	runWarmUpAnalysis(t, "KAMA", factory, params, []int{1, 2, 3, 4, 5, 6, 7})
+}

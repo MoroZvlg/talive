@@ -38,6 +38,7 @@
 | 32 | ZigZag | Pattern | 5/10 |
 | 33 | ADR (Average Daily Range) | Volatility | 6/10 |
 | 34 | ADL (Accumulation/Distribution) | Volume | 7/10 |
+| 35 | KAMA (Kaufman Adaptive MA) | Moving Average | 6/10 |
 
 ## To Build
 
@@ -54,7 +55,6 @@ Sorted by priority. Usage is approximate popularity among retail/algo traders.
 | 14 | DPO (Detrended Price Osc) | Momentum | 5/10 | Removes trend to isolate cycles. Niche but used in cycle analysis |
 | 15 | Chande Momentum Osc (CMO) | Momentum | 5/10 | Like RSI but unsmoothed. Used in adaptive MA systems (Chande's VIDYA) |
 | 16 | VIDYA | Moving Average | 5/10 | Volatility-adaptive MA using CMO. Adjusts speed based on market conditions |
-| 17 | KAMA (Kaufman Adaptive MA) | Moving Average | 6/10 | Adapts to noise level. Less whipsaw than EMA in ranging markets |
 | 18 | Coppock Curve | Momentum | 4/10 | Long-term momentum for monthly charts. Originally for S&P 500 bottom detection |
 | 19 | KST (Know Sure Thing) | Momentum | 5/10 | Weighted sum of 4 ROC smoothed values. Martin Pring's trend confirmation tool |
 | 20 | Mass Index | Volatility | 4/10 | Detects trend reversals via range narrowing/widening ("reversal bulge") |

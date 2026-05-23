@@ -63,6 +63,7 @@ type OHLCV interface {
 | WMA | `NewWMA(period)` | `[wma]` |
 | HMA | `NewHMA(period)` | `[hma]` |
 | VWMA | `NewVWMA(period)` | `[vwma]` |
+| KAMA | `NewKAMA(period, fastPeriod, slowPeriod)` | `[kama]` |
 | MACD | `NewMACD(fast, slow, signal)` | `[macd, signal, hist]` |
 | Bollinger Bands | `NewBBands(period, upMult, downMult, maType)` | `[upper, mid, lower]` |
 | Parabolic SAR | `NewSAR(start, increment, maxAF)` | `[sar]` |
@@ -153,6 +154,7 @@ VWMA             ~5.7 ns/op    0 B/op    0 allocs/op
 ZigZag           ~6.6 ns/op    0 B/op    0 allocs/op
 ATR              ~6.9 ns/op    0 B/op    0 allocs/op
 MACD             ~7.0 ns/op    0 B/op    0 allocs/op
+KAMA             ~7.1 ns/op    0 B/op    0 allocs/op
 VWAP             ~8.3 ns/op    0 B/op    0 allocs/op
 AO               ~8.6 ns/op    0 B/op    0 allocs/op
 BBands          ~10.4 ns/op    0 B/op    0 allocs/op
