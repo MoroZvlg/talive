@@ -71,6 +71,7 @@ type OHLCV interface {
 | ADX | `NewADX(period)` | `[adx]` |
 | Supertrend | `NewSupertrend(period, multiplier)` | `[supertrend, direction]` |
 | ZigZag | `NewZigZag(deviation, minTrendLength)` | `[lastHigh, lastLow, event]` |
+| Pivot High Low | `NewPivotHL(leftBars, rightBars)` | `[lastPivotHigh, lastPivotLow, event]` |
 
 ### Momentum
 
@@ -170,6 +171,7 @@ UO              ~16.0 ns/op    0 B/op    0 allocs/op
 Supertrend      ~17.2 ns/op    0 B/op    0 allocs/op
 ADX             ~21.3 ns/op    0 B/op    0 allocs/op
 PivotPoints     ~22.8 ns/op    0 B/op    0 allocs/op
+PivotHL         ~26.8 ns/op    0 B/op    0 allocs/op
 Ichimoku        ~50.1 ns/op    0 B/op    0 allocs/op
 DonchianChannels ~54.5 ns/op   0 B/op    0 allocs/op
 StochasticRSI   ~68.5 ns/op    0 B/op    0 allocs/op

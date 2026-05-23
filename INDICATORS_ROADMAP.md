@@ -39,6 +39,7 @@
 | 33 | ADR (Average Daily Range) | Volatility | 6/10 |
 | 34 | ADL (Accumulation/Distribution) | Volume | 7/10 |
 | 35 | KAMA (Kaufman Adaptive MA) | Moving Average | 6/10 |
+| 36 | Pivot High Low | Pattern | 6/10 |
 
 ## To Build
 
