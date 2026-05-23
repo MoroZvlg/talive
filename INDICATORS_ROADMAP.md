@@ -36,6 +36,7 @@
 | 30 | Donchian Channel | Volatility | 7/10 |
 | 31 | Pivot Points | Support/Resistance | 8/10 |
 | 32 | ZigZag | Pattern | 5/10 |
+| 33 | ADR (Average Daily Range) | Volatility | 6/10 |
 
 ## To Build
 
@@ -72,4 +73,3 @@ Sorted by priority. Usage is approximate popularity among retail/algo traders.
 | 33 | Chop Index (CHOP) | Volatility | 5/10 | Measures if market is choppy (ranging) or trending. Good as a filter |
 | 35 | Fibonacci Retracement | Support/Resistance | 8/10 | Not a traditional indicator, but worth having as a utility. Every trader knows Fib levels |
 | 36 | Linear Regression Channel | Statistical | 5/10 | Regression line + stddev bands. Used for mean-reversion and trend channels |
-| 38 | ADR (Average Daily Range) | Volatility | 6/10 | Average of daily high-low range. Day traders use it to gauge how much room a move has left. Anchored |

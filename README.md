@@ -90,6 +90,7 @@ type OHLCV interface {
 | Indicator | Constructor | Output |
 |-----------|-------------|--------|
 | ATR | `NewATR(period)` | `[atr]` |
+| ADR | `NewADR(period)` | `[adr]` |
 | StdDev | `NewStdDev(period, ddof)` | `[stddev]` |
 | Variance | `NewVariance(period)` | `[variance]` |
 | Keltner Channels | `NewKeltnerChannels(period, atrPeriod, multiplier)` | `[upper, basis, lower]` |
@@ -106,8 +107,9 @@ type OHLCV interface {
 
 ### Anchored indicators
 
-Some indicators (currently `OBV` and `VWAP`) accumulate state from an anchor point and need
-to be reset at session/period boundaries. They implement the `Anchored` interface:
+Some indicators accumulate state from an anchor point or publish values from completed
+anchor periods, and need to be reset at session/period boundaries. They implement the
+`Anchored` interface:
 
 ```go
 type Anchored interface {
@@ -145,6 +147,7 @@ SMA              ~4.2 ns/op    0 B/op    0 allocs/op
 WMA              ~4.5 ns/op    0 B/op    0 allocs/op
 Momentum         ~4.3 ns/op    0 B/op    0 allocs/op
 BullBearPower    ~4.8 ns/op    0 B/op    0 allocs/op
+ADR              ~5.1 ns/op    0 B/op    0 allocs/op
 VWMA             ~5.7 ns/op    0 B/op    0 allocs/op
 ZigZag           ~6.6 ns/op    0 B/op    0 allocs/op
 ATR              ~6.9 ns/op    0 B/op    0 allocs/op

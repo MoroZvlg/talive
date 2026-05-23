@@ -64,7 +64,7 @@ type Scalar interface {
 }
 
 // Anchored extends Indicator for indicators whose accumulated state can be cleared
-// and started fresh at a chosen point (e.g. VWAP, Pivot Points, ADR).
+// and started fresh at a chosen point (e.g. VWAP, Pivot Points).
 //
 // IdlePeriod and WarmUpPeriod are not meaningful for Anchored indicators — when
 // they exit idle depends on the anchor mode and candle frequency, not a fixed
