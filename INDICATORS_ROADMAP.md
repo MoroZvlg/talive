@@ -37,6 +37,7 @@
 | 31 | Pivot Points | Support/Resistance | 8/10 |
 | 32 | ZigZag | Pattern | 5/10 |
 | 33 | ADR (Average Daily Range) | Volatility | 6/10 |
+| 34 | ADL (Accumulation/Distribution) | Volume | 7/10 |
 
 ## To Build
 
@@ -47,7 +48,6 @@ Sorted by priority. Usage is approximate popularity among retail/algo traders.
 | 5 | Aroon | Trend | 7/10 | Measures time since highest high / lowest low. Good for detecting new trends |
 | 6 | ROC (Rate of Change) | Momentum | 7/10 | Percentage price change over N periods. Simple, widely used in screening |
 | 8 | CMF (Chaikin Money Flow) | Volume | 7/10 | Money flow over N periods. Shows buying/selling pressure. Common screener filter |
-| 9 | ADL (Accumulation/Distribution) | Volume | 7/10 | Cumulative volume-price indicator. Foundation for CMF. Divergence with price = strong signal |
 | 11 | TRIX | Momentum | 6/10 | Triple-smoothed EMA rate of change. Good noise filter, used for signal line crossovers |
 | 12 | EOM (Ease of Movement) | Volume | 5/10 | Relates price change to volume. Useful for detecting low-volume breakouts |
 | 13 | PPO (Percentage Price Osc) | Momentum | 6/10 | Normalized MACD (percentage). Allows comparison across different price levels |

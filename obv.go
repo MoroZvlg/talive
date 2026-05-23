@@ -5,8 +5,7 @@ import (
 	"time"
 )
 
-// OBV is an On Balance Volume indicator. Implements Anchored — use WithAnchor for
-// time-based auto-reset (session/daily-anchored OBV), or call Reset manually.
+// OBV is an On Balance Volume indicator.
 type OBV struct {
 	AnchorMode Anchor
 

@@ -101,6 +101,7 @@ type OHLCV interface {
 
 | Indicator | Constructor | Output |
 |-----------|-------------|--------|
+| Accumulation/Distribution Line | `NewADL()` | `[adl]` |
 | OBV | `NewOBV()` | `[obv]` |
 | VWAP | `NewVWAP()` | `[vwap, upper1, lower1, ...]` |
 | MFI | `NewMFI(period)` | `[mfi]` |
@@ -156,6 +157,7 @@ VWAP             ~8.3 ns/op    0 B/op    0 allocs/op
 AO               ~8.6 ns/op    0 B/op    0 allocs/op
 BBands          ~10.4 ns/op    0 B/op    0 allocs/op
 RSI             ~10.5 ns/op    0 B/op    0 allocs/op
+ADL             ~10.7 ns/op    0 B/op    0 allocs/op
 OBV             ~11.6 ns/op    0 B/op    0 allocs/op
 MFI             ~12.5 ns/op    0 B/op    0 allocs/op
 HMA             ~12.7 ns/op    0 B/op    0 allocs/op
