@@ -40,6 +40,7 @@
 | 34 | ADL (Accumulation/Distribution) | Volume | 7/10 |
 | 35 | KAMA (Kaufman Adaptive MA) | Moving Average | 6/10 |
 | 36 | Pivot High Low | Pattern | 6/10 |
+| 37 | Aroon | Trend | 7/10 |
 
 ## To Build
 
@@ -47,7 +48,6 @@ Sorted by priority. Usage is approximate popularity among retail/algo traders.
 
 | Priority | Indicator | Category | Usage | Comment |
 |----------|-----------|----------|-------|---------|
-| 5 | Aroon | Trend | 7/10 | Measures time since highest high / lowest low. Good for detecting new trends |
 | 6 | ROC (Rate of Change) | Momentum | 7/10 | Percentage price change over N periods. Simple, widely used in screening |
 | 8 | CMF (Chaikin Money Flow) | Volume | 7/10 | Money flow over N periods. Shows buying/selling pressure. Common screener filter |
 | 11 | TRIX | Momentum | 6/10 | Triple-smoothed EMA rate of change. Good noise filter, used for signal line crossovers |
