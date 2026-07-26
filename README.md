@@ -69,6 +69,7 @@ type OHLCV interface {
 | Parabolic SAR | `NewSAR(start, increment, maxAF)` | `[sar]` |
 | Ichimoku Cloud | `NewIchimoku(conv, base, spanB, shift)` | `[tenkan, kijun, spanA, spanB]` |
 | ADX | `NewADX(period)` | `[adx]` |
+| Aroon | `NewAroon(period)` | `[aroonUp, aroonDown]` |
 | Supertrend | `NewSupertrend(period, multiplier)` | `[supertrend, direction]` |
 | ZigZag | `NewZigZag(deviation, minTrendLength)` | `[lastHigh, lastLow, event]` |
 | Pivot High Low | `NewPivotHL(leftBars, rightBars)` | `[lastPivotHigh, lastPivotLow, event]` |
