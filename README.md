@@ -87,6 +87,7 @@ type OHLCV interface {
 | Awesome Oscillator | `NewAO()` | `[ao]` |
 | Momentum | `NewMomentum(period)` | `[momentum]` |
 | ROC | `NewROC(period)` | `[roc]` |
+| PPO | `NewPPO(fast, slow, signal)` | `[ppo, signal, hist]` |
 | Bull Bear Power | `NewBullBearPower(period)` | `[bbp]` |
 
 ### Volatility
