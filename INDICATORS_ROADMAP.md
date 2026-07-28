@@ -2,17 +2,17 @@
 
 ## Already Implemented
 
-| # | Indicator | Category | Usage |
-|---|-----------|----------|-------|
-| 1 | SMA | Moving Average | 10/10 |
-| 2 | EMA | Moving Average | 10/10 |
-| 3 | WMA | Moving Average | 6/10 |
-| 4 | SMMA (Wilder's) | Moving Average | 5/10 |
-| 5 | HMA | Moving Average | 7/10 |
-| 6 | VWMA | Moving Average | 7/10 |
-| 7 | RSI | Oscillator | 10/10 |
-| 8 | MACD | Trend/Momentum | 10/10 |
-| 9 | Bollinger Bands | Volatility | 10/10 |
+| #  | Indicator | Category | Usage |
+|----|-----------|----------|-------|
+| 1  | SMA | Moving Average | 10/10 |
+| 2  | EMA | Moving Average | 10/10 |
+| 3  | WMA | Moving Average | 6/10 |
+| 4  | SMMA (Wilder's) | Moving Average | 5/10 |
+| 5  | HMA | Moving Average | 7/10 |
+| 6  | VWMA | Moving Average | 7/10 |
+| 7  | RSI | Oscillator | 10/10 |
+| 8  | MACD | Trend/Momentum | 10/10 |
+| 9  | Bollinger Bands | Volatility | 10/10 |
 | 10 | Stochastic | Oscillator | 9/10 |
 | 11 | Stochastic RSI | Oscillator | 8/10 |
 | 12 | ATR | Volatility | 9/10 |
@@ -43,6 +43,7 @@
 | 37 | Aroon | Trend | 7/10 |
 | 38 | ROC (Rate of Change) | Momentum | 7/10 |
 | 39 | CMF (Chaikin Money Flow) | Volume | 7/10 |
+| 40 | PPO (Percentage Price Osc) | Momentum | 6/10 |
 
 ## To Build
 
@@ -52,7 +53,6 @@ Sorted by priority. Usage is approximate popularity among retail/algo traders.
 |----------|-----------|----------|-------|---------|
 | 11 | TRIX | Momentum | 6/10 | Triple-smoothed EMA rate of change. Good noise filter, used for signal line crossovers |
 | 12 | EOM (Ease of Movement) | Volume | 5/10 | Relates price change to volume. Useful for detecting low-volume breakouts |
-| 13 | PPO (Percentage Price Osc) | Momentum | 6/10 | Normalized MACD (percentage). Allows comparison across different price levels |
 | 14 | DPO (Detrended Price Osc) | Momentum | 5/10 | Removes trend to isolate cycles. Niche but used in cycle analysis |
 | 15 | Chande Momentum Osc (CMO) | Momentum | 5/10 | Like RSI but unsmoothed. Used in adaptive MA systems (Chande's VIDYA) |
 | 16 | VIDYA | Moving Average | 5/10 | Volatility-adaptive MA using CMO. Adjusts speed based on market conditions |
