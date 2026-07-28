@@ -42,6 +42,7 @@
 | 36 | Pivot High Low | Pattern | 6/10 |
 | 37 | Aroon | Trend | 7/10 |
 | 38 | ROC (Rate of Change) | Momentum | 7/10 |
+| 39 | CMF (Chaikin Money Flow) | Volume | 7/10 |
 
 ## To Build
 
@@ -49,7 +50,6 @@ Sorted by priority. Usage is approximate popularity among retail/algo traders.
 
 | Priority | Indicator | Category | Usage | Comment |
 |----------|-----------|----------|-------|---------|
-| 8 | CMF (Chaikin Money Flow) | Volume | 7/10 | Money flow over N periods. Shows buying/selling pressure. Common screener filter |
 | 11 | TRIX | Momentum | 6/10 | Triple-smoothed EMA rate of change. Good noise filter, used for signal line crossovers |
 | 12 | EOM (Ease of Movement) | Volume | 5/10 | Relates price change to volume. Useful for detecting low-volume breakouts |
 | 13 | PPO (Percentage Price Osc) | Momentum | 6/10 | Normalized MACD (percentage). Allows comparison across different price levels |
