@@ -43,7 +43,7 @@ func (adl *ADL) Next(candle OHLCV) []float64 {
 	adl.prevTime = ts
 	adl.valueNumber++
 
-	adl.value += adlMoneyFlowVolume(candle)
+	adl.value += adl.moneyFlowVolume(candle)
 	adl.out[0] = adl.value
 	return adl.out
 }
@@ -54,7 +54,7 @@ func (adl *ADL) Current(candle OHLCV) []float64 {
 		value = 0
 	}
 
-	adl.out[0] = value + adlMoneyFlowVolume(candle)
+	adl.out[0] = value + adl.moneyFlowVolume(candle)
 	return adl.out
 }
 
@@ -80,7 +80,7 @@ func (adl *ADL) WarmUpPeriod() int {
 	return adl.IdlePeriod()
 }
 
-func adlMoneyFlowVolume(candle OHLCV) float64 {
+func (adl *ADL) moneyFlowVolume(candle OHLCV) float64 {
 	high, low := candle.High(), candle.Low()
 	if high == low {
 		return 0

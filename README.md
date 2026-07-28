@@ -106,6 +106,7 @@ type OHLCV interface {
 | Indicator | Constructor | Output |
 |-----------|-------------|--------|
 | Accumulation/Distribution Line | `NewADL()` | `[adl]` |
+| CMF | `NewCMF(period)` | `[cmf]` |
 | OBV | `NewOBV()` | `[obv]` |
 | VWAP | `NewVWAP()` | `[vwap, upper1, lower1, ...]` |
 | MFI | `NewMFI(period)` | `[mfi]` |
